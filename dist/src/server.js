@@ -33,5 +33,4 @@ app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server running on port ${PORT}`);
     // await prisma.$connect();
 }));
-console.log("ready");
 //# sourceMappingURL=server.js.map

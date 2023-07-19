@@ -9,6 +9,7 @@
 		"moduleResolution": "node",
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true
+		// "removeComments": true
 	},
 	"include": ["src/**/*", "prisma/index.ts"]
 }

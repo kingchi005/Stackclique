@@ -1,50 +1,70 @@
 import { Router, Request, Response } from "express";
 import { ErrorResponse, SuccessResponse } from "../types";
 import prisma from "../../prisma";
+import { createUserSchema, userInputSchema } from "../schema/inputSchema";
 
 const router = Router();
 
 // GET /user
-// router.get("/", async (req: Request, res: Response) => {
-// 	// const { id } = req.params;
-// 	try {
-// 		const users = {
-// 			name: "Theodore King",
-// 			email: "rem@se.ua",
-// 			phoneId: "08107721911",
-// 			address: "U6FFAGTEgp2xu5Ik0P",
-// 		};
-// 		res.status(200).json({ ok: true, data: users } as SuccessResponse<any>);
-// 	} catch (error) {
-// 		console.error(error);
-// 		res.status(500).send("Internal Server Error");
-// 	}
-// });
-
-// GET /user/:id
-router.get("/:id", async (req: Request, res: Response) => {
-	const { id } = req.params;
+router.get("/", async (req: Request, res: Response) => {
+	// const { id } = req.params;
 	try {
-		const user = await prisma.user.findUnique({ where: { id: Number(id) } });
-		if (!user) {
-			res.status(404).json({
-				ok: false,
-				error: { message: "User not found" },
-			} as ErrorResponse<any>);
-		} else {
-			res
-				.status(200)
-				.json({ ok: true, message: "ready to go" } as SuccessResponse<any>);
-		}
+		const users = await prisma.user.findMany({
+			where: {},
+			select: { id: true, name: true, email: true },
+		});
+		res
+			.status(200)
+			.json(<SuccessResponse<typeof users>>{ ok: true, data: users });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Internal Server Error");
 	}
 });
 
+// GET /user/:id
+router.get("/:id", async (req: Request, res: Response) => {
+	const data = userInputSchema.safeParse(+req.params.id);
+	// return console.log(JSON.stringify(data, null, 2));
+	if (!data.success)
+		return res.status(201).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: data.error.issues[0].message, details: data.error },
+		});
+	try {
+		const user = await prisma.user.findUnique({
+			where: { id: data.data },
+			select: { id: true, name: true, email: true },
+		});
+		if (!user) {
+			res.status(404).json(<ErrorResponse<typeof user>>{
+				ok: false,
+				error: { message: "User not found" },
+			});
+		} else {
+			res
+				.status(200)
+				.json(<SuccessResponse<typeof user>>{ ok: true, data: user });
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(500).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "An error occoured" },
+		});
+	}
+});
+
 // POST /user
 router.post("/", async (req: Request, res: Response) => {
-	const { name, email } = req.body;
+	const safe = createUserSchema.safeParse(req.body);
+	if (!safe.success)
+		return res.status(201).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: safe.error.issues[0].message, details: safe.error },
+		});
+
+	const { name, email } = safe.data;
 	try {
 		const user = await prisma.user.create({
 			data: {
@@ -52,10 +72,17 @@ router.post("/", async (req: Request, res: Response) => {
 				email,
 			},
 		});
-		res.status(201).json(user);
+		res.status(201).json(<SuccessResponse<typeof safe.data>>{
+			ok: true,
+			message: "user created successfully",
+			data: user,
+		});
 	} catch (error) {
 		console.error(error);
-		res.status(500).send("Internal Server Error");
+		res.status(500).json(<ErrorResponse<typeof error>>{
+			ok: true,
+			error: { message: "An error occoured", details: error },
+		});
 	}
 });
 

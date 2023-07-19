@@ -14,28 +14,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const prisma_1 = __importDefault(require("../../prisma"));
+const inputSchema_1 = require("../schema/inputSchema");
 const router = (0, express_1.Router)();
 // GET /user
-// router.get("/", async (req: Request, res: Response) => {
-// 	// const { id } = req.params;
-// 	try {
-// 		const users = {
-// 			name: "Theodore King",
-// 			email: "rem@se.ua",
-// 			phoneId: "08107721911",
-// 			address: "U6FFAGTEgp2xu5Ik0P",
-// 		};
-// 		res.status(200).json({ ok: true, data: users } as SuccessResponse<any>);
-// 	} catch (error) {
-// 		console.error(error);
-// 		res.status(500).send("Internal Server Error");
-// 	}
-// });
+router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // const { id } = req.params;
+    try {
+        const users = yield prisma_1.default.user.findMany({
+            where: {},
+            select: { id: true, name: true, email: true },
+        });
+        res
+            .status(200)
+            .json({ ok: true, data: users });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+    }
+}));
 // GET /user/:id
 router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
+    const data = inputSchema_1.userInputSchema.safeParse(+req.params.id);
+    // return console.log(JSON.stringify(data, null, 2));
+    if (!data.success)
+        return res.status(201).json({
+            ok: false,
+            error: { message: data.error.issues[0].message, details: data.error },
+        });
     try {
-        const user = yield prisma_1.default.user.findUnique({ where: { id: Number(id) } });
+        const user = yield prisma_1.default.user.findUnique({
+            where: { id: data.data },
+            select: { id: true, name: true, email: true },
+        });
         if (!user) {
             res.status(404).json({
                 ok: false,
@@ -45,17 +56,26 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         else {
             res
                 .status(200)
-                .json({ ok: true, message: "ready to go" });
+                .json({ ok: true, data: user });
         }
     }
     catch (error) {
         console.error(error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({
+            ok: false,
+            error: { message: "An error occoured" },
+        });
     }
 }));
 // POST /user
 router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email } = req.body;
+    const safe = inputSchema_1.createUserSchema.safeParse(req.body);
+    if (!safe.success)
+        return res.status(201).json({
+            ok: false,
+            error: { message: safe.error.issues[0].message, details: safe.error },
+        });
+    const { name, email } = safe.data;
     try {
         const user = yield prisma_1.default.user.create({
             data: {
@@ -63,11 +83,18 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 email,
             },
         });
-        res.status(201).json(user);
+        res.status(201).json({
+            ok: true,
+            message: "user created successfully",
+            data: user,
+        });
     }
     catch (error) {
         console.error(error);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({
+            ok: true,
+            error: { message: "An error occoured", details: error },
+        });
     }
 }));
 // PUT /user/:id
