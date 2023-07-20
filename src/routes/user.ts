@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { ErrorResponse, SuccessResponse } from "../types";
 import prisma from "../../prisma";
-import { createUserSchema, userInputSchema } from "../schema/inputSchema";
+import { createUserSchema, userInputSchema } from "../zodSchema/inputSchema";
 
 const router = Router();
 

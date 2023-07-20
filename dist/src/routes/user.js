@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const prisma_1 = __importDefault(require("../../prisma"));
-const inputSchema_1 = require("../schema/inputSchema");
+const inputSchema_1 = require("../zodSchema/inputSchema");
 const router = (0, express_1.Router)();
 // GET /user
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
