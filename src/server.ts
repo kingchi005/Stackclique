@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import userRoutes from "./routes/user";
+import authRouter from "./routes/auth";
 // import prisma from "./prisma";
 
 const app: Application = express();
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes setup
 
+app.use("/auth", authRouter);
 app.use("/user", userRoutes);
 
 // Error handling middleware
