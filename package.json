@@ -2,10 +2,11 @@
 	"name": "stackclique",
 	"version": "1.0.0",
 	"description": "",
-	"main": "app.js",
+	"main": "server.js",
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"git repository": "https://github.com/idevelop4life/Stackclique-",
 	"scripts": {
 		"start": "tsc && node dist/server",
 		"dev": "nodemon"

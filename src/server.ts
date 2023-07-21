@@ -10,7 +10,7 @@ import swaggerUI from "swagger-ui-express";
 import swaggerConfig from "./swagger.config";
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // Middleware setup
 app.use(cors({ origin: ["https://app.swaggerhub.com/"] }));
