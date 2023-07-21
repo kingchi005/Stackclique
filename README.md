@@ -6,9 +6,9 @@ This is the backend API for the Stackclique mobile application.
 
 ---
 
-installation and test
+Installation and Test
 
-Run the following scripts in this order
+download the Backend branch of this repo as zip file, extract it into a folder and run the following scripts on you terminal in this order
 
 ```cmd
 npm install
