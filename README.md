@@ -8,7 +8,7 @@ This is the backend API for the Stackclique mobile application.
 
 installation and test
 
-reun the following scripts in the order
+Run the following scripts in this order
 
 ```cmd
 npm install
