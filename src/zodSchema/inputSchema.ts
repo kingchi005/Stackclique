@@ -26,6 +26,11 @@ const passwordSchema = z
 	.string({ required_error: "'password' is required" })
 	.min(6, { message: "'password' must be 6 ore more characters" });
 
+export const bearerTokenSchema = z.string({
+	required_error: "'Token' is required",
+	invalid_type_error: "'Token' must be a string",
+});
+
 // input schemas
 
 export const createUserSchema = z.object({
@@ -37,5 +42,10 @@ export const signupInputSchema = z.object({
 	email: emailSchema,
 	otp: otpSchema,
 	username: usernameSchema,
+	password: passwordSchema,
+});
+
+export const loginInputSchema = z.object({
+	email: emailSchema,
 	password: passwordSchema,
 });

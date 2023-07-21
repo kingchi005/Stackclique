@@ -4,14 +4,22 @@ import userRoutes from "./routes/user";
 import authRouter from "./routes/auth";
 // import prisma from "./prisma";
 
+// swagger api doc
+import swaggerUI from "swagger-ui-express";
+
+import swaggerConfig from "./swagger.config";
+
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware setup
-app.use(cors());
+app.use(cors({ origin: ["https://app.swaggerhub.com/"] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// API Doc endpoint
+app.use("/dev/api-docs", swaggerUI.serve);
+app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 // Routes setup
 
 app.use("/auth", authRouter);
