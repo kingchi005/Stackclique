@@ -10,15 +10,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  username      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model UserEmailVerificationToken {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -26,4 +17,82 @@ model UserEmailVerificationToken {
   verified  Boolean  @default(false)
   createdAt DateTime @default(now())
   expiredAt DateTime
+}
+
+model User {
+  id               String   @id @default(uuid())
+  username         String
+  email            String   @unique
+  password         String
+  enrolled_courses Course[]
+  // completed_courses Course[]
+
+  completed_course_modules CourseModule[]
+
+  level     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model UserEnrolledCourses {
+//   id Int @id @default(autoincrement())
+
+//   user User @relation(fields: [user_id], references: [id])
+//   user_id String
+
+//   course Course @relation(fields: [course_id])
+//   course_id Int
+
+//   createdAt DateTime @default(now())
+// }
+
+model Course {
+  id               Int            @id @default(autoincrement())
+  title            String
+  about            String
+  picture_url      String
+  icon_url         String
+  rating           Int
+  instructor       String
+  module           CourseModule[]
+  reviews          CourseReview[]
+  category         CourseCategory @relation(fields: [courseCategoryId], references: [id])
+  category_id      Int
+  enrolled_users   User[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @default(now())
+  courseCategoryId Int
+}
+
+model CourseReview {
+  id        Int      @id @default(autoincrement())
+  course    Course   @relation(fields: [course_id], references: [id])
+  course_id Int
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model CourseModule {
+  id                 Int    @id @default(autoincrement())
+  name               String
+  title              String
+  content            String
+  course             Course @relation(fields: [course_id], references: [id])
+  course_id          Int
+  video_url          String
+  photo_url          String
+  completed_by_users User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model CourseCategory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  courses     Course[]
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
 }

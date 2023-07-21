@@ -9,7 +9,9 @@
 	"git repository": "https://github.com/idevelop4life/Stackclique-",
 	"scripts": {
 		"start": "tsc && node dist/server",
-		"dev": "nodemon"
+		"dev": "nodemon",
+		"db-sync": "npx prisma migrate dev",
+		"db-view": "npx npx prisma studio"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
