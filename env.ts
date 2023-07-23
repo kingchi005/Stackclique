@@ -8,6 +8,7 @@ const envSchema = z.object({
 	MAIL_USER: z.string(),
 	MAIL_PASSWORD: z.string(),
 	MAIL_HOST: z.string(),
+	TEXTFLOW_API_KEY: z.string(),
 });
 
 const env = envSchema.parse(process.env);

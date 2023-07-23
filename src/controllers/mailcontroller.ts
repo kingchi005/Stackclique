@@ -9,3 +9,12 @@ export const transporter = mailer.createTransport({
 		pass: env.MAIL_PASSWORD,
 	},
 });
+
+export const sendEmail = ({ to, message }: { to: string; message: string }) => {
+	const mailOptions = {
+		from: env.MAIL_USER, // sender address
+		to, // list of receivers
+		// subject: "", // Subject line
+		html: message, // plain text body
+	};
+};
