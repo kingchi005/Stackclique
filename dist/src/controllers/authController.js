@@ -29,6 +29,7 @@ const prisma_1 = __importDefault(require("../../prisma"));
 const inputSchema_1 = require("../zodSchema/inputSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const env_1 = __importDefault(require("./../../env"));
 const requestVerificationEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safe = zod_1.z.object({ email: inputSchema_1.emailSchema }).safeParse(req.params);
     if (!safe.success)
@@ -164,7 +165,7 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             ok: false,
             error: { message: "Incorrect password" },
         });
-    const token = jsonwebtoken_1.default.sign({ email }, process.env.HASH_SECRET + "");
+    const token = jsonwebtoken_1.default.sign({ email }, env_1.default.HASH_SECRET + "");
     const { password: pass } = user, userData = __rest(user, ["password"]);
     res.status(200).json({
         ok: true,
