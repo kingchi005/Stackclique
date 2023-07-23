@@ -27,6 +27,7 @@
 		"jsonwebtoken": "^9.0.1",
 		"nodemailer": "^6.9.4",
 		"swagger-ui-express": "^5.0.0",
+		"textflow": "^1.0.0",
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {
