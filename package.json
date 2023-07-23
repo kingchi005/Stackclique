@@ -8,10 +8,11 @@
 	"license": "ISC",
 	"git repository": "https://github.com/idevelop4life/Stackclique-",
 	"scripts": {
-		"start": "tsc && node dist/src/server",
+		"start": "node dist/src/server",
 		"dev": "nodemon",
-		"sync-db": "npx prisma migrate dev",
-		"view-db": "npx prisma studio"
+		"serve": "tsc && dist/src/server",
+		"dbsync": "npx prisma migrate dev",
+		"viewdb": "npx prisma studio"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
