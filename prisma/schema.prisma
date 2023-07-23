@@ -29,7 +29,7 @@ model User {
 
   completed_course_modules CourseModule[]
 
-  level     Int
+  level     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -56,12 +56,11 @@ model Course {
   instructor       String
   module           CourseModule[]
   reviews          CourseReview[]
-  category         CourseCategory @relation(fields: [courseCategoryId], references: [id])
+  category         CourseCategory @relation(fields: [category_id], references: [id])
   category_id      Int
   enrolled_users   User[]
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @default(now())
-  courseCategoryId Int
 }
 
 model CourseReview {

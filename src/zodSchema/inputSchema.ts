@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-export const userInputSchema = z.number({
-	invalid_type_error: "'id' must be a number",
+export const userInputSchema = z.string({
+	invalid_type_error: "'id' must be a stirng",
 });
 
 const usernameSchema = z

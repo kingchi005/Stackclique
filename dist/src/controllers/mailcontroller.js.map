@@ -1,0 +1,1 @@
+{"version":3,"file":"mailcontroller.js","sourceRoot":"","sources":["../../../src/controllers/mailcontroller.ts"],"names":[],"mappings":";;;;;;AAAA,4DAAgC;AAEnB,QAAA,WAAW,GAAG,oBAAM,CAAC,eAAe,CAAC;IACjD,IAAI,EAAE,OAAO,CAAC,GAAG,CAAC,eAAe;IACjC,IAAI,EAAE,CAAC;IACP,IAAI,EAAE;QACL,IAAI,EAAE,OAAO,CAAC,GAAG,CAAC,eAAe;QACjC,IAAI,EAAE,OAAO,CAAC,GAAG,CAAC,mBAAmB;KACrC;CACD,CAAC,CAAC"}

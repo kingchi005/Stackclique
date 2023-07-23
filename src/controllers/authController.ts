@@ -9,6 +9,7 @@ import {
 } from "../zodSchema/inputSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import env from "./../../env";
 
 export const requestVerificationEmail = async (req: Request, res: Response) => {
 	const safe = z.object({ email: emailSchema }).safeParse(req.params);
@@ -163,7 +164,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 			error: { message: "Incorrect password" },
 		});
 
-	const token = jwt.sign({ email }, process.env.HASH_SECRET + "");
+	const token = jwt.sign({ email }, env.HASH_SECRET + "");
 	const { password: pass, ...userData } = user;
 	res.status(200).json(<SuccessResponse<typeof userData>>{
 		ok: true,

@@ -17,9 +17,14 @@ PORT=500
 DATABASE_URL="file:./db.sqlite"
 DEV_ENV=true
 HASH_SECRET= # any random hash string
-NODEMAILER_USER= # your email
-NODEMAILER_PASSWORD= # your email password
-NODEMAILER_HOST= # your email host
+
+PORT=500
+DATABASE_URL="file:./db.sqlite"
+DEV_ENV=true
+HASH_SECRET='AfRt6nKoaAO49hbWI6nZzsXUsCqPfXzcZV7qM0yM41MJLsZIYyW1JMq4NkTZ1vtnPsfMaUiB'
+MAIL_USER=# your email
+MAIL_PASSWORD=# your email password
+MAIL_HOST=# your email host
 ```
 
 ```cmd
@@ -29,6 +34,6 @@ npm run start
 
 ```
 
-then visit `http://localhost:3000/dev/api-docs` to see the `swagger` API documentation.
+then visit `http://localhost:500/dev/api-docs` to see the `swagger` API documentation.
 
 more endpoints are comming

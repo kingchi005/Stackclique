@@ -2,15 +2,17 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import userRoutes from "./routes/user";
 import authRouter from "./routes/auth";
-// import prisma from "./prisma";
 
 // swagger api doc
 import swaggerUI from "swagger-ui-express";
 
 import swaggerConfig from "./swagger.config";
+import prisma from "../prisma";
+import env from "../env";
+// import { seedDatabase } from "./../prisma/seed/seedb";
 
 const app: Application = express();
-const PORT = 3000;
+const PORT = env.PORT || 3000;
 
 // Middleware setup
 app.use(cors({ origin: ["https://app.swaggerhub.com/"] }));
@@ -30,6 +32,16 @@ app.use((err: any, req: any, res: any, next: any) => {
 	console.error(err.stack);
 	res.status(500).send("Internal Server Error");
 });
+
+// seedDatabase()
+// 	.then(() => {
+// 		console.log("Database seeded successfully");
+// 		prisma.$disconnect();
+// 	})
+// 	.catch((error) => {
+// 		console.error(`Error seeding database: ${error}`);
+// 		prisma.$disconnect();
+// 	});
 
 app.listen(PORT, async () => {
 	console.log(`Server running on port ${PORT}`);

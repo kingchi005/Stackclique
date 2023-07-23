@@ -1,10 +1,11 @@
 import mailer from "nodemailer";
+import env from "../../env";
 
 export const transporter = mailer.createTransport({
-	host: process.env.NODEMAILER_HOST,
+	host: env.MAIL_HOST,
 	port: 0,
 	auth: {
-		user: process.env.NODEMAILER_USER,
-		pass: process.env.NODEMAILER_PASSWORD,
+		user: env.MAIL_USER,
+		pass: env.MAIL_PASSWORD,
 	},
 });
