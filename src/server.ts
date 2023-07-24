@@ -10,7 +10,7 @@ import swaggerConfig from "./api-doc/swagger-config";
 import prisma from "../prisma";
 import env from "../env";
 import { phoneNumberSchema } from "./zodSchema/inputSchema";
-import { seedDatabase } from "./../prisma/seed/seedb";
+import { seedDatabase } from "../prisma/seedb";
 
 const app: Application = express();
 const PORT = +env.PORT || 3000;
@@ -33,16 +33,6 @@ app.use((err: any, req: any, res: any, next: any) => {
 	console.error(err.stack);
 	res.status(500).send("Internal Server Error");
 });
-
-seedDatabase()
-	.then(() => {
-		console.log("Database seeded successfully");
-		// prisma.$disconnect();
-	})
-	.catch((error: any) => {
-		console.error(`Error seeding database: ${error}`);
-		// prisma.$disconnect();
-	});
 
 app.listen(PORT, async () => {
 	console.log(`Server running on port ${PORT}`);

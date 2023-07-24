@@ -11,8 +11,9 @@
 		"start": "node dist/src/server",
 		"dev": "nodemon",
 		"serve": "tsc && dist/src/server",
-		"dbsync": "npx prisma migrate dev",
-		"dbview": "npx prisma studio"
+		"db:seed": "node dist/prisma/seedb",
+		"db:sync": "npx prisma migrate dev",
+		"db:view": "npx prisma studio"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",

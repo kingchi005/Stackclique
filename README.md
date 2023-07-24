@@ -27,7 +27,7 @@ BASE_URL=http://localhost:${PORT}
 The run the following scripts on your terminal in this order
 
 ```cmd
-npm run dbsync
+npm run db:sync
 npm run start
 ```
 
@@ -40,7 +40,8 @@ more endpoints are comming
 To visualise the data in the database run the command
 
 ```cmd
-npm run dbview
+npm run db:seed
+npm run db:view
 ```
 
 You will see a UI like so
