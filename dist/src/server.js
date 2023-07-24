@@ -18,7 +18,7 @@ const user_1 = __importDefault(require("./routes/user"));
 const auth_1 = __importDefault(require("./routes/auth"));
 // swagger api doc
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
-const swagger_config_1 = __importDefault(require("./swagger.config"));
+const swagger_config_1 = __importDefault(require("./api-doc/swagger-config"));
 const env_1 = __importDefault(require("../env"));
 // import { seedDatabase } from "./../prisma/seed/seedb";
 const app = (0, express_1.default)();

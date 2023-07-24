@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginInputSchema = exports.signupInputSchema = exports.createUserSchema = exports.bearerTokenSchema = exports.emailSchema = exports.userInputSchema = void 0;
+exports.loginInputSchema = exports.phoneSignupInputSchema = exports.emailSignupInputSchema = exports.createUserSchema = exports.bearerTokenSchema = exports.phoneNumberSchema = exports.emailSchema = exports.userInputSchema = void 0;
 const zod_1 = require("zod");
 exports.userInputSchema = zod_1.z.string({
     invalid_type_error: "'id' must be a stirng",
@@ -14,6 +14,12 @@ const usernameSchema = zod_1.z
 exports.emailSchema = zod_1.z
     .string({ required_error: "Email is required" })
     .email({ message: "Provide a valid email" });
+exports.phoneNumberSchema = zod_1.z
+    .string()
+    .regex(/^\+(?:[0-9] ?){6,14}[0-9]$/, { message: "Invalid phone number" })
+    .min(7, { message: "Invalid phone number" })
+    .max(14, { message: "Invalid phone number" })
+    .transform((v) => v.replace(/\s/g, ""));
 const otpSchema = zod_1.z
     .number({
     invalid_type_error: "'OTP' must be a number",
@@ -32,8 +38,14 @@ exports.createUserSchema = zod_1.z.object({
     username: usernameSchema,
     email: exports.emailSchema,
 });
-exports.signupInputSchema = zod_1.z.object({
+exports.emailSignupInputSchema = zod_1.z.object({
     email: exports.emailSchema,
+    otp: otpSchema,
+    username: usernameSchema,
+    password: passwordSchema,
+});
+exports.phoneSignupInputSchema = zod_1.z.object({
+    phone_number: exports.phoneNumberSchema,
     otp: otpSchema,
     username: usernameSchema,
     password: passwordSchema,

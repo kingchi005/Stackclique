@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import {
 	emailSchema,
 	loginInputSchema,
-	signupInputSchema,
+	emailSignupInputSchema,
 } from "../zodSchema/inputSchema";
 import { ErrorResponse, SuccessResponse } from "../types";
 import { z } from "zod";
@@ -12,20 +12,20 @@ import { transporter } from "../controllers/mailcontroller";
 import jwt from "jsonwebtoken";
 import {
 	handleLogin,
-	handleSignup,
-	requestVerificationEmail,
+	handleSignupByEmail,
+	handleSignupByPhone,
+	sendOTPEmail,
+	sendOTPSMS,
 } from "../controllers/authController";
 import { anthenticUser } from "../controllers/middleWares";
 
 const authRouter = Router();
 
-authRouter.get(
-	"/send-verification/:email",
-	// anthenticUser,
-	requestVerificationEmail
-);
+authRouter.get("/get-email-otp/:email", sendOTPEmail);
 
-authRouter.post("/signup", handleSignup);
+authRouter.get("/get-sms-otp/:phone_number", sendOTPSMS);
+
+authRouter.post("/signup", handleSignupByPhone, handleSignupByEmail);
 
 authRouter.post("/login", handleLogin);
 

@@ -15,6 +15,13 @@ export const emailSchema = z
 	.string({ required_error: "Email is required" })
 	.email({ message: "Provide a valid email" });
 
+export const phoneNumberSchema = z
+	.string()
+	.regex(/^\+(?:[0-9] ?){6,14}[0-9]$/, { message: "Invalid phone number" })
+	.min(7, { message: "Invalid phone number" })
+	.max(14, { message: "Invalid phone number" })
+	.transform((v) => v.replace(/\s/g, ""));
+
 const otpSchema = z
 	.number({
 		invalid_type_error: "'OTP' must be a number",
@@ -38,8 +45,15 @@ export const createUserSchema = z.object({
 	email: emailSchema,
 });
 
-export const signupInputSchema = z.object({
+export const emailSignupInputSchema = z.object({
 	email: emailSchema,
+	otp: otpSchema,
+	username: usernameSchema,
+	password: passwordSchema,
+});
+
+export const phoneSignupInputSchema = z.object({
+	phone_number: phoneNumberSchema,
 	otp: otpSchema,
 	username: usernameSchema,
 	password: passwordSchema,

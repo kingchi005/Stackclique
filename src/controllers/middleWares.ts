@@ -25,13 +25,3 @@ export const anthenticUser = async (
 	console.log(token);
 	next();
 };
-// for textflow verification
-//User has sent his phone number for verification
-/* textflow.sendVerificationSMS("+11234567890", verificationOptions);
-
-//Show him the code submission form
-
-//The user has submitted the code
-let result = await textflow.verifyCode("+11234567890", "USER_ENTERED_CODE"); 
-if(result.valid)
-    console.log("Verified!"); */

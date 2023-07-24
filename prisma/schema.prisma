@@ -21,8 +21,9 @@ model UserEmailVerificationToken {
 
 model User {
   id               String   @id @default(uuid())
-  username         String
-  email            String   @unique
+  username         String   @unique
+  email            String?   @unique
+  phone_number     String?   @unique
   password         String
   enrolled_courses Course[]
   // completed_courses Course[]
@@ -47,20 +48,20 @@ model User {
 // }
 
 model Course {
-  id               Int            @id @default(autoincrement())
-  title            String
-  about            String
-  picture_url      String
-  icon_url         String
-  rating           Int
-  instructor       String
-  module           CourseModule[]
-  reviews          CourseReview[]
-  category         CourseCategory @relation(fields: [category_id], references: [id])
-  category_id      Int
-  enrolled_users   User[]
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @default(now())
+  id             Int            @id @default(autoincrement())
+  title          String
+  about          String
+  picture_url    String
+  icon_url       String
+  rating         Int
+  instructor     String
+  module         CourseModule[]
+  reviews        CourseReview[]
+  category       CourseCategory @relation(fields: [category_id], references: [id])
+  category_id    Int
+  enrolled_users User[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @default(now())
 }
 
 model CourseReview {

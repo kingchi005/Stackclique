@@ -1,15 +1,16 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.fromPostman = void 0;
+const env_1 = __importDefault(require("../env"));
 exports.default = {
     openapi: "3.0.0",
     servers: [
         {
-            description: "SwaggerHub API Auto Mocking",
-            url: "https://virtserver.swaggerhub.com/kingchi005/StackClique/1.0.0",
-        },
-        {
             description: "localhost",
-            url: "http://localhost:500",
+            url: `${env_1.default.BASE_URL}`,
         },
     ],
     info: {
@@ -27,12 +28,12 @@ exports.default = {
         },
     ],
     paths: {
-        "/auth/send-verification/{email}": {
+        "/auth/get-email-otp/{email}": {
             get: {
                 tags: ["authentication Route"],
                 summary: "request for email verification code",
                 operationId: "verifyEmail",
-                description: "By passing user's email, the user will get an email with the 4 digit code",
+                description: "Route for verifying email",
                 parameters: [
                     {
                         in: "path",
@@ -58,12 +59,60 @@ exports.default = {
                         },
                     },
                     "401": {
-                        description: "Success response",
+                        description: "Error response",
                         content: {
                             "application/json": {
                                 examples: {
                                     "201": {
-                                        value: '{\n  "ok": false,\n  "error":{\n    "message": "string"\n  }\n}',
+                                        value: '{\n  "ok": false,\n  "error":{\n    "message": "string",\n    "details": "any"\n  }\n}',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    "500": {
+                        description: "sever error",
+                    },
+                },
+            },
+        },
+        "/auth/get-sms-otp/{phone_number}": {
+            get: {
+                tags: ["authentication Route"],
+                summary: "request for phone number verification code",
+                operationId: "verifyPhoneNumebr",
+                description: "Route for verifying phone",
+                parameters: [
+                    {
+                        in: "path",
+                        name: "phone_nmeber",
+                        description: "pass the user's phone as a string in the internal format '+234 810 232 323'",
+                        required: true,
+                        schema: {
+                            type: "string",
+                        },
+                    },
+                ],
+                responses: {
+                    "200": {
+                        description: "Success response",
+                        content: {
+                            "application/json": {
+                                examples: {
+                                    "200": {
+                                        value: '{\n  "ok": true,\n  "data": {},\n  "message": "OTP was sent to +234 810 232 323 \'. Please check yourr SMS"\n}',
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    "401": {
+                        description: "Error response",
+                        content: {
+                            "application/json": {
+                                examples: {
+                                    "401": {
+                                        value: '{\n  "ok": false,\n  "error":{\n    "message": "string",\n    "details": "any"\n  }\n}',
                                     },
                                 },
                             },
@@ -195,7 +244,7 @@ exports.default = {
                     },
                     message: {
                         type: "string",
-                        example: "Email was sent to 'example@stackclique.com'. Please check you email",
+                        example: "Email was sent to 'example@stackclique.com'. Please check your email",
                     },
                     data: {
                         type: "object",
@@ -233,6 +282,91 @@ exports.default = {
                     "application/json": {
                         schema: {
                             $ref: "#/components/schemas/signUpReqSch",
+                        },
+                    },
+                },
+            },
+        },
+    },
+};
+exports.fromPostman = {
+    openapi: "3.0.0",
+    info: {
+        title: "stackclique",
+        description: "",
+        version: "1.0.0",
+    },
+    servers: [
+        {
+            url: "http://{{host}}",
+        },
+    ],
+    paths: {
+        "/auth/signup": {
+            post: {
+                tags: ["General"],
+                summary: "signup",
+                requestBody: {
+                    content: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                                example: {
+                                    username: "Jane David",
+                                    email: "asrigzi@marekiled.sb",
+                                    otp: 1493,
+                                    password: "ihjsbd",
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    "200": {
+                        description: "Successful response",
+                        content: {
+                            "application/json": {},
+                        },
+                    },
+                },
+            },
+        },
+        "/auth/send-verification/asrigzi@marekiled.sb": {
+            get: {
+                tags: ["General"],
+                summary: "send email verification request",
+                responses: {
+                    "200": {
+                        description: "Successful response",
+                        content: {
+                            "application/json": {},
+                        },
+                    },
+                },
+            },
+        },
+        "/auth/login": {
+            post: {
+                tags: ["General"],
+                summary: "login",
+                requestBody: {
+                    content: {
+                        "application/json": {
+                            schema: {
+                                type: "object",
+                                example: {
+                                    email: "dohti@zi.vg",
+                                    password: "ihjsbd",
+                                },
+                            },
+                        },
+                    },
+                },
+                responses: {
+                    "200": {
+                        description: "Successful response",
+                        content: {
+                            "application/json": {},
                         },
                     },
                 },

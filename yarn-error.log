@@ -28,10 +28,11 @@ npm manifest:
   	"license": "ISC",
   	"git repository": "https://github.com/idevelop4life/Stackclique-",
   	"scripts": {
-  		"start": "tsc && node dist/src/server",
+  		"start": "node dist/src/server",
   		"dev": "nodemon",
-  		"sync-db": "npx prisma migrate dev",
-  		"view-db": "npx prisma studio"
+  		"serve": "tsc && dist/src/server",
+  		"dbsync": "npx prisma migrate dev",
+  		"viewdb": "npx prisma studio"
   	},
   	"dependencies": {
   		"@prisma/client": "^5.0.0",
@@ -46,6 +47,7 @@ npm manifest:
   		"jsonwebtoken": "^9.0.1",
   		"nodemailer": "^6.9.4",
   		"swagger-ui-express": "^5.0.0",
+  		"textflow.js": "^0.1.4",
   		"zod": "^3.21.4"
   	},
   	"devDependencies": {
@@ -53,6 +55,7 @@ npm manifest:
   		"@types/cors": "^2.8.11",
   		"@types/express": "^4.17.13",
   		"@types/node": "^16.3.0",
+  		"@types/textflow.js": "^1.0.0",
   		"faker": "^6.6.6",
   		"prisma": "^5.0.0",
   		"ts-node-dev": "^1.1.8",

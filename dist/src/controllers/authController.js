@@ -23,14 +23,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleLogin = exports.handleSignup = exports.requestVerificationEmail = void 0;
+exports.handleLogin = exports.handleSignupByEmail = exports.handleSignupByPhone = exports.sendOTPEmail = exports.sendOTPSMS = void 0;
 const zod_1 = require("zod");
 const prisma_1 = __importDefault(require("../../prisma"));
+const textflow_js_1 = __importDefault(require("textflow.js"));
 const inputSchema_1 = require("../zodSchema/inputSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = __importDefault(require("./../../env"));
-const requestVerificationEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const mailcontroller_1 = require("./mailcontroller");
+textflow_js_1.default.useKey(env_1.default.TEXTFLOW_API_KEY);
+const sendOTPSMS = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const safe = zod_1.z
+        .object({ phone_number: inputSchema_1.phoneNumberSchema })
+        .safeParse(req.params);
+    if (!safe.success)
+        return res.status(401).json({
+            ok: false,
+            error: {
+                message: safe.error.issues.map((d) => d.message).join(", "),
+                details: safe.error,
+            },
+        });
+    const { phone_number } = safe.data;
+    const existingUser = yield prisma_1.default.user.findFirst({
+        where: { phone_number },
+    });
+    if (existingUser)
+        return res.status(202).json({
+            ok: false,
+            error: { message: "Your phone number is already verified" },
+        });
+    // for textflow verification
+    const textflowRes = yield textflow_js_1.default.sendVerificationSMS(phone_number, {
+        service_name: "Stack clique",
+    });
+    if (textflowRes == undefined)
+        return res.status(500).json({
+            ok: false,
+            error: { message: "An error occored" },
+        });
+    if (!textflowRes.ok)
+        return res.status(400).json({
+            ok: false,
+            error: {
+                message: textflowRes.message,
+                details: { expires: (_a = textflowRes.data) === null || _a === void 0 ? void 0 : _a.expires },
+            },
+        });
+    return res.status(200).json({
+        ok: true,
+        message: textflowRes.message,
+        data: textflowRes.data,
+    });
+});
+exports.sendOTPSMS = sendOTPSMS;
+const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safe = zod_1.z.object({ email: inputSchema_1.emailSchema }).safeParse(req.params);
     if (!safe.success)
         return res.status(401).json({
@@ -41,10 +90,10 @@ const requestVerificationEmail = (req, res) => __awaiter(void 0, void 0, void 0,
             },
         });
     const { email } = safe.data;
-    const alreadyVerified = yield prisma_1.default.userEmailVerificationToken.findFirst({
-        where: { email, verified: true },
+    const emailIsExisting = yield prisma_1.default.user.findFirst({
+        where: { email },
     });
-    if (alreadyVerified)
+    if (emailIsExisting)
         return res.status(202).json({
             ok: false,
             error: { message: "Your email is already verified" },
@@ -67,20 +116,89 @@ const requestVerificationEmail = (req, res) => __awaiter(void 0, void 0, void 0,
     }
     catch (error) {
         console.log(error);
+        return res.status(500).json({
+            ok: false,
+            error: { message: "An error occored please try after few minutes" },
+        });
     }
     // send email with OTP---------------------------------------
-    // transporter.sendMail
+    const EMAIL_MESSAGE = `<p>Your Stack Clique verification code is <b>${OTP}</b></p><p>This code will expire after <i>10 minutes</i></p>`;
     // if email sent
-    res.status(200).json({
+    const emailResponse = yield (0, mailcontroller_1.sendEmail)(email, EMAIL_MESSAGE, "STACK CLIQUE EMAIL VERIFICATION");
+    if (!emailResponse.success)
+        return res.status(500).json({
+            ok: false,
+            error: {
+                message: "An error occored and email was not sent",
+                details: emailResponse.details,
+            },
+        });
+    return res.status(200).json({
         ok: true,
-        data: {},
-        message: `Email was sent to '${email}'. Please check you email`,
+        data: emailResponse.details,
+        message: emailResponse.message,
     });
 });
-exports.requestVerificationEmail = requestVerificationEmail;
-const handleSignup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.sendOTPEmail = sendOTPEmail;
+const handleSignupByPhone = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const isByPhone = req.query.phone;
+    if (!isByPhone)
+        return next();
+    const safeInput = inputSchema_1.phoneSignupInputSchema.safeParse(req.body);
+    if (!safeInput.success)
+        return res.status(400).json({
+            ok: false,
+            error: {
+                message: safeInput.error.issues.map((d) => d.message).join(", "),
+                details: safeInput.error,
+            },
+        });
+    const { phone_number, otp, password, username } = safeInput.data;
+    // check if user already exists-------------------------
+    const existingUser = yield prisma_1.default.user.findFirst({ where: { phone_number } });
+    if (existingUser)
+        return res.status(401).json({
+            ok: false,
+            error: { message: `User with email '${phone_number}' already exists` },
+        });
+    // verify phone number-------------
+    const verificationReseponse = yield textflow_js_1.default.verifyCode(phone_number, "" + otp);
+    if (verificationReseponse == undefined)
+        return res.status(500).json({
+            ok: false,
+            error: { message: "An error occored" },
+        });
+    if (!verificationReseponse.valid)
+        return res.status(400).json({
+            ok: false,
+            error: { message: verificationReseponse.message },
+        });
+    const salt = bcrypt_1.default.genSaltSync(10);
+    const hashedPassword = yield bcrypt_1.default.hashSync(password, salt);
+    // create the user
+    try {
+        const newUser = yield prisma_1.default.user.create({
+            data: { phone_number, password: hashedPassword, username },
+            select: { email: true, username: true, id: true },
+        });
+        return res.status(201).json({
+            ok: true,
+            message: "Registreation successful",
+            data: newUser,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error: { details: error, message: "An error occoured please try again" },
+        });
+    }
+    res.json({ msg: "success", result: verificationReseponse });
+});
+exports.handleSignupByPhone = handleSignupByPhone;
+const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // validate user input
-    const safe = inputSchema_1.signupInputSchema.safeParse(req.body);
+    const safe = inputSchema_1.emailSignupInputSchema.safeParse(req.body);
     if (!safe.success)
         return res.status(400).json({
             ok: false,
@@ -125,20 +243,21 @@ const handleSignup = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             data: { email, password: hashedPassword, username },
             select: { email: true, username: true, id: true },
         });
-        res.status(201).json({
+        return res.status(201).json({
             ok: true,
             message: "Registreation successful",
             data: newUser,
         });
     }
     catch (error) {
-        res.status(500).json({
+        console.log(error);
+        return res.status(500).json({
             ok: false,
-            error,
+            error: { details: error, message: "An error occoured please try again" },
         });
     }
 });
-exports.handleSignup = handleSignup;
+exports.handleSignupByEmail = handleSignupByEmail;
 const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safe = inputSchema_1.loginInputSchema.safeParse(req.body);
     if (!safe.success)
@@ -167,11 +286,13 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     const token = jsonwebtoken_1.default.sign({ email }, env_1.default.HASH_SECRET + "");
     const { password: pass } = user, userData = __rest(user, ["password"]);
-    res.status(200).json({
+    return res.status(200).json({
         ok: true,
         message: "Login successful",
         data: Object.assign(Object.assign({}, userData), { UserAccessToken: token }),
     });
 });
 exports.handleLogin = handleLogin;
+const verifyByEmail = (req, res, next) => { };
+const verifyBySMS = (req, res, next) => { };
 //# sourceMappingURL=authController.js.map

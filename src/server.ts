@@ -6,9 +6,10 @@ import authRouter from "./routes/auth";
 // swagger api doc
 import swaggerUI from "swagger-ui-express";
 
-import swaggerConfig from "./swagger.config";
+import swaggerConfig from "./api-doc/swagger-config";
 import prisma from "../prisma";
 import env from "../env";
+import { phoneNumberSchema } from "./zodSchema/inputSchema";
 // import { seedDatabase } from "./../prisma/seed/seedb";
 
 const app: Application = express();

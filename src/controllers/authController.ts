@@ -1,17 +1,73 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import prisma from "../../prisma";
 import { ErrorResponse, SuccessResponse } from "../types";
+import textflow from "textflow.js";
 import {
 	emailSchema,
 	loginInputSchema,
-	signupInputSchema,
+	phoneNumberSchema,
+	emailSignupInputSchema,
+	phoneSignupInputSchema,
 } from "../zodSchema/inputSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import env from "./../../env";
+import { sendEmail, sendTestMail } from "./mailcontroller";
 
-export const requestVerificationEmail = async (req: Request, res: Response) => {
+textflow.useKey(env.TEXTFLOW_API_KEY);
+
+export const sendOTPSMS = async (req: Request, res: Response) => {
+	const safe = z
+		.object({ phone_number: phoneNumberSchema })
+		.safeParse(req.params);
+	if (!safe.success)
+		return res.status(401).json(<ErrorResponse<typeof safe.error>>{
+			ok: false,
+			error: {
+				message: safe.error.issues.map((d) => d.message).join(", "),
+				details: safe.error,
+			},
+		});
+
+	const { phone_number } = safe.data;
+	const existingUser = await prisma.user.findFirst({
+		where: { phone_number },
+	});
+
+	if (existingUser)
+		return res.status(202).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "Your phone number is already verified" },
+		});
+
+	// for textflow verification
+	const textflowRes = await textflow.sendVerificationSMS(phone_number, {
+		service_name: "Stack clique",
+	});
+	if (textflowRes == undefined)
+		return res.status(500).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "An error occored" },
+		});
+
+	if (!textflowRes.ok)
+		return res.status(400).json(<ErrorResponse<any>>{
+			ok: false,
+			error: {
+				message: textflowRes.message,
+				details: { expires: textflowRes.data?.expires },
+			},
+		});
+
+	return res.status(200).json(<SuccessResponse<typeof textflowRes.data>>{
+		ok: true,
+		message: textflowRes.message,
+		data: textflowRes.data,
+	});
+};
+
+export const sendOTPEmail = async (req: Request, res: Response) => {
 	const safe = z.object({ email: emailSchema }).safeParse(req.params);
 	if (!safe.success)
 		return res.status(401).json(<ErrorResponse<typeof safe.error>>{
@@ -23,11 +79,12 @@ export const requestVerificationEmail = async (req: Request, res: Response) => {
 		});
 
 	const { email } = safe.data;
-	const alreadyVerified = await prisma.userEmailVerificationToken.findFirst({
-		where: { email, verified: true },
+
+	const emailIsExisting = await prisma.user.findFirst({
+		where: { email },
 	});
 
-	if (alreadyVerified)
+	if (emailIsExisting)
 		return res.status(202).json(<ErrorResponse<any>>{
 			ok: false,
 			error: { message: "Your email is already verified" },
@@ -51,22 +108,111 @@ export const requestVerificationEmail = async (req: Request, res: Response) => {
 		});
 	} catch (error) {
 		console.log(error);
+		return res.status(500).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "An error occored please try after few minutes" },
+		});
 	}
 
 	// send email with OTP---------------------------------------
-	// transporter.sendMail
+	const EMAIL_MESSAGE = `<p>Your Stack Clique verification code is <b>${OTP}</b></p><p>This code will expire after <i>10 minutes</i></p>`;
 	// if email sent
+	const emailResponse = await sendEmail(
+		email,
+		EMAIL_MESSAGE,
+		"STACK CLIQUE EMAIL VERIFICATION"
+	);
 
-	res.status(200).json(<SuccessResponse<any>>{
+	if (!emailResponse.success)
+		return res.status(500).json(<ErrorResponse<any>>{
+			ok: false,
+			error: {
+				message: "An error occored and email was not sent",
+				details: emailResponse.details,
+			},
+		});
+
+	return res.status(200).json(<SuccessResponse<any>>{
 		ok: true,
-		data: {},
-		message: `Email was sent to '${email}'. Please check you email`,
+		data: emailResponse.details,
+		message: emailResponse.message,
 	});
 };
 
-export const handleSignup = async (req: Request, res: Response) => {
+export const handleSignupByPhone = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	const isByPhone = req.query.phone;
+	if (!isByPhone) return next();
+
+	const safeInput = phoneSignupInputSchema.safeParse(req.body);
+	if (!safeInput.success)
+		return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
+			ok: false,
+			error: {
+				message: safeInput.error.issues.map((d) => d.message).join(", "),
+				details: safeInput.error,
+			},
+		});
+
+	const { phone_number, otp, password, username } = safeInput.data;
+
+	// check if user already exists-------------------------
+	const existingUser = await prisma.user.findFirst({ where: { phone_number } });
+	if (existingUser)
+		return res.status(401).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: `User with email '${phone_number}' already exists` },
+		});
+
+	// verify phone number-------------
+	const verificationReseponse = await textflow.verifyCode(
+		phone_number,
+		"" + otp
+	);
+
+	if (verificationReseponse == undefined)
+		return res.status(500).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "An error occored" },
+		});
+
+	if (!verificationReseponse.valid)
+		return res.status(400).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: verificationReseponse.message },
+		});
+
+	const salt = bcrypt.genSaltSync(10);
+	const hashedPassword = await bcrypt.hashSync(password, salt);
+
+	// create the user
+	try {
+		const newUser = await prisma.user.create({
+			data: { phone_number, password: hashedPassword, username },
+			select: { email: true, username: true, id: true },
+		});
+
+		return res.status(201).json(<SuccessResponse<any>>{
+			ok: true,
+			message: "Registreation successful",
+			data: newUser,
+		});
+	} catch (error) {
+		return res.status(500).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { details: error, message: "An error occoured please try again" },
+		});
+	}
+
+	res.json({ msg: "success", result: verificationReseponse });
+};
+
+export const handleSignupByEmail = async (req: Request, res: Response) => {
 	// validate user input
-	const safe = signupInputSchema.safeParse(req.body);
+	const safe = emailSignupInputSchema.safeParse(req.body);
 	if (!safe.success)
 		return res.status(400).json(<ErrorResponse<typeof safe.error>>{
 			ok: false,
@@ -119,15 +265,17 @@ export const handleSignup = async (req: Request, res: Response) => {
 			data: { email, password: hashedPassword, username },
 			select: { email: true, username: true, id: true },
 		});
-		res.status(201).json(<SuccessResponse<any>>{
+		return res.status(201).json(<SuccessResponse<any>>{
 			ok: true,
 			message: "Registreation successful",
 			data: newUser,
 		});
 	} catch (error) {
-		res.status(500).json(<ErrorResponse<any>>{
+		console.log(error);
+
+		return res.status(500).json(<ErrorResponse<any>>{
 			ok: false,
-			error,
+			error: { details: error, message: "An error occoured please try again" },
 		});
 	}
 };
@@ -166,7 +314,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 
 	const token = jwt.sign({ email }, env.HASH_SECRET + "");
 	const { password: pass, ...userData } = user;
-	res.status(200).json(<SuccessResponse<typeof userData>>{
+	return res.status(200).json(<SuccessResponse<typeof userData>>{
 		ok: true,
 		message: "Login successful",
 		data: {
@@ -175,3 +323,6 @@ export const handleLogin = async (req: Request, res: Response) => {
 		},
 	});
 };
+
+const verifyByEmail = (req: Request, res: Response, next: NextFunction) => {};
+const verifyBySMS = (req: Request, res: Response, next: NextFunction) => {};
