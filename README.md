@@ -42,3 +42,6 @@ To visualise the data in the database run the command
 ```cmd
 npm run dbview
 ```
+
+You will see a UI like so
+![Alt text](db-UI.png)
