@@ -1,15 +1,4 @@
-import { Router, Request, Response } from "express";
-import {
-	emailSchema,
-	loginInputSchema,
-	emailSignupInputSchema,
-} from "../zodSchema/inputSchema";
-import { ErrorResponse, SuccessResponse } from "../types";
-import { z } from "zod";
-import prisma from "../../prisma";
-import bcrypt from "bcrypt";
-import { transporter } from "../controllers/mailcontroller";
-import jwt from "jsonwebtoken";
+import { Router } from "express";
 import {
 	handleLogin,
 	handleSignupByEmail,
@@ -17,7 +6,6 @@ import {
 	sendOTPEmail,
 	sendOTPSMS,
 } from "../controllers/authController";
-import { anthenticUser } from "../controllers/middleWares";
 
 const authRouter = Router();
 

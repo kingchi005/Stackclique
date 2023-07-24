@@ -11,6 +11,7 @@ import prisma from "../prisma";
 import env from "../env";
 import { phoneNumberSchema } from "./zodSchema/inputSchema";
 import { seedDatabase } from "../prisma/seedb";
+import courseRoute from "./routes/courses";
 
 const app: Application = express();
 const PORT = +env.PORT || 3000;
@@ -26,8 +27,7 @@ app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 // Routes setup
 
 app.use("/auth", authRouter);
-app.use("/user", userRoutes);
-
+app.use("/courses", courseRoute);
 // Error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {
 	console.error(err.stack);
