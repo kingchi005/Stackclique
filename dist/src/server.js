@@ -20,7 +20,7 @@ const auth_1 = __importDefault(require("./routes/auth"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_config_1 = __importDefault(require("./api-doc/swagger-config"));
 const env_1 = __importDefault(require("../env"));
-// import { seedDatabase } from "./../prisma/seed/seedb";
+const seedb_1 = require("./../prisma/seed/seedb");
 const app = (0, express_1.default)();
 const PORT = +env_1.default.PORT || 3000;
 // Middleware setup
@@ -38,15 +38,15 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send("Internal Server Error");
 });
-// seedDatabase()
-// 	.then(() => {
-// 		console.log("Database seeded successfully");
-// 		prisma.$disconnect();
-// 	})
-// 	.catch((error) => {
-// 		console.error(`Error seeding database: ${error}`);
-// 		prisma.$disconnect();
-// 	});
+(0, seedb_1.seedDatabase)()
+    .then(() => {
+    console.log("Database seeded successfully");
+    // prisma.$disconnect();
+})
+    .catch((error) => {
+    console.error(`Error seeding database: ${error}`);
+    // prisma.$disconnect();
+});
 app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server running on port ${PORT}`);
     // await prisma.$connect();

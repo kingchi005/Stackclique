@@ -6,7 +6,7 @@ This is the backend API for the Stackclique mobile application.
 
 ---
 
-Installation and Test of the API
+# Installation and Test of the API
 
 Download the Backend branch of this repo as zip file, extract it into a folder
 
@@ -20,6 +20,8 @@ HASH_SECRET= # any random hash string
 MAIL_USER=# your email
 MAIL_PASSWORD=# your email password
 MAIL_HOST=# your email host
+TEXTFLOW_API_KEY=# api_key from textflow
+BASE_URL=http://localhost:${PORT}
 ```
 
 The run the following scripts on your terminal in this order
@@ -32,3 +34,11 @@ npm run start
 then visit `http://localhost:500/dev/api-docs` to see the `swagger` API documentation.
 
 more endpoints are comming
+
+# Visualise Database
+
+To visualise the data in the database run the command
+
+```cmd
+npm run dbview
+```

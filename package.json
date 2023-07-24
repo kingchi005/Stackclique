@@ -12,7 +12,7 @@
 		"dev": "nodemon",
 		"serve": "tsc && dist/src/server",
 		"dbsync": "npx prisma migrate dev",
-		"viewdb": "npx prisma studio"
+		"dbview": "npx prisma studio"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
