@@ -35,8 +35,8 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
             data: {
                 title: faker_1.faker.lorem.sentence(),
                 about: faker_1.faker.lorem.paragraph(),
-                picture_url: faker_1.faker.image.url(),
-                icon_url: faker_1.faker.image.url(),
+                cover_photo: faker_1.faker.image.url(),
+                profile_photo: faker_1.faker.image.url(),
                 rating: faker_1.faker.number.int({ min: 1, max: 5 }),
                 instructor: faker_1.faker.person.fullName(),
                 category: {
@@ -63,7 +63,8 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
                     title: faker_1.faker.lorem.sentence(),
                     content: faker_1.faker.lorem.paragraph(),
                     video_url: faker_1.faker.internet.url(),
-                    photo_url: faker_1.faker.image.url(),
+                    profile_photo: faker_1.faker.internet.url(),
+                    cover_photo: faker_1.faker.image.url(),
                     course: { connect: { id: course.id } },
                 },
                 // select: {},
@@ -80,6 +81,8 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
                 username: faker_1.faker.internet.userName(),
                 email: faker_1.faker.internet.email(),
                 phone_number: faker_1.faker.phone.number("+234##########"),
+                profile_photo: faker_1.faker.internet.url(),
+                cover_photo: faker_1.faker.image.url(),
                 password: faker_1.faker.internet.password(),
                 level: faker_1.faker.number.int({ min: 1, max: 10 }),
                 enrolled_courses: {

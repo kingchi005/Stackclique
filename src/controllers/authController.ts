@@ -5,10 +5,11 @@ import { ErrorResponse, SuccessResponse } from "../types";
 import textflow from "textflow.js";
 import {
 	emailSchema,
-	loginInputSchema,
 	phoneNumberSchema,
 	emailSignupInputSchema,
 	phoneSignupInputSchema,
+	loginEmailSchema,
+	loginPhoneSchema,
 } from "../zodSchema/inputSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -281,27 +282,81 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 };
 
 export const handleLogin = async (req: Request, res: Response) => {
-	const safe = loginInputSchema.safeParse(req.body);
-	if (!safe.success)
-		return res.status(400).json(<ErrorResponse<typeof safe.error>>{
+	if (!req.body.email && !req.body.phone_number)
+		return res.status(401).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "please provide email or phone number" },
+		});
+
+	if (req.body.email) {
+		const safeInput = loginEmailSchema.safeParse(req.body);
+
+		if (!safeInput.success)
+			return res.status(401).json(<ErrorResponse<typeof safeInput.error>>{
+				ok: false,
+				error: {
+					message: safeInput.error.issues.map((d) => d.message).join(", "),
+					details: safeInput.error,
+				},
+			});
+
+		// login with email
+		const { email, password } = safeInput.data;
+
+		const user = await prisma.user.findFirst({
+			where: { email },
+			select: { id: true, username: true, email: true, password: true },
+		});
+
+		if (!user)
+			return res.status(401).json(<ErrorResponse<any>>{
+				ok: false,
+				error: { message: "Incorrect email" },
+			});
+
+		const authorised = await bcrypt.compareSync(password, user.password);
+
+		if (!authorised)
+			return res.status(401).json(<ErrorResponse<any>>{
+				ok: false,
+				error: { message: "Incorrect password" },
+			});
+
+		const token = jwt.sign({ email }, env.HASH_SECRET + "");
+		const { password: pass, ...userData } = user;
+		return res.status(200).json(<SuccessResponse<typeof userData>>{
+			ok: true,
+			message: "Login successful",
+			data: {
+				...userData,
+				UserAccessToken: token,
+			},
+		});
+	}
+
+	const safeInput = loginPhoneSchema.safeParse(req.body);
+
+	if (!safeInput.success)
+		return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
 			ok: false,
 			error: {
-				message: safe.error.issues.map((d) => d.message).join(", "),
-				details: safe.error,
+				message: safeInput.error.issues.map((d) => d.message).join(", "),
+				details: safeInput.error,
 			},
 		});
 
-	const { email, password } = safe.data;
+	// login with phone number
+	const { phone_number, password } = safeInput.data;
 
 	const user = await prisma.user.findFirst({
-		where: { email },
-		select: { id: true, username: true, email: true, password: true },
+		where: { phone_number },
+		select: { id: true, username: true, phone_number: true, password: true },
 	});
 
 	if (!user)
 		return res.status(401).json(<ErrorResponse<any>>{
 			ok: false,
-			error: { message: "Incorrect email" },
+			error: { message: "Incorrect phone_number" },
 		});
 
 	const authorised = await bcrypt.compareSync(password, user.password);
@@ -312,7 +367,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 			error: { message: "Incorrect password" },
 		});
 
-	const token = jwt.sign({ email }, env.HASH_SECRET + "");
+	const token = jwt.sign({ phone_number }, env.HASH_SECRET + "");
 	const { password: pass, ...userData } = user;
 	return res.status(200).json(<SuccessResponse<typeof userData>>{
 		ok: true,
@@ -323,6 +378,3 @@ export const handleLogin = async (req: Request, res: Response) => {
 		},
 	});
 };
-
-const verifyByEmail = (req: Request, res: Response, next: NextFunction) => {};
-const verifyBySMS = (req: Request, res: Response, next: NextFunction) => {};

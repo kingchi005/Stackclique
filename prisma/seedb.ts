@@ -26,8 +26,8 @@ export const seedDatabase = async () => {
 			data: {
 				title: faker.lorem.sentence(),
 				about: faker.lorem.paragraph(),
-				picture_url: faker.image.url(),
-				icon_url: faker.image.url(),
+				cover_photo: faker.image.url(),
+				profile_photo: faker.image.url(),
 				rating: faker.number.int({ min: 1, max: 5 }),
 				instructor: faker.person.fullName(),
 				category: {
@@ -55,7 +55,8 @@ export const seedDatabase = async () => {
 					title: faker.lorem.sentence(),
 					content: faker.lorem.paragraph(),
 					video_url: faker.internet.url(),
-					photo_url: faker.image.url(),
+					profile_photo: faker.internet.url(),
+					cover_photo: faker.image.url(),
 					course: { connect: { id: course.id } },
 				},
 				// select: {},
@@ -73,6 +74,8 @@ export const seedDatabase = async () => {
 				username: faker.internet.userName(),
 				email: faker.internet.email(),
 				phone_number: faker.phone.number("+234##########"),
+				profile_photo: faker.internet.url(),
+				cover_photo: faker.image.url(),
 				password: faker.internet.password(),
 				level: faker.number.int({ min: 1, max: 10 }),
 				enrolled_courses: {

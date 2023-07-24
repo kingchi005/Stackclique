@@ -259,24 +259,65 @@ const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 exports.handleSignupByEmail = handleSignupByEmail;
 const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const safe = inputSchema_1.loginInputSchema.safeParse(req.body);
-    if (!safe.success)
+    if (!req.body.email && !req.body.phone_number)
+        return res.status(401).json({
+            ok: false,
+            error: { message: "please provide email or phone number" },
+        });
+    if (req.body.email) {
+        const safeInput = inputSchema_1.loginEmailSchema.safeParse(req.body);
+        if (!safeInput.success)
+            return res.status(401).json({
+                ok: false,
+                error: {
+                    message: safeInput.error.issues.map((d) => d.message).join(", "),
+                    details: safeInput.error,
+                },
+            });
+        // login with email
+        const { email, password } = safeInput.data;
+        const user = yield prisma_1.default.user.findFirst({
+            where: { email },
+            select: { id: true, username: true, email: true, password: true },
+        });
+        if (!user)
+            return res.status(401).json({
+                ok: false,
+                error: { message: "Incorrect email" },
+            });
+        const authorised = yield bcrypt_1.default.compareSync(password, user.password);
+        if (!authorised)
+            return res.status(401).json({
+                ok: false,
+                error: { message: "Incorrect password" },
+            });
+        const token = jsonwebtoken_1.default.sign({ email }, env_1.default.HASH_SECRET + "");
+        const { password: pass } = user, userData = __rest(user, ["password"]);
+        return res.status(200).json({
+            ok: true,
+            message: "Login successful",
+            data: Object.assign(Object.assign({}, userData), { UserAccessToken: token }),
+        });
+    }
+    const safeInput = inputSchema_1.loginPhoneSchema.safeParse(req.body);
+    if (!safeInput.success)
         return res.status(400).json({
             ok: false,
             error: {
-                message: safe.error.issues.map((d) => d.message).join(", "),
-                details: safe.error,
+                message: safeInput.error.issues.map((d) => d.message).join(", "),
+                details: safeInput.error,
             },
         });
-    const { email, password } = safe.data;
+    // login with phone number
+    const { phone_number, password } = safeInput.data;
     const user = yield prisma_1.default.user.findFirst({
-        where: { email },
-        select: { id: true, username: true, email: true, password: true },
+        where: { phone_number },
+        select: { id: true, username: true, phone_number: true, password: true },
     });
     if (!user)
         return res.status(401).json({
             ok: false,
-            error: { message: "Incorrect email" },
+            error: { message: "Incorrect phone_number" },
         });
     const authorised = yield bcrypt_1.default.compareSync(password, user.password);
     if (!authorised)
@@ -284,7 +325,7 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             ok: false,
             error: { message: "Incorrect password" },
         });
-    const token = jsonwebtoken_1.default.sign({ email }, env_1.default.HASH_SECRET + "");
+    const token = jsonwebtoken_1.default.sign({ phone_number }, env_1.default.HASH_SECRET + "");
     const { password: pass } = user, userData = __rest(user, ["password"]);
     return res.status(200).json({
         ok: true,
@@ -293,6 +334,4 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     });
 });
 exports.handleLogin = handleLogin;
-const verifyByEmail = (req, res, next) => { };
-const verifyBySMS = (req, res, next) => { };
 //# sourceMappingURL=authController.js.map

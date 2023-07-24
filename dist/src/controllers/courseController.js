@@ -27,16 +27,54 @@ const getSingleCourse = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
     const { id } = safeParam.data;
     const course = yield prisma_1.default.course.findFirst({
-        where: { id: +id },
+        where: { id },
+        include: {
+            category: { select: { name: true } },
+            module: true,
+            reviews: true,
+            // enrolled_users: true,
+        },
     });
-    res.status(200).json({
+    if (!course)
+        return res.status(404).json({
+            ok: false,
+            error: { message: "Course not found" },
+        });
+    return res.status(200).json({
         ok: true,
         data: course,
     });
 });
 exports.getSingleCourse = getSingleCourse;
 const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json({ msg: `get ${req.query.p} courses` });
+    const safeParam = zod_1.z.object({ p: zod_1.z.string() }).safeParse(req.query);
+    if (!safeParam.success)
+        return res.status(401).json({
+            ok: false,
+            error: {
+                message: safeParam.error.issues.map((d) => d.message).join(", "),
+                details: safeParam.error,
+            },
+        });
+    const { p } = safeParam.data;
+    const courses = yield prisma_1.default.course.findMany({
+        take: +p,
+        include: {
+            category: { select: { name: true } },
+            module: true,
+            reviews: true,
+            enrolled_users: { select: { username: true } },
+        },
+    });
+    if ((courses === null || courses === void 0 ? void 0 : courses.length) < 1)
+        return res.status(404).json({
+            ok: false,
+            error: { message: "No course in record" },
+        });
+    return res.status(200).json({
+        ok: true,
+        data: courses,
+    });
 });
 exports.getCourseByLimit = getCourseByLimit;
 //# sourceMappingURL=courseController.js.map

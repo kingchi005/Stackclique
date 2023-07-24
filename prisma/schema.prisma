@@ -11,89 +11,80 @@ datasource db {
 }
 
 model UserEmailVerificationToken {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  otp       Int
-  verified  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  expiredAt DateTime
+  id         String   @id @default(uuid())
+  email      String   @unique
+  otp        Int
+  verified   Boolean  @default(false)
+  created_at DateTime @default(now())
+  expiredAt  DateTime
 }
 
 model User {
-  id               String   @id @default(uuid())
-  username         String   @unique
-  email            String?  @unique
-  phone_number     String?  @unique
-  password         String
-  enrolled_courses Course[]
-  // completed_courses Course[]
+  id            String  @id @default(uuid())
+  username      String  @unique
+  email         String? @unique
+  phone_number  String? @unique
+  password      String
+  profile_photo String?
+  cover_photo   String?
 
+  enrolled_courses         Course[]
   completed_course_modules CourseModule[]
-
-  level     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  course_review            CourseReview[]
+  level                    Int            @default(0)
+  created_at               DateTime       @default(now())
+  updated_at               DateTime       @updatedAt
 }
 
-// model UserEnrolledCourses {
-//   id Int @id @default(autoincrement())
-
-//   user User @relation(fields: [user_id], references: [id])
-//   user_id String
-
-//   course Course @relation(fields: [course_id])
-//   course_id Int
-
-//   createdAt DateTime @default(now())
-// }
-
 model Course {
-  id             Int            @id @default(autoincrement())
+  id             String         @id @default(uuid())
   title          String
   about          String
-  picture_url    String
-  icon_url       String
-  rating         Int 
+  profile_photo  String
+  cover_photo    String
+  rating         Int
   instructor     String
   module         CourseModule[]
   reviews        CourseReview[]
   category       CourseCategory @relation(fields: [category_id], references: [id])
-  category_id    Int
+  category_id    String
   enrolled_users User[]
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @default(now())
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @default(now())
 }
 
 model CourseReview {
-  id        Int      @id @default(autoincrement())
-  course    Course   @relation(fields: [course_id], references: [id])
-  course_id Int
-  rating    Int
-  text      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id             String   @id @default(uuid())
+  course         Course   @relation(fields: [course_id], references: [id])
+  course_id      String
+  rating         Int
+  reviewed_by    User     @relation(fields: [review_user_Id], references: [id])
+  review_user_Id String
+  text           String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now())
 }
 
 model CourseModule {
-  id                 Int    @id @default(autoincrement())
+  id                 String   @id @default(uuid())
   name               String
   title              String
   content            String
-  course             Course @relation(fields: [course_id], references: [id])
-  course_id          Int
+  course             Course   @relation(fields: [course_id], references: [id])
+  course_id          String
   video_url          String
-  photo_url          String
+  cover_photo        String
+  profile_photo      String
   completed_by_users User[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  created_at         DateTime @default(now())
+  updated_at         DateTime @default(now())
 }
 
 model CourseCategory {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   name        String
   courses     Course[]
   description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now())
 }

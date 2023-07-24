@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginInputSchema = exports.phoneSignupInputSchema = exports.emailSignupInputSchema = exports.createUserSchema = exports.bearerTokenSchema = exports.phoneNumberSchema = exports.emailSchema = exports.userInputSchema = void 0;
+exports.loginPhoneSchema = exports.loginEmailSchema = exports.phoneSignupInputSchema = exports.emailSignupInputSchema = exports.createUserSchema = exports.bearerTokenSchema = exports.phoneNumberSchema = exports.emailSchema = exports.userInputSchema = void 0;
 const zod_1 = require("zod");
 exports.userInputSchema = zod_1.z.string({
     invalid_type_error: "'id' must be a stirng",
@@ -51,8 +51,12 @@ exports.phoneSignupInputSchema = zod_1.z.object({
     username: usernameSchema,
     password: passwordSchema,
 });
-exports.loginInputSchema = zod_1.z.object({
+exports.loginEmailSchema = zod_1.z.object({
     email: exports.emailSchema,
+    password: passwordSchema,
+});
+exports.loginPhoneSchema = zod_1.z.object({
+    phone_number: exports.phoneNumberSchema,
     password: passwordSchema,
 });
 //# sourceMappingURL=inputSchema.js.map

@@ -13,19 +13,23 @@
     "tags": [
         {
             "name": "authentication routes"
+        },
+        {
+            "name": "course routes"
         }
     ],
     "paths": {
         "/auth/signup": {
             "post": {
-                "tags": ["authentication routes"],
-                "summary": "signup using phone number or email",
+                "tags": [
+                    "authentication routes"
+                ],
+                "summary": "signup using phone number",
                 "requestBody": {
                     "content": {
                         "application/json": {
                             "schema": {
                                 "type": "object",
-                                "description": "user 'email' instead of 'phone_nmber' when signing with email",
                                 "example": {
                                     "username": "Jane David",
                                     "phone_number": "+2348107721911",
@@ -58,16 +62,10 @@
         },
         "/auth/get-email-otp/{email}": {
             "get": {
-                "tags": ["authentication routes"],
+                "tags": [
+                    "authentication routes"
+                ],
                 "summary": "request email verification",
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {}
-                        }
-                    }
-                },
                 "parameters": [
                     {
                         "name": "email",
@@ -75,15 +73,10 @@
                         "schema": {
                             "type": "string"
                         },
+                        "required": true,
                         "example": "eazybundledata@gmail.com"
                     }
-                ]
-            }
-        },
-        "/auth/get-sms-otp/{phone_number}": {
-            "get": {
-                "tags": ["authentication routes"],
-                "summary": "request phone nmber verification",
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -91,22 +84,41 @@
                             "application/json": {}
                         }
                     }
-                },
+                }
+            }
+        },
+        "/auth/get-sms-otp/{phone_numebr}": {
+            "get": {
+                "tags": [
+                    "authentication routes"
+                ],
+                "summary": "request phone nmber verification",
                 "parameters": [
                     {
-                        "name": "phone_number",
+                        "name": "phone_numebr",
                         "in": "path",
                         "schema": {
-                            "type": "string"
+                            "type": "number"
                         },
+                        "required": true,
                         "example": "+2348107721911"
                     }
-                ]
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
             }
         },
         "/auth/login": {
             "post": {
-                "tags": ["authentication routes"],
+                "tags": [
+                    "authentication routes"
+                ],
                 "summary": "login",
                 "requestBody": {
                     "content": {
@@ -114,7 +126,7 @@
                             "schema": {
                                 "type": "object",
                                 "example": {
-                                    "email": "jhg@bv.dns",
+                                    "phone_number": "+2350527410",
                                     "password": "disdujh"
                                 }
                             }
@@ -129,6 +141,59 @@
                             "type": "string"
                         },
                         "example": "Bearer token "
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/{id}": {
+            "get": {
+                "tags": [
+                    "course routes"
+                ],
+                "summary": "get single course",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true,
+                        "example": "3"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/courses": {
+            "get": {
+                "tags": [
+                    "course routes"
+                ],
+                "summary": "get course 'pagnated'",
+                "parameters": [
+                    {
+                        "name": "p",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": "3"
                     }
                 ],
                 "responses": {

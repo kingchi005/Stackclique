@@ -61,7 +61,12 @@ export const phoneSignupInputSchema = z.object({
 	password: passwordSchema,
 });
 
-export const loginInputSchema = z.object({
+export const loginEmailSchema = z.object({
 	email: emailSchema,
+	password: passwordSchema,
+});
+
+export const loginPhoneSchema = z.object({
+	phone_number: phoneNumberSchema,
 	password: passwordSchema,
 });
