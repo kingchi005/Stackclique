@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { z } from "zod";
+import { number, string, z } from "zod";
 import { ErrorResponse, SuccessResponse } from "../types";
 import prisma from "../../prisma";
 
@@ -73,3 +73,97 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 		data: courses,
 	});
 };
+
+export const searchCourse = async (req: Request, res: Response) => {
+	const safeParam = z
+		.object({
+			category: z.string().optional(),
+			title: z.string().optional(),
+		})
+		.safeParse(req.query);
+
+	if (!safeParam.success)
+		return res.status(401).json(<ErrorResponse<typeof safeParam.error>>{
+			ok: false,
+			error: {
+				message: safeParam.error.issues.map((d) => d.message).join(", "),
+				details: safeParam.error,
+			},
+		});
+
+	const { category, title } = safeParam.data;
+
+	const courses = await prisma.course.findMany({
+		where: {
+			category: { name: { contains: category } },
+			title: { contains: title },
+		},
+		include: {
+			category: { select: { name: true, description: true } },
+		},
+	});
+
+	if (courses.length < 1)
+		return res.status(404).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "No result found" },
+		});
+
+	return res.status(200).json(<SuccessResponse<typeof courses>>{
+		ok: true,
+		data: courses,
+	});
+};
+
+// (async () => {
+// 	const result = await prisma.course.findMany({
+// 		where: {
+// 			category: { name: { contains: "" } },
+// 			title: { contains: "" },
+// 		},
+// 		select: {
+// 			id: true,
+// 			title: true,
+// 			category: { select: { name: true } },
+// 		},
+// 	});
+
+// 	console.log(JSON.stringify(result, null, 2));
+// })()
+
+(async () => {
+	const input = {
+		category: "",
+		title: "",
+	};
+	const safeParam = z
+		.object({
+			category: z.string().optional(),
+			title: z.string().optional(),
+		})
+		.safeParse(input);
+
+	if (!safeParam.success) return console.log(safeParam.error);
+
+	const { category, title } = safeParam.data;
+
+	const result = await prisma.course.findMany({
+		where: {
+			category: { name: { contains: category } },
+			title: { contains: title },
+		},
+		select: {
+			id: true,
+			title: true,
+			category: { select: { name: true, description: true } },
+		},
+	});
+
+	if (result.length < 1)
+		return console.log(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: "No result found" },
+		});
+
+	return console.log();
+})();

@@ -11,6 +11,9 @@ const envSchema = z.object({
 	MAIL_HOST: z.string(),
 	MAIL_PORT: z.string(),
 	TEXTFLOW_API_KEY: z.string(),
+	TWILIO_ACCOUNT_SID: z.string(),
+	TWILIO_AUTH_TOKEN: z.string(),
+	TWILIO_VERIFY_SID: z.string(),
 });
 
 const env = envSchema.parse(process.env);

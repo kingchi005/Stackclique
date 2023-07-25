@@ -32,9 +32,10 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = __importDefault(require("./../../env"));
 const mailcontroller_1 = require("./mailcontroller");
+const twilio_1 = __importDefault(require("twilio"));
+const twilioClient = (0, twilio_1.default)(env_1.default.TWILIO_ACCOUNT_SID, env_1.default.TWILIO_AUTH_TOKEN);
 textflow_js_1.default.useKey(env_1.default.TEXTFLOW_API_KEY);
 const sendOTPSMS = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const safe = zod_1.z
         .object({ phone_number: inputSchema_1.phoneNumberSchema })
         .safeParse(req.params);
@@ -55,27 +56,28 @@ const sendOTPSMS = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             ok: false,
             error: { message: "Your phone number is already verified" },
         });
-    // for textflow verification
-    const textflowRes = yield textflow_js_1.default.sendVerificationSMS(phone_number, {
-        service_name: "Stack clique",
-    });
-    if (textflowRes == undefined)
+    try {
+        const twilioRes = yield twilioClient.verify.v2
+            .services(env_1.default.TWILIO_VERIFY_SID)
+            .verifications.create({ to: phone_number, channel: "sms" });
+        // return res.json(twilioRes);
+        if (!twilioRes.dateCreated)
+            return res.status(500).json({
+                ok: false,
+                error: { message: "An error occored", details: twilioRes },
+            });
+    }
+    catch (error) {
+        console.log(error);
         return res.status(500).json({
             ok: false,
-            error: { message: "An error occored" },
+            error: { message: "An error occored", details: error },
         });
-    if (!textflowRes.ok)
-        return res.status(400).json({
-            ok: false,
-            error: {
-                message: textflowRes.message,
-                details: { expires: (_a = textflowRes.data) === null || _a === void 0 ? void 0 : _a.expires },
-            },
-        });
+    }
     return res.status(200).json({
         ok: true,
-        message: textflowRes.message,
-        data: textflowRes.data,
+        message: `OTP was sent to ${phone_number}`,
+        data: {},
     });
 });
 exports.sendOTPSMS = sendOTPSMS;
@@ -101,7 +103,7 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const OTP = (() => Math.floor(Math.random() * 9000) + 1000)();
     try {
         const generatedUserOTP = yield prisma_1.default.userEmailVerificationToken.upsert({
-            where: { email, verified: false },
+            where: { email },
             update: {
                 otp: OTP,
                 expiredAt: new Date(new Date().getTime() + 60 * 60 * 1000),
@@ -111,14 +113,17 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 otp: OTP,
                 expiredAt: new Date(new Date().getTime() + 60 * 60 * 1000),
             },
-            select: { email: true, otp: true, expiredAt: true },
+            // select: { email: true, otp: true, expiredAt: true },
         });
     }
     catch (error) {
         console.log(error);
         return res.status(500).json({
             ok: false,
-            error: { message: "An error occored please try after few minutes" },
+            error: {
+                message: "An error occored please try after few minutes",
+                details: error,
+            },
         });
     }
     // send email with OTP---------------------------------------
@@ -141,59 +146,83 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.sendOTPEmail = sendOTPEmail;
 const handleSignupByPhone = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const isByPhone = req.query.phone;
-    if (!isByPhone)
-        return next();
-    const safeInput = inputSchema_1.phoneSignupInputSchema.safeParse(req.body);
-    if (!safeInput.success)
-        return res.status(400).json({
-            ok: false,
-            error: {
-                message: safeInput.error.issues.map((d) => d.message).join(", "),
-                details: safeInput.error,
-            },
-        });
-    const { phone_number, otp, password, username } = safeInput.data;
-    // check if user already exists-------------------------
-    const existingUser = yield prisma_1.default.user.findFirst({ where: { phone_number } });
-    if (existingUser)
-        return res.status(401).json({
-            ok: false,
-            error: { message: `User with email '${phone_number}' already exists` },
-        });
-    // verify phone number-------------
-    const verificationReseponse = yield textflow_js_1.default.verifyCode(phone_number, "" + otp);
-    if (verificationReseponse == undefined)
-        return res.status(500).json({
-            ok: false,
-            error: { message: "An error occored" },
-        });
-    if (!verificationReseponse.valid)
-        return res.status(400).json({
-            ok: false,
-            error: { message: verificationReseponse.message },
-        });
-    const salt = bcrypt_1.default.genSaltSync(10);
-    const hashedPassword = yield bcrypt_1.default.hashSync(password, salt);
-    // create the user
-    try {
-        const newUser = yield prisma_1.default.user.create({
-            data: { phone_number, password: hashedPassword, username },
-            select: { email: true, username: true, id: true },
-        });
-        return res.status(201).json({
-            ok: true,
-            message: "Registreation successful",
-            data: newUser,
-        });
-    }
-    catch (error) {
-        return res.status(500).json({
-            ok: false,
-            error: { details: error, message: "An error occoured please try again" },
-        });
-    }
-    res.json({ msg: "success", result: verificationReseponse });
+    console.log(req.query);
+    return;
+    // const isByPhone = req.query.phone;
+    // if (!isByPhone) return next();
+    // const safeInput = phoneSignupInputSchema.safeParse(req.body);
+    // if (!safeInput.success)
+    // 	return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
+    // 		ok: false,
+    // 		error: {
+    // 			message: safeInput.error.issues.map((d) => d.message).join(", "),
+    // 			details: safeInput.error,
+    // 		},
+    // 	});
+    // const { phone_number, otp, password, username } = safeInput.data;
+    // // check if user already exists-------------------------
+    // const existingUser = await prisma.user.findFirst({ where: { phone_number } });
+    // if (existingUser)
+    // 	return res.status(401).json(<ErrorResponse<any>>{
+    // 		ok: false,
+    // 		error: {
+    // 			message: `User with phone number '${phone_number}' already exists`,
+    // 		},
+    // 	});
+    // // verify phone number-------------
+    // try {
+    // 	const twilioRes = await twilioClient.verify.v2
+    // 		.services(env.TWILIO_VERIFY_SID)
+    // 		.verificationChecks.create({ to: phone_number, code: `${otp}` });
+    // 	return console.log(twilioRes);
+    // 	if (twilioRes == undefined)
+    // 		return res.status(500).json(<ErrorResponse<any>>{
+    // 			ok: false,
+    // 			error: {
+    // 				message: "Phone number verification failed",
+    // 				details: twilioRes,
+    // 			},
+    // 		});
+    // 	if (!twilioRes.valid)
+    // 		return res.status(400).json(<ErrorResponse<any>>{
+    // 			ok: false,
+    // 			error: {
+    // 				message: "Phone number verification failed",
+    // 				details: twilioRes,
+    // 			},
+    // 		});
+    // 	// return res.json(twilioRes);
+    // } catch (error) {
+    // 	console.log(error);
+    // 	return res.status(500).json(<ErrorResponse<any>>{
+    // 		ok: false,
+    // 		error: {
+    // 			message: "An error occour and phone number couldn't verify ",
+    // 			details: error,
+    // 		},
+    // 	});
+    // }
+    // next----
+    // const salt = bcrypt.genSaltSync(10);
+    // const hashedPassword = await bcrypt.hashSync(password, salt);
+    // // create the user
+    // try {
+    // 	const newUser = await prisma.user.create({
+    // 		data: { phone_number, password: hashedPassword, username },
+    // 		select: { phone_number: true, username: true, id: true },
+    // 	});
+    // 	return res.status(201).json(<SuccessResponse<any>>{
+    // 		ok: true,
+    // 		message: "Registreation successful",
+    // 		data: newUser,
+    // 	});
+    // } catch (error) {
+    // 	return res.status(500).json(<ErrorResponse<any>>{
+    // 		ok: false,
+    // 		error: { details: error, message: "An error occoured please try again" },
+    // 	});
+    // }
+    // res.json({ msg: "success", result: verificationReseponse });
 });
 exports.handleSignupByPhone = handleSignupByPhone;
 const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -291,7 +320,7 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 ok: false,
                 error: { message: "Incorrect password" },
             });
-        const token = jsonwebtoken_1.default.sign({ email }, env_1.default.HASH_SECRET + "");
+        const token = jsonwebtoken_1.default.sign({ id: user.id }, env_1.default.HASH_SECRET + "");
         const { password: pass } = user, userData = __rest(user, ["password"]);
         return res.status(200).json({
             ok: true,
@@ -325,7 +354,7 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             ok: false,
             error: { message: "Incorrect password" },
         });
-    const token = jsonwebtoken_1.default.sign({ phone_number }, env_1.default.HASH_SECRET + "");
+    const token = jsonwebtoken_1.default.sign({ id: user.id }, env_1.default.HASH_SECRET + "");
     const { password: pass } = user, userData = __rest(user, ["password"]);
     return res.status(200).json({
         ok: true,
@@ -334,4 +363,41 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     });
 });
 exports.handleLogin = handleLogin;
+// (async () => {
+// 	const email = "testing";
+// 	const exisitngEmail = await prisma.userEmailVerificationToken.findUnique({
+// 		where: { email },
+// 	});
+// 	const OTP = (() => Math.floor(Math.random() * 9000) + 1000)();
+// 	let generatedUserOTP;
+// 	if (!exisitngEmail) {
+// 		generatedUserOTP = await prisma.userEmailVerificationToken.create({
+// 			data: {
+// 				email,
+// 				otp: OTP,
+// 				expiredAt: new Date(new Date().getTime() + 60 * 60 * 1000),
+// 			},
+// 		});
+// 	} else {
+// 		generatedUserOTP = await prisma.userEmailVerificationToken.update({
+// 			where: { email },
+// 			data: {
+// 				email,
+// 				otp: OTP,
+// 				expiredAt: new Date(new Date().getTime() + 60 * 60 * 1000),
+// 			},
+// 		});
+// 	}
+// 	console.log(generatedUserOTP, exisitngEmail);
+// })();
+// (async () => {
+// 	// twilioClient.verify.v2
+// 	// 	.services(env.TWILIO_VERIFY_SID)
+// 	// 	.verificationChecks.create({ to: "+2348107721911", code: "569132" })
+// 	twilioClient.verify.v2
+// 		.services(env.TWILIO_VERIFY_SID)
+// 		.verificationChecks.create({ to: "+2348107721911", code: `569132` })
+// 		.then((res) => console.log(res));
+// })();
+// import "../../node_modules/body-parser/lib/types/json.js:89:19";
 //# sourceMappingURL=authController.js.map

@@ -12,7 +12,7 @@
 		"dev": "nodemon",
 		"serve": "tsc && dist/src/server",
 		"db:seed": "node dist/prisma/seedb",
-		"db:sync": "npx prisma migrate dev",
+		"db:sync": "npx prisma db push",
 		"db:view": "npx prisma studio"
 	},
 	"dependencies": {
@@ -29,6 +29,7 @@
 		"nodemailer": "^6.9.4",
 		"swagger-ui-express": "^5.0.0",
 		"textflow.js": "^0.1.4",
+		"twilio": "^4.14.0",
 		"zod": "^3.21.4"
 	},
 	"devDependencies": {

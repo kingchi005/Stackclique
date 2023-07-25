@@ -30,8 +30,8 @@ const passwordSchema = zod_1.z
     .string({ required_error: "'password' is required" })
     .min(6, { message: "'password' must be 6 ore more characters" });
 exports.bearerTokenSchema = zod_1.z.string({
-    required_error: "'Token' is required",
-    invalid_type_error: "'Token' must be a string",
+    required_error: "'Authorisation' is required",
+    invalid_type_error: "'Authorisation' must be a string",
 });
 // export const
 // input schemas

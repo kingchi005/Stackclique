@@ -34,8 +34,8 @@ const passwordSchema = z
 	.min(6, { message: "'password' must be 6 ore more characters" });
 
 export const bearerTokenSchema = z.string({
-	required_error: "'Token' is required",
-	invalid_type_error: "'Token' must be a string",
+	required_error: "'Authorisation' is required",
+	invalid_type_error: "'Authorisation' must be a string",
 });
 
 // export const
