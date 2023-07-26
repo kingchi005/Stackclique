@@ -17,11 +17,15 @@ PORT=500
 DATABASE_URL="file:./db.sqlite"
 DEV_ENV=true
 HASH_SECRET= # any random hash string
+
 MAIL_USER=# your email
 MAIL_PASSWORD=# your email password
 MAIL_HOST=# your email host
-TEXTFLOW_API_KEY=# api_key from textflow
 BASE_URL=http://localhost:${PORT}
+
+TWILIO_ACCOUNT_SID=# your twilio account SID
+TWILIO_AUTH_TOKEN=# your twilio Authentication token
+TWILIO_VERIFY_SID=# your twilio verify service SID
 ```
 
 The run the following scripts on your terminal in this order
