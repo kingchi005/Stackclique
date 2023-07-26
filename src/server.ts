@@ -30,7 +30,7 @@ app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 app.use("/auth", authRouter);
 
 // secured routes
-app.use(secureRoute);
+// app.use(secureRoute);
 
 app.use("/courses", courseRoute);
 
