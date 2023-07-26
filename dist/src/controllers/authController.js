@@ -100,7 +100,7 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             ok: false,
             error: { message: "Your email is already verified" },
         });
-    const OTP = (() => Math.floor(Math.random() * 9000) + 1000)();
+    const OTP = (() => Math.floor(Math.random() * 900000) + 100000)();
     try {
         const generatedUserOTP = yield prisma_1.default.userEmailVerificationToken.upsert({
             where: { email },
@@ -140,88 +140,89 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     return res.status(200).json({
         ok: true,
-        data: emailResponse.details,
+        data: {},
         message: emailResponse.message,
     });
 });
 exports.sendOTPEmail = sendOTPEmail;
-const handleSignupByPhone = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.query);
-    return;
+const handleSignupByPhone = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // const isByPhone = req.query.phone;
     // if (!isByPhone) return next();
-    // const safeInput = phoneSignupInputSchema.safeParse(req.body);
-    // if (!safeInput.success)
-    // 	return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
-    // 		ok: false,
-    // 		error: {
-    // 			message: safeInput.error.issues.map((d) => d.message).join(", "),
-    // 			details: safeInput.error,
-    // 		},
-    // 	});
-    // const { phone_number, otp, password, username } = safeInput.data;
-    // // check if user already exists-------------------------
-    // const existingUser = await prisma.user.findFirst({ where: { phone_number } });
-    // if (existingUser)
-    // 	return res.status(401).json(<ErrorResponse<any>>{
-    // 		ok: false,
-    // 		error: {
-    // 			message: `User with phone number '${phone_number}' already exists`,
-    // 		},
-    // 	});
-    // // verify phone number-------------
-    // try {
-    // 	const twilioRes = await twilioClient.verify.v2
-    // 		.services(env.TWILIO_VERIFY_SID)
-    // 		.verificationChecks.create({ to: phone_number, code: `${otp}` });
-    // 	return console.log(twilioRes);
-    // 	if (twilioRes == undefined)
-    // 		return res.status(500).json(<ErrorResponse<any>>{
-    // 			ok: false,
-    // 			error: {
-    // 				message: "Phone number verification failed",
-    // 				details: twilioRes,
-    // 			},
-    // 		});
-    // 	if (!twilioRes.valid)
-    // 		return res.status(400).json(<ErrorResponse<any>>{
-    // 			ok: false,
-    // 			error: {
-    // 				message: "Phone number verification failed",
-    // 				details: twilioRes,
-    // 			},
-    // 		});
-    // 	// return res.json(twilioRes);
-    // } catch (error) {
-    // 	console.log(error);
-    // 	return res.status(500).json(<ErrorResponse<any>>{
-    // 		ok: false,
-    // 		error: {
-    // 			message: "An error occour and phone number couldn't verify ",
-    // 			details: error,
-    // 		},
-    // 	});
-    // }
+    const safeInput = inputSchema_1.phoneSignupInputSchema.safeParse(req.body);
+    if (!safeInput.success)
+        return res.status(400).json({
+            ok: false,
+            error: {
+                message: safeInput.error.issues.map((d) => d.message).join(", "),
+                details: safeInput.error,
+            },
+        });
+    const { phone_number, otp, password, username } = safeInput.data;
+    // check if user already exists-------------------------
+    const existingUser = yield prisma_1.default.user.findFirst({ where: { phone_number } });
+    if (existingUser)
+        return res.status(401).json({
+            ok: false,
+            error: {
+                message: `User with phone number '${phone_number}' already exists`,
+            },
+        });
+    // verify phone number-------------
+    try {
+        const twilioRes = yield twilioClient.verify.v2
+            .services(env_1.default.TWILIO_VERIFY_SID)
+            .verificationChecks.create({ to: phone_number, code: `${otp}` });
+        // console.log(twilioRes.toJSON());
+        // return res.json({ r: twilioRes.status });
+        if (twilioRes == undefined)
+            return res.status(500).json({
+                ok: false,
+                error: {
+                    message: "Phone number erification failed",
+                    details: twilioRes,
+                },
+            });
+        if (!twilioRes.valid)
+            return res.status(400).json({
+                ok: false,
+                error: {
+                    message: "Invalid OTP",
+                    details: twilioRes,
+                },
+            });
+        // return res.json(twilioRes);
+    }
+    catch (error) {
+        // console.log(error);
+        return res.status(500).json({
+            ok: false,
+            error: {
+                message: "Phone number verification failed. Please retry after few minutes",
+                details: error,
+            },
+        });
+    }
     // next----
-    // const salt = bcrypt.genSaltSync(10);
-    // const hashedPassword = await bcrypt.hashSync(password, salt);
-    // // create the user
-    // try {
-    // 	const newUser = await prisma.user.create({
-    // 		data: { phone_number, password: hashedPassword, username },
-    // 		select: { phone_number: true, username: true, id: true },
-    // 	});
-    // 	return res.status(201).json(<SuccessResponse<any>>{
-    // 		ok: true,
-    // 		message: "Registreation successful",
-    // 		data: newUser,
-    // 	});
-    // } catch (error) {
-    // 	return res.status(500).json(<ErrorResponse<any>>{
-    // 		ok: false,
-    // 		error: { details: error, message: "An error occoured please try again" },
-    // 	});
-    // }
+    const salt = bcrypt_1.default.genSaltSync(10);
+    const hashedPassword = yield bcrypt_1.default.hashSync(password, salt);
+    // create the user
+    try {
+        const newUser = yield prisma_1.default.user.create({
+            data: { phone_number, password: hashedPassword, username },
+            select: { phone_number: true, username: true, id: true },
+        });
+        return res.status(201).json({
+            ok: true,
+            message: "Registreation successful",
+            data: newUser,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            ok: false,
+            error: { details: error, message: "An error occoured please try again" },
+        });
+    }
     // res.json({ msg: "success", result: verificationReseponse });
 });
 exports.handleSignupByPhone = handleSignupByPhone;

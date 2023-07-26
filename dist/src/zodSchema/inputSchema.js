@@ -21,11 +21,12 @@ exports.phoneNumberSchema = zod_1.z
     .max(14, { message: "Invalid phone number" })
     .transform((v) => v.replace(/\s/g, ""));
 const otpSchema = zod_1.z
-    .number({
+    .string({
     invalid_type_error: "'OTP' must be a number",
     required_error: "OTP is required",
 })
-    .min(4, { message: "'OTP' should be 4 digits" });
+    .min(4, { message: "'OTP' should at least be 4 digits" })
+    .transform((v) => +v);
 const passwordSchema = zod_1.z
     .string({ required_error: "'password' is required" })
     .min(6, { message: "'password' must be 6 ore more characters" });

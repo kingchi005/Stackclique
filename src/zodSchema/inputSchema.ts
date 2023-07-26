@@ -23,11 +23,12 @@ export const phoneNumberSchema = z
 	.transform((v) => v.replace(/\s/g, ""));
 
 const otpSchema = z
-	.number({
+	.string({
 		invalid_type_error: "'OTP' must be a number",
 		required_error: "OTP is required",
 	})
-	.min(4, { message: "'OTP' should be 4 digits" });
+	.min(4, { message: "'OTP' should at least be 4 digits" })
+	.transform((v) => +v);
 
 const passwordSchema = z
 	.string({ required_error: "'password' is required" })
