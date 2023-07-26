@@ -36,6 +36,7 @@ model User {
   updated_at               DateTime        @updatedAt
 }
 
+
 model Notifications {
   id         String   @id @default(uuid())
   message    String
@@ -58,7 +59,7 @@ model Course {
   category_id    String
   enrolled_users User[]
   created_at     DateTime       @default(now())
-  updated_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
 }
 
 model CourseReview {
@@ -70,7 +71,7 @@ model CourseReview {
   review_user_Id String
   text           String
   created_at     DateTime @default(now())
-  updated_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 }
 
 model CourseModule {
@@ -85,7 +86,7 @@ model CourseModule {
   profile_photo      String
   completed_by_users User[]
   created_at         DateTime @default(now())
-  updated_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
 }
 
 model CourseCategory {
@@ -94,5 +95,5 @@ model CourseCategory {
   courses     Course[]
   description String
   created_at  DateTime @default(now())
-  updated_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 }
