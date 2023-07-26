@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:500"
+            "url": "http://localhost:500"
         }
     ],
     "tags": [
@@ -19,11 +19,38 @@
         }
     ],
     "paths": {
-        "/auth/signup": {
+        "/auth/signup-email": {
             "post": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
+                "summary": "signup using email",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "username": "Eazy Bundle",
+                                    "email": "eazybundledata@gmail.com",
+                                    "otp": "8051",
+                                    "password": "ihjsbd"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/signup-phone": {
+            "post": {
+                "tags": ["authentication routes"],
                 "summary": "signup using phone number",
                 "requestBody": {
                     "content": {
@@ -33,23 +60,13 @@
                                 "example": {
                                     "username": "Jane David",
                                     "phone_number": "+2348107721911",
-                                    "otp": 9250,
+                                    "otp": "602630",
                                     "password": "ihjsbd"
                                 }
                             }
                         }
                     }
                 },
-                "parameters": [
-                    {
-                        "name": "phone",
-                        "in": "query",
-                        "schema": {
-                            "type": "boolean"
-                        },
-                        "example": "true"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -62,9 +79,7 @@
         },
         "/auth/get-email-otp/{email}": {
             "get": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "request email verification",
                 "parameters": [
                     {
@@ -89,10 +104,8 @@
         },
         "/auth/get-sms-otp/{phone_numebr}": {
             "get": {
-                "tags": [
-                    "authentication routes"
-                ],
-                "summary": "request phone nmber verification",
+                "tags": ["authentication routes"],
+                "summary": "request phone number verification",
                 "parameters": [
                     {
                         "name": "phone_numebr",
@@ -116,9 +129,7 @@
         },
         "/auth/login": {
             "post": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "login",
                 "requestBody": {
                     "content": {
@@ -126,8 +137,8 @@
                             "schema": {
                                 "type": "object",
                                 "example": {
-                                    "phone_number": "+2350527410",
-                                    "password": "disdujh"
+                                    "phone_number": "+2349450527410",
+                                    "password": "testing"
                                 }
                             }
                         }
@@ -155,19 +166,17 @@
         },
         "/courses/{id}": {
             "get": {
-                "tags": [
-                    "course routes"
-                ],
+                "tags": ["course routes"],
                 "summary": "get single course",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         },
                         "required": true,
-                        "example": "3"
+                        "example": "2a54c18c-b7dd-43e7-bd13-747594288175"
                     }
                 ],
                 "responses": {
@@ -182,9 +191,7 @@
         },
         "/courses": {
             "get": {
-                "tags": [
-                    "course routes"
-                ],
+                "tags": ["course routes"],
                 "summary": "get course 'pagnated'",
                 "parameters": [
                     {
@@ -194,6 +201,30 @@
                             "type": "integer"
                         },
                         "example": "3"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/courses/search": {
+            "get": {
+                "tags": ["course routes"],
+                "summary": "Course search by category or title or key_word",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "ips"
                     }
                 ],
                 "responses": {
