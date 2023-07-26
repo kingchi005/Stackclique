@@ -20,22 +20,32 @@ model UserEmailVerificationToken {
 }
 
 model User {
-  id                       String          @id @default(uuid())
-  username                 String          @unique
-  email                    String?         @unique
-  phone_number             String?         @unique
+  id                       String              @id @default(uuid())
+  username                 String              @unique
+  email                    String?             @unique
+  phone_number             String?             @unique
   password                 String
   profile_photo            String?
   cover_photo              String?
   notifications            Notifications[]
-  enrolled_courses         Course[]
+  enrolled_courses         CourseEnrollement[]
   completed_course_modules CourseModule[]
   course_review            CourseReview[]
-  level                    Int             @default(0)
-  created_at               DateTime        @default(now())
-  updated_at               DateTime        @updatedAt
+  level                    Int                 @default(0)
+  created_at               DateTime            @default(now())
+  updated_at               DateTime            @updatedAt
 }
 
+model CourseEnrollement {
+  id               Int      @id @default(autoincrement())
+  course           Course   @relation(fields: [course_id], references: [id])
+  course_id        String
+  enrolled_user    User     @relation(fields: [enrolled_user_id], references: [id])
+  enrolled_user_id String
+  enrolled_date    DateTime @default(now())
+
+  @@unique([course_id, enrolled_user_id])
+}
 
 model Notifications {
   id         String   @id @default(uuid())
@@ -46,20 +56,20 @@ model Notifications {
 }
 
 model Course {
-  id             String         @id @default(uuid())
-  title          String
-  about          String
-  profile_photo  String
-  cover_photo    String
-  rating         Int
-  instructor     String
-  module         CourseModule[]
-  reviews        CourseReview[]
-  category       CourseCategory @relation(fields: [category_id], references: [id])
-  category_id    String
-  enrolled_users User[]
-  created_at     DateTime       @default(now())
-  updated_at     DateTime       @updatedAt
+  id            String              @id @default(uuid())
+  title         String
+  about         String
+  profile_photo String
+  cover_photo   String
+  rating        Int
+  instructor    String
+  module        CourseModule[]
+  reviews       CourseReview[]
+  category      CourseCategory      @relation(fields: [category_id], references: [id])
+  category_id   String
+  enrollement   CourseEnrollement[]
+  created_at    DateTime            @default(now())
+  updated_at    DateTime            @updatedAt
 }
 
 model CourseReview {
