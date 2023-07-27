@@ -42,7 +42,6 @@ export const secureRoute = async (
 		where: { id },
 		select: {
 			id: true,
-			completed_course_modules: true,
 			level: true,
 			email: true,
 			phone_number: true,

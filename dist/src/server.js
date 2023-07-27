@@ -14,13 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const user_1 = __importDefault(require("./routes/user"));
 const auth_1 = __importDefault(require("./routes/auth"));
 // swagger api doc
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_config_1 = __importDefault(require("./api-doc/swagger-config"));
 const env_1 = __importDefault(require("../env"));
 const courses_1 = __importDefault(require("./routes/courses"));
-const middleWare_1 = require("./controllers/middleWare");
 const app = (0, express_1.default)();
 const PORT = +env_1.default.PORT || 3000;
 // Middleware setup
@@ -33,8 +33,9 @@ app.get("/dev/api-docs", swagger_ui_express_1.default.setup(swagger_config_1.def
 // Routes setup
 app.use("/auth", auth_1.default);
 // secured routes
-app.use(middleWare_1.secureRoute);
+// app.use(secureRoute);
 app.use("/courses", courses_1.default);
+app.use("/user", user_1.default);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

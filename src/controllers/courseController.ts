@@ -58,7 +58,7 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 			category: { select: { name: true } },
 			module: true,
 			reviews: true,
-			enrolled_users: { select: { username: true } },
+			enrollement: { select: { enrolled_user: true } },
 		},
 	});
 
@@ -131,39 +131,39 @@ export const searchCourse = async (req: Request, res: Response) => {
 // 	console.log(JSON.stringify(result, null, 2));
 // })()
 
-(async () => {
-	const input = {
-		category: "",
-		title: "",
-	};
-	const safeParam = z
-		.object({
-			category: z.string().optional(),
-			title: z.string().optional(),
-		})
-		.safeParse(input);
+// (async () => {
+// 	const input = {
+// 		category: "",
+// 		title: "",
+// 	};
+// 	const safeParam = z
+// 		.object({
+// 			category: z.string().optional(),
+// 			title: z.string().optional(),
+// 		})
+// 		.safeParse(input);
 
-	if (!safeParam.success) return console.log(safeParam.error);
+// 	if (!safeParam.success) return console.log(safeParam.error);
 
-	const { category, title } = safeParam.data;
+// 	const { category, title } = safeParam.data;
 
-	const result = await prisma.course.findMany({
-		where: {
-			category: { name: { contains: category } },
-			title: { contains: title },
-		},
-		select: {
-			id: true,
-			title: true,
-			category: { select: { name: true, description: true } },
-		},
-	});
+// 	const result = await prisma.course.findMany({
+// 		where: {
+// 			category: { name: { contains: category } },
+// 			title: { contains: title },
+// 		},
+// 		select: {
+// 			id: true,
+// 			title: true,
+// 			category: { select: { name: true, description: true } },
+// 		},
+// 	});
 
-	if (result.length < 1)
-		return console.log(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "No result found" },
-		});
+// 	if (result.length < 1)
+// 		return console.log(<ErrorResponse<any>>{
+// 			ok: false,
+// 			error: { message: "No result found" },
+// 		});
 
-	return console.log();
-})();
+// 	return console.log();
+// })();

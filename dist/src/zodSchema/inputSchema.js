@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginPhoneSchema = exports.loginEmailSchema = exports.phoneSignupInputSchema = exports.emailSignupInputSchema = exports.createUserSchema = exports.bearerTokenSchema = exports.phoneNumberSchema = exports.emailSchema = exports.userInputSchema = void 0;
+exports.loginPhoneSchema = exports.loginEmailSchema = exports.phoneSignupInputSchema = exports.emailSignupInputSchema = exports.createUserSchema = exports.idParamSchema = exports.bearerTokenSchema = exports.phoneNumberSchema = exports.emailSchema = exports.userInputSchema = void 0;
 const zod_1 = require("zod");
 exports.userInputSchema = zod_1.z.string({
     invalid_type_error: "'id' must be a stirng",
@@ -34,6 +34,7 @@ exports.bearerTokenSchema = zod_1.z.string({
     required_error: "'Authorisation' is required",
     invalid_type_error: "'Authorisation' must be a string",
 });
+exports.idParamSchema = zod_1.z.object({ id: zod_1.z.string() });
 // export const
 // input schemas
 exports.createUserSchema = zod_1.z.object({

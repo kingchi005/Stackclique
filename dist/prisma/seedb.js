@@ -16,9 +16,12 @@ exports.seedDatabase = void 0;
 const faker_1 = require("@faker-js/faker");
 const index_1 = __importDefault(require("./index"));
 const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
+    const NUM_OF_COURSES = 13;
+    const NUM_OF_USERS = 4;
+    const NUM_OF_CATEGORIES = 3;
     // Generate categories
     const categories = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < NUM_OF_CATEGORIES; i++) {
         const category = yield (index_1.default === null || index_1.default === void 0 ? void 0 : index_1.default.courseCategory.create({
             data: {
                 name: faker_1.faker.lorem.words(),
@@ -29,7 +32,7 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     const modules = [];
     const courses = [];
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < NUM_OF_COURSES; i++) {
         // const s_modules = faker.helpers.arrayElements(modules, 3);
         const course = yield index_1.default.course.create({
             data: {
@@ -75,7 +78,7 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
         courses.push(course);
     }
     // const courses = await prisma.course.findMany();
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < NUM_OF_USERS; i++) {
         const user = yield index_1.default.user.create({
             data: {
                 username: faker_1.faker.internet.userName(),
@@ -85,9 +88,6 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
                 cover_photo: faker_1.faker.image.url(),
                 password: faker_1.faker.internet.password(),
                 level: faker_1.faker.number.int({ min: 1, max: 10 }),
-                enrolled_courses: {
-                    connect: { id: faker_1.faker.helpers.arrayElement(courses).id },
-                },
             },
         });
         // users.push(user);
