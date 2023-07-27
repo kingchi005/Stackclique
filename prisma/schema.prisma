@@ -44,7 +44,7 @@ model CourseEnrollement {
   enrolled_user_id  String
   completed         Boolean  @default(false)
   completed_modules Int      @default(0)
-  enrolled_at     DateTime @default(now())
+  enrolled_at       DateTime @default(now())
   completed_at      DateTime @updatedAt
 
   @@unique([course_id, enrolled_user_id])

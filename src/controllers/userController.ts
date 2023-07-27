@@ -31,9 +31,10 @@ export const fetchUserDetails = async (req: Request, res: Response) => {
 			enrolled_courses: {
 				select: {
 					course: { include: { module: {} } },
-					enrolled_date: true,
 					completed_modules: true,
 					completed: true,
+					enrolled_at: true,
+					completed_at: true,
 				},
 			},
 		},

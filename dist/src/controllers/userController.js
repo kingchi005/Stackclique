@@ -40,9 +40,10 @@ const fetchUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, functio
             enrolled_courses: {
                 select: {
                     course: { include: { module: {} } },
-                    enrolled_date: true,
                     completed_modules: true,
                     completed: true,
+                    enrolled_at: true,
+                    completed_at: true,
                 },
             },
         },
