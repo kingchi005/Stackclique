@@ -28,11 +28,16 @@ export const fetchUserDetails = async (req: Request, res: Response) => {
 			notifications: true,
 			profile_photo: true,
 			cover_photo: true,
-			enrolled_courses: { select: { course: {}, enrolled_date: true } },
+			enrolled_courses: {
+				select: {
+					course: { include: { module: {} } },
+					enrolled_date: true,
+					completed_modules: true,
+					completed: true,
+				},
+			},
 		},
 	});
-
-	const course_progrees: number = 0;
 
 	if (!user)
 		return res.status(404).json(<ErrorResponse<any>>{
@@ -46,30 +51,29 @@ export const fetchUserDetails = async (req: Request, res: Response) => {
 	});
 };
 
-(async () => {
-	const id = "0d860861-b9d6-4270-8791-56d91ad977bf";
-	const user = await prisma.user.findUnique({
-		where: { id },
-		select: {
-			id: true,
-			email: true,
-			username: true,
-			phone_number: true,
-			level: true,
-			notifications: true,
-			profile_photo: true,
-			cover_photo: true,
-			enrolled_courses: {
-				select: {
-					course: { include: { module: {} } },
-					enrolled_date: true,
-					completed_modules: true,
-					completed: true,
-				},
-			},
-		},
-	});
+// (async () => {
+// 	const id = "0d860861-b9d6-4270-8791-56d91ad977bf";
+// 	const user = await prisma.user.findUnique({
+// 		where: { id },
+// 		select: {
+// 			id: true,
+// 			email: true,
+// 			username: true,
+// 			phone_number: true,
+// 			level: true,
+// 			notifications: true,
+// 			profile_photo: true,
+// 			cover_photo: true,
+// 			enrolled_courses: {
+// 				select: {
+// 					course: { include: { module: {} } },
+// 					enrolled_date: true,
+// 					completed_modules: true,
+// 					completed: true,
+// 				},
+// 			},
+// 		},
+// 	});
 
-	const course_progrees: number = 0;
-	console.log(user);
-})();
+// 	console.log(user);
+// })();
