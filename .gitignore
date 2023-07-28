@@ -4,5 +4,3 @@ node_modules
 prisma/*.sqlite
 prisma/*.db
 prisma/db.sqlite
-./prisma/db.sqlite
-prisma/db.sqlite
