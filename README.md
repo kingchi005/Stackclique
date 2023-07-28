@@ -22,10 +22,6 @@ MAIL_USER=# your email
 MAIL_PASSWORD=# your email password
 MAIL_HOST=# your email host
 BASE_URL=http://localhost:${PORT}
-
-TWILIO_ACCOUNT_SID=# your twilio account SID
-TWILIO_AUTH_TOKEN=# your twilio Authentication token
-TWILIO_VERIFY_SID=# your twilio verify service SID
 ```
 
 The run the following scripts on your terminal in this order
@@ -47,6 +43,8 @@ To visualise the data in the database run the command
 npm run db:seed
 npm run db:view
 ```
+
+- for now i am using sqlite database. But SQL database will be used for the production deployment
 
 You will see a UI like so
 ![Alt text](db-UI.png)

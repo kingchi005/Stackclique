@@ -11,11 +11,11 @@ const authRouter = Router();
 
 authRouter.get("/get-email-otp/:email", sendOTPEmail);
 
-authRouter.get("/get-sms-otp/:phone_number", sendOTPSMS);
+// authRouter.get("/get-sms-otp/:phone_number", sendOTPSMS);
 
 authRouter.post("/signup-email", handleSignupByEmail);
 
-authRouter.post("/signup-phone", handleSignupByPhone);
+// authRouter.post("/signup-phone", handleSignupByPhone);
 
 authRouter.post("/login", handleLogin);
 
