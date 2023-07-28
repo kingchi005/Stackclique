@@ -16,12 +16,17 @@
         },
         {
             "name": "course routes"
+        },
+        {
+            "name": "user routes"
         }
     ],
     "paths": {
         "/auth/signup-email": {
             "post": {
-                "tags": ["authentication routes"],
+                "tags": [
+                    "authentication routes"
+                ],
                 "summary": "signup using email",
                 "requestBody": {
                     "content": {
@@ -48,38 +53,11 @@
                 }
             }
         },
-        "/auth/signup-phone": {
-            "post": {
-                "tags": ["authentication routes"],
-                "summary": "signup using phone number",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "example": {
-                                    "username": "Jane David",
-                                    "phone_number": "+2348107721911",
-                                    "otp": "602630",
-                                    "password": "ihjsbd"
-                                }
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful response",
-                        "content": {
-                            "application/json": {}
-                        }
-                    }
-                }
-            }
-        },
         "/auth/get-email-otp/{email}": {
             "get": {
-                "tags": ["authentication routes"],
+                "tags": [
+                    "authentication routes"
+                ],
                 "summary": "request email verification",
                 "parameters": [
                     {
@@ -104,7 +82,9 @@
         },
         "/auth/get-sms-otp/{phone_numebr}": {
             "get": {
-                "tags": ["authentication routes"],
+                "tags": [
+                    "authentication routes"
+                ],
                 "summary": "request phone number verification",
                 "parameters": [
                     {
@@ -129,7 +109,9 @@
         },
         "/auth/login": {
             "post": {
-                "tags": ["authentication routes"],
+                "tags": [
+                    "authentication routes"
+                ],
                 "summary": "login",
                 "requestBody": {
                     "content": {
@@ -164,10 +146,43 @@
                 }
             }
         },
+        "/auth/signup-phone": {
+            "post": {
+                "tags": [
+                    "authentication routes"
+                ],
+                "summary": "signup using phone number",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "example": {
+                                    "username": "Jane David",
+                                    "phone_number": "+2348107721911",
+                                    "otp": "602630",
+                                    "password": "ihjsbd"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
         "/courses/{id}": {
             "get": {
-                "tags": ["course routes"],
-                "summary": "get single course",
+                "tags": [
+                    "course routes"
+                ],
+                "summary": "get course details",
                 "parameters": [
                     {
                         "name": "id",
@@ -176,7 +191,7 @@
                             "type": "string"
                         },
                         "required": true,
-                        "example": "2a54c18c-b7dd-43e7-bd13-747594288175"
+                        "example": "1c3fbd80-4046-413e-afd0-57928a29a824"
                     }
                 ],
                 "responses": {
@@ -191,7 +206,9 @@
         },
         "/courses": {
             "get": {
-                "tags": ["course routes"],
+                "tags": [
+                    "course routes"
+                ],
                 "summary": "get course 'pagnated'",
                 "parameters": [
                     {
@@ -215,16 +232,72 @@
         },
         "/courses/search": {
             "get": {
-                "tags": ["course routes"],
+                "tags": [
+                    "course routes"
+                ],
                 "summary": "Course search by category or title or key_word",
                 "parameters": [
                     {
-                        "name": "category",
+                        "name": "title",
                         "in": "query",
                         "schema": {
                             "type": "string"
                         },
-                        "example": "ips"
+                        "example": "quidem"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "tags": [
+                    "user routes"
+                ],
+                "summary": "get user details",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "example": "17bf203d-2824-49c7-b326-0cb3e6d6de19"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/user/enrolled/{id}": {
+            "get": {
+                "tags": [
+                    "user routes"
+                ],
+                "summary": "get user enrolled courses",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "example": "17bf203d-2824-49c7-b326-0cb3e6d6de19"
                     }
                 ],
                 "responses": {
