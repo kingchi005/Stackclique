@@ -1,8 +1,7 @@
 import { Router } from "express";
 import {
 	getCourseByLimit,
-	getErroledCourses,
-	getSingleCourse,
+	getCourseDetails,
 	searchCourse,
 } from "../controllers/courseController";
 
@@ -12,8 +11,6 @@ courseRoute.get("/", getCourseByLimit);
 
 courseRoute.get("/search", searchCourse);
 
-courseRoute.get("/enrolled/:user_id", getErroledCourses);
-
-courseRoute.get("/:id", getSingleCourse);
+courseRoute.get("/:id", getCourseDetails);
 
 export default courseRoute;

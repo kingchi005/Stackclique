@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getErroledCourses = exports.searchCourse = exports.getCourseByLimit = exports.getSingleCourse = void 0;
+exports.searchCourse = exports.getCourseByLimit = exports.getCourseDetails = void 0;
 const zod_1 = require("zod");
 const prisma_1 = __importDefault(require("../../prisma"));
-const getSingleCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ id: zod_1.z.string() }).safeParse(req.params);
     if (!safeParam.success)
         return res.status(401).json({
@@ -30,9 +30,17 @@ const getSingleCourse = (req, res) => __awaiter(void 0, void 0, void 0, function
         where: { id },
         include: {
             category: { select: { name: true } },
-            module: true,
+            module: {
+                select: {
+                    id: true,
+                    name: true,
+                    title: true,
+                    profile_photo: true,
+                    cover_photo: true,
+                },
+            },
             reviews: true,
-            // enrolled_users: true,
+            _count: { select: { enrollement: {}, reviews: {}, module: true } },
         },
     });
     if (!course)
@@ -45,7 +53,7 @@ const getSingleCourse = (req, res) => __awaiter(void 0, void 0, void 0, function
         data: course,
     });
 });
-exports.getSingleCourse = getSingleCourse;
+exports.getCourseDetails = getCourseDetails;
 const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ p: zod_1.z.string() }).safeParse(req.query);
     if (!safeParam.success)
@@ -59,19 +67,17 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
     const { p } = safeParam.data;
     const courses = yield prisma_1.default.course.findMany({
         take: +p,
-        // include: {
-        // 	category: { select: { name: true } },
-        // 	module: true,
-        // 	reviews: true,
-        // 	enrollement: { select: { enrolled_user: true } },
         // },
         select: {
             id: true,
             title: true,
-            reviews: true,
-            _count: { select: { enrollement: {}, reviews: {} } },
+            about: true,
+            category: { select: { name: true } },
             profile_photo: true,
             cover_photo: true,
+            required_user_level: true,
+            reviews: true,
+            _count: { select: { enrollement: {}, reviews: {}, module: true } },
         },
     });
     if ((courses === null || courses === void 0 ? void 0 : courses.length) < 1)
@@ -128,81 +134,5 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     });
 });
 exports.searchCourse = searchCourse;
-const getErroledCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const safeParam = zod_1.z.object({ user_id: zod_1.z.string() }).safeParse(req.params);
-    if (!safeParam.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeParam.error.issues.map((d) => d.message).join(", "),
-                details: safeParam.error,
-            },
-        });
-    const id = safeParam.data.user_id;
-    const user = yield prisma_1.default.user.findUnique({
-        where: { id },
-        select: {
-            enrolled_courses: {
-                select: {
-                    course: {
-                        select: {
-                            id: true,
-                            title: true,
-                            category: { select: { name: true } },
-                            about: true,
-                            profile_photo: true,
-                            cover_photo: true,
-                            _count: { select: { module: true } },
-                        },
-                    },
-                    completed: true,
-                    completed_modules: true,
-                    enrolled_at: true,
-                },
-            },
-        },
-    });
-    if (!user)
-        return res.status(401).json({
-            ok: false,
-            error: { message: `User with id '${id}' does not exist` },
-        });
-    if (user.enrolled_courses.length < 1)
-        return res.status(404).json({
-            ok: false,
-            error: { message: `User with id '${id}' is not enrolled in any course` },
-        });
-    return res.status(200).json({
-        ok: true,
-        data: user.enrolled_courses,
-    });
-});
-exports.getErroledCourses = getErroledCourses;
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    const id = "1d321ad0-2225-423d-b406-9a0cdc937af3";
-    const user = yield prisma_1.default.user.findUnique({
-        where: { id },
-        select: {
-            enrolled_courses: {
-                select: {
-                    course: {
-                        select: {
-                            id: true,
-                            title: true,
-                            category: { select: { name: true } },
-                            about: true,
-                            profile_photo: true,
-                            cover_photo: true,
-                            _count: { select: { module: true } },
-                        },
-                    },
-                    completed: true,
-                    completed_modules: true,
-                    enrolled_at: true,
-                },
-            },
-        },
-    });
-    console.log(user === null || user === void 0 ? void 0 : user.enrolled_courses);
-}))();
+(() => __awaiter(void 0, void 0, void 0, function* () { }))();
 //# sourceMappingURL=courseController.js.map

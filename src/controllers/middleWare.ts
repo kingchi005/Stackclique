@@ -42,14 +42,28 @@ export const secureRoute = async (
 		where: { id },
 		select: {
 			id: true,
-			level: true,
 			email: true,
-			phone_number: true,
-			// notification:true ,
 			username: true,
+			phone_number: true,
 			profile_photo: true,
 			cover_photo: true,
-			enrolled_courses: true,
+			level: true,
+			notifications: true,
+			enrolled_courses: {
+				select: {
+					course: {
+						select: {
+							id: true,
+							title: true,
+							reviews: true,
+							_count: { select: { enrollement: {}, reviews: {} } },
+							profile_photo: true,
+						},
+					},
+					enrolled_at: true,
+				},
+			},
+			created_at: true,
 		},
 	});
 	//

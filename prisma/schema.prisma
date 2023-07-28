@@ -29,7 +29,6 @@ model User {
   cover_photo      String?
   notifications    Notifications[]
   enrolled_courses CourseEnrollement[]
-  // completed_course_modules CourseModule[]
   course_review    CourseReview[]
   level            Int                 @default(0)
   created_at       DateTime            @default(now())
@@ -59,20 +58,21 @@ model Notifications {
 }
 
 model Course {
-  id            String              @id @default(uuid())
-  title         String
-  about         String
-  profile_photo String
-  cover_photo   String
-  rating        Int
-  instructor    String
-  module        CourseModule[]
-  reviews       CourseReview[]
-  category      CourseCategory      @relation(fields: [category_id], references: [id])
-  category_id   String
-  enrollement   CourseEnrollement[]
-  created_at    DateTime            @default(now())
-  updated_at    DateTime            @updatedAt
+  id                  String              @id @default(uuid())
+  title               String
+  about               String
+  profile_photo       String
+  cover_photo         String
+  instructor          String
+  category            CourseCategory      @relation(fields: [category_id], references: [id])
+  category_id         String
+  rating              Int
+  module              CourseModule[]
+  enrollement         CourseEnrollement[]
+  required_user_level Int
+  reviews             CourseReview[]
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
 }
 
 model CourseReview {

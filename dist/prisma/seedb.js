@@ -40,6 +40,7 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
                 about: faker_1.faker.lorem.paragraph(),
                 cover_photo: faker_1.faker.image.url(),
                 profile_photo: faker_1.faker.image.url(),
+                required_user_level: faker_1.faker.number.int({ min: 1, max: 10 }),
                 rating: faker_1.faker.number.int({ min: 1, max: 5 }),
                 instructor: faker_1.faker.person.fullName(),
                 category: {

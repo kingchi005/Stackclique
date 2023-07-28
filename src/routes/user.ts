@@ -1,8 +1,13 @@
 import { Router } from "express";
-import { fetchUserDetails } from "../controllers/userController";
+import {
+	getUserDetails,
+	getErroledCourses,
+} from "../controllers/userController";
 
 const userRoute = Router();
 
-userRoute.get("/:id", fetchUserDetails);
+userRoute.get("/enrolled/:id", getErroledCourses);
+
+userRoute.get("/:id", getUserDetails);
 
 export default userRoute;

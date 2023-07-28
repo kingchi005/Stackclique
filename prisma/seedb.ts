@@ -31,6 +31,7 @@ export const seedDatabase = async () => {
 				about: faker.lorem.paragraph(),
 				cover_photo: faker.image.url(),
 				profile_photo: faker.image.url(),
+				required_user_level: faker.number.int({ min: 1, max: 10 }),
 				rating: faker.number.int({ min: 1, max: 5 }),
 				instructor: faker.person.fullName(),
 				category: {

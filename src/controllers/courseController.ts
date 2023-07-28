@@ -4,7 +4,7 @@ import { ErrorResponse, SuccessResponse } from "../types";
 import prisma from "../../prisma";
 import { idParamSchema } from "../zodSchema/inputSchema";
 
-export const getSingleCourse = async (req: Request, res: Response) => {
+export const getCourseDetails = async (req: Request, res: Response) => {
 	const safeParam = z.object({ id: z.string() }).safeParse(req.params);
 
 	if (!safeParam.success)
@@ -21,9 +21,17 @@ export const getSingleCourse = async (req: Request, res: Response) => {
 		where: { id },
 		include: {
 			category: { select: { name: true } },
-			module: true,
+			module: {
+				select: {
+					id: true,
+					name: true,
+					title: true,
+					profile_photo: true,
+					cover_photo: true,
+				},
+			},
 			reviews: true,
-			// enrolled_users: true,
+			_count: { select: { enrollement: {}, reviews: {}, module: true } },
 		},
 	});
 
@@ -55,19 +63,18 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 
 	const courses = await prisma.course.findMany({
 		take: +p,
-		// include: {
-		// 	category: { select: { name: true } },
-		// 	module: true,
-		// 	reviews: true,
-		// 	enrollement: { select: { enrolled_user: true } },
+
 		// },
 		select: {
 			id: true,
 			title: true,
-			reviews: true,
-			_count: { select: { enrollement: {}, reviews: {} } },
+			about: true,
+			category: { select: { name: true } },
 			profile_photo: true,
 			cover_photo: true,
+			required_user_level: true,
+			reviews: true,
+			_count: { select: { enrollement: {}, reviews: {}, module: true } },
 		},
 	});
 
@@ -131,89 +138,4 @@ export const searchCourse = async (req: Request, res: Response) => {
 	});
 };
 
-export const getErroledCourses = async (req: Request, res: Response) => {
-	const safeParam = z.object({ user_id: z.string() }).safeParse(req.params);
-
-	if (!safeParam.success)
-		return res.status(401).json(<ErrorResponse<typeof safeParam.error>>{
-			ok: false,
-			error: {
-				message: safeParam.error.issues.map((d) => d.message).join(", "),
-				details: safeParam.error,
-			},
-		});
-
-	const id = safeParam.data.user_id;
-
-	const user = await prisma.user.findUnique({
-		where: { id },
-		select: {
-			enrolled_courses: {
-				select: {
-					course: {
-						select: {
-							id: true,
-							title: true,
-							category: { select: { name: true } },
-							about: true,
-							profile_photo: true,
-							cover_photo: true,
-							_count: { select: { module: true } },
-						},
-					},
-
-					completed: true,
-					completed_modules: true,
-					enrolled_at: true,
-				},
-			},
-		},
-	});
-
-	if (!user)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: `User with id '${id}' does not exist` },
-		});
-
-	if (user.enrolled_courses.length < 1)
-		return res.status(404).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: `User with id '${id}' is not enrolled in any course` },
-		});
-
-	return res.status(200).json(<SuccessResponse<typeof user.enrolled_courses>>{
-		ok: true,
-		data: user.enrolled_courses,
-	});
-};
-
-(async () => {
-	const id = "1d321ad0-2225-423d-b406-9a0cdc937af3";
-	const user = await prisma.user.findUnique({
-		where: { id },
-		select: {
-			enrolled_courses: {
-				select: {
-					course: {
-						select: {
-							id: true,
-							title: true,
-							category: { select: { name: true } },
-							about: true,
-							profile_photo: true,
-							cover_photo: true,
-							_count: { select: { module: true } },
-						},
-					},
-
-					completed: true,
-					completed_modules: true,
-					enrolled_at: true,
-				},
-			},
-		},
-	});
-
-	console.log(user?.enrolled_courses);
-})();
+(async () => {})();
