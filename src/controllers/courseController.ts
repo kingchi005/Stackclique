@@ -98,8 +98,14 @@ export const searchCourse = async (req: Request, res: Response) => {
 			category: { name: { contains: category } },
 			title: { contains: title },
 		},
-		include: {
-			category: { select: { name: true, description: true } },
+		// include: {
+		// 	// category: { select: { name: true, description: true } },
+		// },
+		select: {
+			title: true,
+			reviews: true,
+			_count: { select: { enrollement: {}, reviews: {} } },
+			profile_photo: true,
 		},
 	});
 

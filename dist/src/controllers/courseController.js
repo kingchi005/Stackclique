@@ -98,8 +98,14 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             category: { name: { contains: category } },
             title: { contains: title },
         },
-        include: {
-            category: { select: { name: true, description: true } },
+        // include: {
+        // 	// category: { select: { name: true, description: true } },
+        // },
+        select: {
+            title: true,
+            reviews: true,
+            _count: { select: { enrollement: {}, reviews: {} } },
+            profile_photo: true,
         },
     });
     if (courses.length < 1)
