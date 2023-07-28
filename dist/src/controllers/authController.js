@@ -26,59 +26,61 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleLogin = exports.handleSignupByEmail = exports.handleSignupByPhone = exports.sendOTPEmail = exports.sendOTPSMS = void 0;
 const zod_1 = require("zod");
 const prisma_1 = __importDefault(require("../../prisma"));
-const textflow_js_1 = __importDefault(require("textflow.js"));
 const inputSchema_1 = require("../zodSchema/inputSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = __importDefault(require("./../../env"));
 const mailcontroller_1 = require("./mailcontroller");
-const twilio_1 = __importDefault(require("twilio"));
-const twilioClient = (0, twilio_1.default)(env_1.default.TWILIO_ACCOUNT_SID, env_1.default.TWILIO_AUTH_TOKEN);
-textflow_js_1.default.useKey(env_1.default.TEXTFLOW_API_KEY);
 const sendOTPSMS = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const safe = zod_1.z
-        .object({ phone_number: inputSchema_1.phoneNumberSchema })
+    /* {
+    const safe = z
+        .object({ phone_number: phoneNumberSchema })
         .safeParse(req.params);
     if (!safe.success)
-        return res.status(401).json({
+        return res.status(401).json(<ErrorResponse<typeof safe.error>>{
             ok: false,
             error: {
                 message: safe.error.issues.map((d) => d.message).join(", "),
                 details: safe.error,
             },
         });
+
     const { phone_number } = safe.data;
-    const existingUser = yield prisma_1.default.user.findFirst({
+    const existingUser = await prisma.user.findFirst({
         where: { phone_number },
     });
+
     if (existingUser)
-        return res.status(202).json({
+        return res.status(202).json(<ErrorResponse<any>>{
             ok: false,
             error: { message: "Your phone number is already verified" },
         });
+
     try {
-        const twilioRes = yield twilioClient.verify.v2
-            .services(env_1.default.TWILIO_VERIFY_SID)
+        const twilioRes = await twilioClient.verify.v2
+            .services(env.TWILIO_VERIFY_SID)
             .verifications.create({ to: phone_number, channel: "sms" });
+
         // return res.json(twilioRes);
         if (!twilioRes.dateCreated)
-            return res.status(500).json({
+            return res.status(500).json(<ErrorResponse<any>>{
                 ok: false,
                 error: { message: "An error occored", details: twilioRes },
             });
-    }
-    catch (error) {
+    } catch (error) {
         console.log(error);
-        return res.status(500).json({
+        return res.status(500).json(<ErrorResponse<any>>{
             ok: false,
             error: { message: "An error occored", details: error },
         });
     }
-    return res.status(200).json({
+
+    return res.status(200).json(<SuccessResponse<any>>{
         ok: true,
         message: `OTP was sent to ${phone_number}`,
         data: {},
     });
+} */
 });
 exports.sendOTPSMS = sendOTPSMS;
 const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -146,11 +148,13 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.sendOTPEmail = sendOTPEmail;
 const handleSignupByPhone = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    /* {
     // const isByPhone = req.query.phone;
     // if (!isByPhone) return next();
-    const safeInput = inputSchema_1.phoneSignupInputSchema.safeParse(req.body);
+
+    const safeInput = phoneSignupInputSchema.safeParse(req.body);
     if (!safeInput.success)
-        return res.status(400).json({
+        return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
             ok: false,
             error: {
                 message: safeInput.error.issues.map((d) => d.message).join(", "),
@@ -158,32 +162,37 @@ const handleSignupByPhone = (req, res) => __awaiter(void 0, void 0, void 0, func
             },
         });
     const { phone_number, otp, password, username } = safeInput.data;
+
     // check if user already exists-------------------------
-    const existingUser = yield prisma_1.default.user.findFirst({ where: { phone_number } });
+    const existingUser = await prisma.user.findFirst({ where: { phone_number } });
     if (existingUser)
-        return res.status(401).json({
+        return res.status(401).json(<ErrorResponse<any>>{
             ok: false,
             error: {
                 message: `User with phone number '${phone_number}' already exists`,
             },
         });
+
     // verify phone number-------------
     try {
-        const twilioRes = yield twilioClient.verify.v2
-            .services(env_1.default.TWILIO_VERIFY_SID)
+        const twilioRes = await twilioClient.verify.v2
+            .services(env.TWILIO_VERIFY_SID)
             .verificationChecks.create({ to: phone_number, code: `${otp}` });
+
         // console.log(twilioRes.toJSON());
         // return res.json({ r: twilioRes.status });
+
         if (twilioRes == undefined)
-            return res.status(500).json({
+            return res.status(500).json(<ErrorResponse<any>>{
                 ok: false,
                 error: {
                     message: "Phone number erification failed",
                     details: twilioRes,
                 },
             });
+
         if (!twilioRes.valid)
-            return res.status(400).json({
+            return res.status(400).json(<ErrorResponse<any>>{
                 ok: false,
                 error: {
                     message: "Invalid OTP",
@@ -191,39 +200,44 @@ const handleSignupByPhone = (req, res) => __awaiter(void 0, void 0, void 0, func
                 },
             });
         // return res.json(twilioRes);
-    }
-    catch (error) {
+    } catch (error) {
         // console.log(error);
-        return res.status(500).json({
+        return res.status(500).json(<ErrorResponse<any>>{
             ok: false,
             error: {
-                message: "Phone number verification failed. Please retry after few minutes",
+                message:
+                    "Phone number verification failed. Please retry after few minutes",
                 details: error,
             },
         });
     }
+
     // next----
-    const salt = bcrypt_1.default.genSaltSync(10);
-    const hashedPassword = yield bcrypt_1.default.hashSync(password, salt);
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hashSync(password, salt);
+
     // create the user
     try {
-        const newUser = yield prisma_1.default.user.create({
+        const newUser = await prisma.user.create({
             data: { phone_number, password: hashedPassword, username },
             select: { phone_number: true, username: true, id: true },
         });
-        return res.status(201).json({
+
+        return res.status(201).json(<SuccessResponse<any>>{
             ok: true,
             message: "Registreation successful",
             data: newUser,
         });
-    }
-    catch (error) {
-        return res.status(500).json({
+    } catch (error) {
+        return res.status(500).json(<ErrorResponse<any>>{
             ok: false,
             error: { details: error, message: "An error occoured please try again" },
         });
     }
+
     // res.json({ msg: "success", result: verificationReseponse });
+} */
 });
 exports.handleSignupByPhone = handleSignupByPhone;
 const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

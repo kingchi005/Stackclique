@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { z } from "zod";
 import prisma from "../../prisma";
 import { ErrorResponse, SuccessResponse } from "../types";
@@ -14,14 +14,10 @@ import {
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import env from "./../../env";
-import { sendEmail, sendTestMail } from "./mailcontroller";
-import twilio from "twilio";
-
-const twilioClient = twilio(env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN);
-
-textflow.useKey(env.TEXTFLOW_API_KEY);
+import { sendEmail } from "./mailcontroller";
 
 export const sendOTPSMS = async (req: Request, res: Response) => {
+	/* {
 	const safe = z
 		.object({ phone_number: phoneNumberSchema })
 		.safeParse(req.params);
@@ -69,6 +65,7 @@ export const sendOTPSMS = async (req: Request, res: Response) => {
 		message: `OTP was sent to ${phone_number}`,
 		data: {},
 	});
+} */
 };
 
 export const sendOTPEmail = async (req: Request, res: Response) => {
@@ -147,6 +144,7 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 };
 
 export const handleSignupByPhone = async (req: Request, res: Response) => {
+	/* {
 	// const isByPhone = req.query.phone;
 	// if (!isByPhone) return next();
 
@@ -235,6 +233,7 @@ export const handleSignupByPhone = async (req: Request, res: Response) => {
 	}
 
 	// res.json({ msg: "success", result: verificationReseponse });
+} */
 };
 
 export const handleSignupByEmail = async (req: Request, res: Response) => {

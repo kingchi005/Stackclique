@@ -11,10 +11,6 @@ const envSchema = zod_1.z.object({
     MAIL_PASSWORD: zod_1.z.string(),
     MAIL_HOST: zod_1.z.string(),
     MAIL_PORT: zod_1.z.string(),
-    TEXTFLOW_API_KEY: zod_1.z.string(),
-    TWILIO_ACCOUNT_SID: zod_1.z.string(),
-    TWILIO_AUTH_TOKEN: zod_1.z.string(),
-    TWILIO_VERIFY_SID: zod_1.z.string(),
 });
 const env = envSchema.parse(process.env);
 exports.default = env;
