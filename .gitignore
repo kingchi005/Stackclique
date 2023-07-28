@@ -1,8 +1,8 @@
-node_modules
-*.vscode
-# dist
-# src/controllers/userController.ts
+.vscode
 .env
+node_modules
+prisma/*.sqlite
+prisma/*.db
 prisma/db.sqlite
-*.sqlite
-*.db
+./prisma/db.sqlite
+prisma/db.sqlite
