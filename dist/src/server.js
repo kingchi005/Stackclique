@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const user_1 = __importDefault(require("./routes/user"));
 const auth_1 = __importDefault(require("./routes/auth"));
 // swagger api doc
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
@@ -34,6 +35,7 @@ app.use("/auth", auth_1.default);
 // secured routes
 // app.use(secureRoute);
 app.use("/courses", courses_1.default);
+app.use("/user", user_1.default);
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);

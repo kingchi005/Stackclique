@@ -63,7 +63,7 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
             category: { select: { name: true } },
             module: true,
             reviews: true,
-            enrolled_users: { select: { username: true } },
+            enrollement: { select: { enrolled_user: true } },
         },
     });
     if ((courses === null || courses === void 0 ? void 0 : courses.length) < 1)
@@ -127,36 +127,35 @@ exports.searchCourse = searchCourse;
 // 	});
 // 	console.log(JSON.stringify(result, null, 2));
 // })()
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    const input = {
-        category: "",
-        title: "",
-    };
-    const safeParam = zod_1.z
-        .object({
-        category: zod_1.z.string().optional(),
-        title: zod_1.z.string().optional(),
-    })
-        .safeParse(input);
-    if (!safeParam.success)
-        return console.log(safeParam.error);
-    const { category, title } = safeParam.data;
-    const result = yield prisma_1.default.course.findMany({
-        where: {
-            category: { name: { contains: category } },
-            title: { contains: title },
-        },
-        select: {
-            id: true,
-            title: true,
-            category: { select: { name: true, description: true } },
-        },
-    });
-    if (result.length < 1)
-        return console.log({
-            ok: false,
-            error: { message: "No result found" },
-        });
-    return console.log();
-}))();
+// (async () => {
+// 	const input = {
+// 		category: "",
+// 		title: "",
+// 	};
+// 	const safeParam = z
+// 		.object({
+// 			category: z.string().optional(),
+// 			title: z.string().optional(),
+// 		})
+// 		.safeParse(input);
+// 	if (!safeParam.success) return console.log(safeParam.error);
+// 	const { category, title } = safeParam.data;
+// 	const result = await prisma.course.findMany({
+// 		where: {
+// 			category: { name: { contains: category } },
+// 			title: { contains: title },
+// 		},
+// 		select: {
+// 			id: true,
+// 			title: true,
+// 			category: { select: { name: true, description: true } },
+// 		},
+// 	});
+// 	if (result.length < 1)
+// 		return console.log(<ErrorResponse<any>>{
+// 			ok: false,
+// 			error: { message: "No result found" },
+// 		});
+// 	return console.log();
+// })();
 //# sourceMappingURL=courseController.js.map

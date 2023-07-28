@@ -46,7 +46,6 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         where: { id },
         select: {
             id: true,
-            completed_course_modules: true,
             level: true,
             email: true,
             phone_number: true,

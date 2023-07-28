@@ -39,6 +39,8 @@ export const bearerTokenSchema = z.string({
 	invalid_type_error: "'Authorisation' must be a string",
 });
 
+export const idParamSchema = z.object({ id: z.string() });
+
 // export const
 
 // input schemas

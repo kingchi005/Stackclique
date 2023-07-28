@@ -3,9 +3,12 @@ import prisma from "./index";
 import { GetResult } from "@prisma/client/runtime/library";
 
 export const seedDatabase = async () => {
+	const NUM_OF_COURSES = 13;
+	const NUM_OF_USERS = 4;
+	const NUM_OF_CATEGORIES = 3;
 	// Generate categories
 	const categories = [];
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < NUM_OF_CATEGORIES; i++) {
 		const category = await prisma?.courseCategory.create({
 			data: {
 				name: faker.lorem.words(),
@@ -19,7 +22,7 @@ export const seedDatabase = async () => {
 
 	const courses = [];
 
-	for (let i = 0; i < 15; i++) {
+	for (let i = 0; i < NUM_OF_COURSES; i++) {
 		// const s_modules = faker.helpers.arrayElements(modules, 3);
 
 		const course = await prisma.course.create({
@@ -68,7 +71,7 @@ export const seedDatabase = async () => {
 	}
 	// const courses = await prisma.course.findMany();
 
-	for (let i = 0; i < 50; i++) {
+	for (let i = 0; i < NUM_OF_USERS; i++) {
 		const user = await prisma.user.create({
 			data: {
 				username: faker.internet.userName(),
@@ -78,9 +81,6 @@ export const seedDatabase = async () => {
 				cover_photo: faker.image.url(),
 				password: faker.internet.password(),
 				level: faker.number.int({ min: 1, max: 10 }),
-				enrolled_courses: {
-					connect: { id: faker.helpers.arrayElement(courses).id },
-				},
 			},
 		});
 		// users.push(user);

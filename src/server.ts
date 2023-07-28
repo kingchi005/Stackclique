@@ -33,6 +33,7 @@ app.use("/auth", authRouter);
 // app.use(secureRoute);
 
 app.use("/courses", courseRoute);
+app.use("/user", userRoutes);
 
 // Error handling middleware
 
