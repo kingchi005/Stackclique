@@ -3,4 +3,3 @@ node_modules
 .env
 prisma/*.sqlite
 prisma/*.db
-prisma/db.sqlite
