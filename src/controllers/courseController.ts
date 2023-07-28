@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { number, string, z } from "zod";
 import { ErrorResponse, SuccessResponse } from "../types";
 import prisma from "../../prisma";
+import { idParamSchema } from "../zodSchema/inputSchema";
 
 export const getSingleCourse = async (req: Request, res: Response) => {
 	const safeParam = z.object({ id: z.string() }).safeParse(req.params);
@@ -54,11 +55,19 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 
 	const courses = await prisma.course.findMany({
 		take: +p,
-		include: {
-			category: { select: { name: true } },
-			module: true,
+		// include: {
+		// 	category: { select: { name: true } },
+		// 	module: true,
+		// 	reviews: true,
+		// 	enrollement: { select: { enrolled_user: true } },
+		// },
+		select: {
+			id: true,
+			title: true,
 			reviews: true,
-			enrollement: { select: { enrolled_user: true } },
+			_count: { select: { enrollement: {}, reviews: {} } },
+			profile_photo: true,
+			cover_photo: true,
 		},
 	});
 
@@ -102,6 +111,7 @@ export const searchCourse = async (req: Request, res: Response) => {
 		// 	// category: { select: { name: true, description: true } },
 		// },
 		select: {
+			id: true,
 			title: true,
 			reviews: true,
 			_count: { select: { enrollement: {}, reviews: {} } },
@@ -121,55 +131,89 @@ export const searchCourse = async (req: Request, res: Response) => {
 	});
 };
 
-// (async () => {
-// 	const result = await prisma.course.findMany({
-// 		where: {
-// 			category: { name: { contains: "" } },
-// 			title: { contains: "" },
-// 		},
-// 		select: {
-// 			id: true,
-// 			title: true,
-// 			category: { select: { name: true } },
-// 		},
-// 	});
+export const getErroledCourses = async (req: Request, res: Response) => {
+	const safeParam = z.object({ user_id: z.string() }).safeParse(req.params);
 
-// 	console.log(JSON.stringify(result, null, 2));
-// })()
+	if (!safeParam.success)
+		return res.status(401).json(<ErrorResponse<typeof safeParam.error>>{
+			ok: false,
+			error: {
+				message: safeParam.error.issues.map((d) => d.message).join(", "),
+				details: safeParam.error,
+			},
+		});
 
-// (async () => {
-// 	const input = {
-// 		category: "",
-// 		title: "",
-// 	};
-// 	const safeParam = z
-// 		.object({
-// 			category: z.string().optional(),
-// 			title: z.string().optional(),
-// 		})
-// 		.safeParse(input);
+	const id = safeParam.data.user_id;
 
-// 	if (!safeParam.success) return console.log(safeParam.error);
+	const user = await prisma.user.findUnique({
+		where: { id },
+		select: {
+			enrolled_courses: {
+				select: {
+					course: {
+						select: {
+							id: true,
+							title: true,
+							category: { select: { name: true } },
+							about: true,
+							profile_photo: true,
+							cover_photo: true,
+							_count: { select: { module: true } },
+						},
+					},
 
-// 	const { category, title } = safeParam.data;
+					completed: true,
+					completed_modules: true,
+					enrolled_at: true,
+				},
+			},
+		},
+	});
 
-// 	const result = await prisma.course.findMany({
-// 		where: {
-// 			category: { name: { contains: category } },
-// 			title: { contains: title },
-// 		},
-// 		select: {
-// 			id: true,
-// 			title: true,
-// 			category: { select: { name: true, description: true } },
-// 		},
-// 	});
+	if (!user)
+		return res.status(401).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: `User with id '${id}' does not exist` },
+		});
 
-// 	if (result.length < 1)
-// 		return console.log(<ErrorResponse<any>>{
-// 			ok: false,
-// 			error: { message: "No result found" },
-// 		});
+	if (user.enrolled_courses.length < 1)
+		return res.status(404).json(<ErrorResponse<any>>{
+			ok: false,
+			error: { message: `User with id '${id}' is not enrolled in any course` },
+		});
 
-// 	return console.log();
-// })();
+	return res.status(200).json(<SuccessResponse<typeof user.enrolled_courses>>{
+		ok: true,
+		data: user.enrolled_courses,
+	});
+};
+
+(async () => {
+	const id = "1d321ad0-2225-423d-b406-9a0cdc937af3";
+	const user = await prisma.user.findUnique({
+		where: { id },
+		select: {
+			enrolled_courses: {
+				select: {
+					course: {
+						select: {
+							id: true,
+							title: true,
+							category: { select: { name: true } },
+							about: true,
+							profile_photo: true,
+							cover_photo: true,
+							_count: { select: { module: true } },
+						},
+					},
+
+					completed: true,
+					completed_modules: true,
+					enrolled_at: true,
+				},
+			},
+		},
+	});
+
+	console.log(user?.enrolled_courses);
+})();
