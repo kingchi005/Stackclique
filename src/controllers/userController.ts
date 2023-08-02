@@ -23,7 +23,6 @@ export const getUserDetails = async (req: Request, res: Response) => {
 			id: true,
 			email: true,
 			username: true,
-			phone_number: true,
 			level: true,
 			notifications: true,
 			profile_photo: true,

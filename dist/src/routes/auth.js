@@ -4,9 +4,7 @@ const express_1 = require("express");
 const authController_1 = require("../controllers/authController");
 const authRouter = (0, express_1.Router)();
 authRouter.get("/get-email-otp/:email", authController_1.sendOTPEmail);
-// authRouter.get("/get-sms-otp/:phone_number", sendOTPSMS);
 authRouter.post("/signup-email", authController_1.handleSignupByEmail);
-// authRouter.post("/signup-phone", handleSignupByPhone);
 authRouter.post("/login", authController_1.handleLogin);
 exports.default = authRouter;
 //# sourceMappingURL=auth.js.map

@@ -19,7 +19,6 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     const NUM_OF_COURSES = 13;
     const NUM_OF_USERS = 4;
     const NUM_OF_CATEGORIES = 3;
-    // Generate categories
     const categories = [];
     for (let i = 0; i < NUM_OF_CATEGORIES; i++) {
         const category = yield (index_1.default === null || index_1.default === void 0 ? void 0 : index_1.default.courseCategory.create({
@@ -33,7 +32,6 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     const modules = [];
     const courses = [];
     for (let i = 0; i < NUM_OF_COURSES; i++) {
-        // const s_modules = faker.helpers.arrayElements(modules, 3);
         const course = yield index_1.default.course.create({
             data: {
                 title: faker_1.faker.lorem.sentence(),
@@ -46,17 +44,6 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
                 category: {
                     connect: { id: faker_1.faker.helpers.arrayElement(categories).id },
                 },
-                // category_id:
-                // module: {
-                // 	// connectOrCreate: { id: faker.helpers.arrayElement(s_modules).id },
-                // 	create: {
-                // 		name: faker.lorem.words(),
-                // 		title: faker.lorem.sentence(),
-                // 		content: faker.lorem.paragraph(),
-                // 		video_url: faker.internet.url(),
-                // 		photo_url: faker.image.url(),
-                // 	},
-                // },
             },
             include: { module: true },
         });
@@ -71,37 +58,31 @@ const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
                     cover_photo: faker_1.faker.image.url(),
                     course: { connect: { id: course.id } },
                 },
-                // select: {},
             });
             modules.push(module);
         }
         course.module = modules;
         courses.push(course);
     }
-    // const courses = await prisma.course.findMany();
     for (let i = 0; i < NUM_OF_USERS; i++) {
         const user = yield index_1.default.user.create({
             data: {
                 username: faker_1.faker.internet.userName(),
                 email: faker_1.faker.internet.email(),
-                phone_number: faker_1.faker.phone.number("+234##########"),
                 profile_photo: faker_1.faker.internet.url(),
                 cover_photo: faker_1.faker.image.url(),
                 password: faker_1.faker.internet.password(),
                 level: faker_1.faker.number.int({ min: 1, max: 10 }),
             },
         });
-        // users.push(user);
     }
 });
 exports.seedDatabase = seedDatabase;
 (0, exports.seedDatabase)()
     .then(() => {
     console.log("Database seeded successfully");
-    // prisma.$disconnect();
 })
     .catch((error) => {
     console.error(`Error seeding database: ${error}`);
-    // prisma.$disconnect();
 });
 //# sourceMappingURL=seedb.js.map

@@ -307,62 +307,17 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 };
 
 export const handleLogin = async (req: Request, res: Response) => {
-	if (!req.body.email && !req.body.phone_number)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "please provide email or phone number" },
-		});
+	// if (!req.body.email && !req.body.phone_number)
+	// 	return res.status(401).json(<ErrorResponse<any>>{
+	// 		ok: false,
+	// 		error: { message: "please provide email or phone number" },
+	// 	});
 
-	if (req.body.email) {
-		const safeInput = loginEmailSchema.safeParse(req.body);
-
-		if (!safeInput.success)
-			return res.status(401).json(<ErrorResponse<typeof safeInput.error>>{
-				ok: false,
-				error: {
-					message: safeInput.error.issues.map((d) => d.message).join(", "),
-					details: safeInput.error,
-				},
-			});
-
-		// login with email
-		const { email, password } = safeInput.data;
-
-		const user = await prisma.user.findFirst({
-			where: { email },
-			select: { id: true, username: true, email: true, password: true },
-		});
-
-		if (!user)
-			return res.status(401).json(<ErrorResponse<any>>{
-				ok: false,
-				error: { message: "Incorrect email" },
-			});
-
-		const authorised = await bcrypt.compareSync(password, user.password);
-
-		if (!authorised)
-			return res.status(401).json(<ErrorResponse<any>>{
-				ok: false,
-				error: { message: "Incorrect password" },
-			});
-
-		const token = jwt.sign({ id: user.id }, env.HASH_SECRET + "");
-		const { password: pass, ...userData } = user;
-		return res.status(200).json(<SuccessResponse<typeof userData>>{
-			ok: true,
-			message: "Login successful",
-			data: {
-				...userData,
-				UserAccessToken: token,
-			},
-		});
-	}
-
-	const safeInput = loginPhoneSchema.safeParse(req.body);
+	// if (req.body.email) {
+	const safeInput = loginEmailSchema.safeParse(req.body);
 
 	if (!safeInput.success)
-		return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
+		return res.status(401).json(<ErrorResponse<typeof safeInput.error>>{
 			ok: false,
 			error: {
 				message: safeInput.error.issues.map((d) => d.message).join(", "),
@@ -370,18 +325,18 @@ export const handleLogin = async (req: Request, res: Response) => {
 			},
 		});
 
-	// login with phone number
-	const { phone_number, password } = safeInput.data;
+	// login with email
+	const { email, password } = safeInput.data;
 
 	const user = await prisma.user.findFirst({
-		where: { phone_number },
-		select: { id: true, username: true, phone_number: true, password: true },
+		where: { email },
+		select: { id: true, username: true, email: true, password: true },
 	});
 
 	if (!user)
 		return res.status(401).json(<ErrorResponse<any>>{
 			ok: false,
-			error: { message: "Incorrect phone_number" },
+			error: { message: "Incorrect email" },
 		});
 
 	const authorised = await bcrypt.compareSync(password, user.password);
@@ -402,6 +357,51 @@ export const handleLogin = async (req: Request, res: Response) => {
 			UserAccessToken: token,
 		},
 	});
+	// }
+
+	// const safeInput = loginPhoneSchema.safeParse(req.body);
+
+	// if (!safeInput.success)
+	// 	return res.status(400).json(<ErrorResponse<typeof safeInput.error>>{
+	// 		ok: false,
+	// 		error: {
+	// 			message: safeInput.error.issues.map((d) => d.message).join(", "),
+	// 			details: safeInput.error,
+	// 		},
+	// 	});
+
+	// // login with phone number
+	// const { phone_number, password } = safeInput.data;
+
+	// const user = await prisma.user.findFirst({
+	// 	where: { phone_number },
+	// 	select: { id: true, username: true, phone_number: true, password: true },
+	// });
+
+	// if (!user)
+	// 	return res.status(401).json(<ErrorResponse<any>>{
+	// 		ok: false,
+	// 		error: { message: "Incorrect phone_number" },
+	// 	});
+
+	// const authorised = await bcrypt.compareSync(password, user.password);
+
+	// if (!authorised)
+	// 	return res.status(401).json(<ErrorResponse<any>>{
+	// 		ok: false,
+	// 		error: { message: "Incorrect password" },
+	// 	});
+
+	// const token = jwt.sign({ id: user.id }, env.HASH_SECRET + "");
+	// const { password: pass, ...userData } = user;
+	// return res.status(200).json(<SuccessResponse<typeof userData>>{
+	// 	ok: true,
+	// 	message: "Login successful",
+	// 	data: {
+	// 		...userData,
+	// 		UserAccessToken: token,
+	// 	},
+	// });
 };
 
 // (async () => {

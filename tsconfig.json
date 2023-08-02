@@ -10,13 +10,13 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"allowJs": true,
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
 		// Generate d.ts files
 		// "declaration": true,
 		// This compiler run should
 		// only output d.ts files
 		// "emitDeclarationOnly": true
-		// "removeComments": true
+		"removeComments": true
 	},
 	"include": ["src/**/*", "prisma/index.ts"]
 }

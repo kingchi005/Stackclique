@@ -67,7 +67,6 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
     const { p } = safeParam.data;
     const courses = yield prisma_1.default.course.findMany({
         take: +p,
-        // },
         select: {
             id: true,
             title: true,
@@ -112,9 +111,6 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             category: { name: { contains: category } },
             title: { contains: title },
         },
-        // include: {
-        // 	// category: { select: { name: true, description: true } },
-        // },
         select: {
             id: true,
             title: true,

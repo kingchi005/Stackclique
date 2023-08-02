@@ -77,7 +77,7 @@ export const seedDatabase = async () => {
 			data: {
 				username: faker.internet.userName(),
 				email: faker.internet.email(),
-				phone_number: faker.phone.number("+234##########"),
+				// phone_number: faker.phone.number("+234##########"),
 				profile_photo: faker.internet.url(),
 				cover_photo: faker.image.url(),
 				password: faker.internet.password(),

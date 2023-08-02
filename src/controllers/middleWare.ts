@@ -44,7 +44,6 @@ export const secureRoute = async (
 			id: true,
 			email: true,
 			username: true,
-			phone_number: true,
 			profile_photo: true,
 			cover_photo: true,
 			level: true,

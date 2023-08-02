@@ -35,8 +35,6 @@ exports.bearerTokenSchema = zod_1.z.string({
     invalid_type_error: "'Authorisation' must be a string",
 });
 exports.idParamSchema = zod_1.z.object({ id: zod_1.z.string() });
-// export const
-// input schemas
 exports.createUserSchema = zod_1.z.object({
     username: usernameSchema,
     email: exports.emailSchema,

@@ -32,7 +32,6 @@ const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
             id: true,
             email: true,
             username: true,
-            phone_number: true,
             level: true,
             notifications: true,
             profile_photo: true,

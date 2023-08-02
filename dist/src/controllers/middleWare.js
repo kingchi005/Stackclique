@@ -36,7 +36,6 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         id = jsonwebtoken_1.default.verify(providedToken, env_1.default.HASH_SECRET);
     }
     catch (error) {
-        // console.log(error.message);
         return res.status(401).json({
             ok: false,
             error: { message: "Invalid API key", details: error },
@@ -48,7 +47,6 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             id: true,
             email: true,
             username: true,
-            phone_number: true,
             profile_photo: true,
             cover_photo: true,
             level: true,
@@ -70,7 +68,6 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             created_at: true,
         },
     });
-    //
     if (!user)
         return res.status(401).json({
             ok: false,
@@ -81,10 +78,5 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
 });
 exports.secureRoute = secureRoute;
 (() => {
-    // const token = jwt.sign(
-    // 	"aa3fe03a-e9e7-41da-b674-f3a69d6feebc",
-    // 	env.HASH_SECRET
-    // );
-    // console.log(token);
 })();
 //# sourceMappingURL=middleWare.js.map
