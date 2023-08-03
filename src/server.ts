@@ -15,7 +15,6 @@ import courseRoute from "./routes/courses";
 import { secureRoute } from "./controllers/middleWare";
 
 const app: Application = express();
-const PORT = +env.PORT;
 
 // Middleware setup
 app.use(cors({ origin: ["https://app.swaggerhub.com/"] }));
@@ -42,7 +41,4 @@ app.use((err: any, req: any, res: any, next: any) => {
 	res.status(500).send("Internal Server Error");
 });
 
-app.listen(PORT, async () => {
-	console.log(`Server running on port ${PORT}`);
-	// await prisma.$connect();
-});
+export default app;
