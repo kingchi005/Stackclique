@@ -8,7 +8,7 @@
 	"license": "ISC",
 	"git repository": "https://github.com/idevelop4life/Stackclique-",
 	"scripts": {
-		"start": " node dist/index",
+		"start": "node dist/index",
 		"dev": "nodemon",
 		"build": "npx tsc",
 		"pre-start": "npm run db:sync && npm run db:seed",
