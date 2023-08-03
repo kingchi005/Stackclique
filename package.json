@@ -10,6 +10,7 @@
 	"scripts": {
 		"start": "node dist/src/server",
 		"dev": "nodemon",
+		"build": "npx tsc",
 		"pre-start": "npm run db:sync && npm run db:seed",
 		"serve": "tsc && node dist/src/server",
 		"db:seed": "node dist/prisma/seedb",
