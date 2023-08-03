@@ -1,6 +1,8 @@
 import { z } from "zod";
-import { config } from "dotenv";
-config();
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const envSchema = z.object({
 	PORT: z.string(),
 	BASE_URL: z.string(),
