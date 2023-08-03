@@ -15,7 +15,7 @@ import courseRoute from "./routes/courses";
 import { secureRoute } from "./controllers/middleWare";
 
 const app: Application = express();
-const PORT = +env.PORT || 3000;
+const PORT = +env.PORT;
 
 // Middleware setup
 app.use(cors({ origin: ["https://app.swaggerhub.com/"] }));
