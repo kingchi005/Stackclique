@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { idParamSchema } from "../zodSchema/inputSchema";
-import { ErrorResponse, SuccessResponse } from "../types";
+import { SuccessResponse } from "../types";
 import prisma from "../../prisma";
+import AppError from "./AppError";
+import { BAD_REQUEST, NOT_FOUND, OK } from "./errorController";
 
 export const getUserDetails = async (req: Request, res: Response) => {
 	const safeParam = idParamSchema.safeParse(req.params);
 
 	if (!safeParam.success)
-		return res.status(401).json(<ErrorResponse<typeof safeParam.error>>{
-			ok: false,
-			error: {
-				message: safeParam.error.issues.map((d) => d.message).join(", "),
-				details: safeParam.error,
-			},
-		});
+		throw new AppError(
+			safeParam.error.issues.map((d) => d.message).join(", "),
+			BAD_REQUEST.code,
+			safeParam.error
+		);
 
 	const { id } = safeParam.data;
 
@@ -47,13 +47,9 @@ export const getUserDetails = async (req: Request, res: Response) => {
 		},
 	});
 
-	if (!user)
-		return res.status(404).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "User not found" },
-		});
+	if (!user) throw new AppError("User not found", NOT_FOUND.code);
 
-	return res.status(200).json(<SuccessResponse<typeof user>>{
+	return res.status(OK.code).json(<SuccessResponse<typeof user>>{
 		ok: true,
 		data: user,
 	});
@@ -63,13 +59,11 @@ export const getErroledCourses = async (req: Request, res: Response) => {
 	const safeParam = idParamSchema.safeParse(req.params);
 
 	if (!safeParam.success)
-		return res.status(401).json(<ErrorResponse<typeof safeParam.error>>{
-			ok: false,
-			error: {
-				message: safeParam.error.issues.map((d) => d.message).join(", "),
-				details: safeParam.error,
-			},
-		});
+		throw new AppError(
+			safeParam.error.issues.map((d) => d.message).join(", "),
+			BAD_REQUEST.code,
+			safeParam.error
+		);
 
 	const { id } = safeParam.data;
 
@@ -100,18 +94,17 @@ export const getErroledCourses = async (req: Request, res: Response) => {
 	});
 
 	if (!user)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: `User with id '${id}' does not exist` },
-		});
+		throw new AppError(`User with id '${id}' does not exist`, NOT_FOUND.code);
 
 	if (user.enrolled_courses.length < 1)
-		return res.status(404).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: `User with id '${id}' is not enrolled in any course` },
-		});
+		throw new AppError(
+			`User with id '${id}' is not enrolled in any course`,
+			NOT_FOUND.code
+		);
 
-	return res.status(200).json(<SuccessResponse<typeof user.enrolled_courses>>{
+	return res.status(OK.code).json(<
+		SuccessResponse<typeof user.enrolled_courses>
+	>{
 		ok: true,
 		data: user.enrolled_courses,
 	});

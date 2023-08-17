@@ -2,21 +2,20 @@ import { Router } from "express";
 import {
 	handleLogin,
 	handleSignupByEmail,
-	handleSignupByPhone,
 	sendOTPEmail,
-	sendOTPSMS,
 } from "../controllers/authController";
+import { tryCatchWapper } from "../controllers/errorController";
 
 const authRouter = Router();
 
-authRouter.get("/get-email-otp/:email", sendOTPEmail);
+authRouter.get("/get-email-otp/:email", tryCatchWapper(sendOTPEmail));
 
-// authRouter.get("/get-sms-otp/:phone_number", sendOTPSMS);
+// authRouter.get("/get-sms-otp/:phone_number", tryCatchWapper(sendOTPSMS));
 
-authRouter.post("/signup-email", handleSignupByEmail);
+authRouter.post("/signup-email", tryCatchWapper(handleSignupByEmail));
 
-// authRouter.post("/signup-phone", handleSignupByPhone);
+// authRouter.post("/signup-phone", tryCatchWapper(handleSignupByPhone));
 
-authRouter.post("/login", handleLogin);
+authRouter.post("/login", tryCatchWapper(handleLogin));
 
 export default authRouter;

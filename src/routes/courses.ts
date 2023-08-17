@@ -4,13 +4,14 @@ import {
 	getCourseDetails,
 	searchCourse,
 } from "../controllers/courseController";
+import { tryCatchWapper } from "../controllers/errorController";
 
 const courseRoute = Router();
 
-courseRoute.get("/", getCourseByLimit);
+courseRoute.get("/", tryCatchWapper(getCourseByLimit));
 
-courseRoute.get("/search", searchCourse);
+courseRoute.get("/search", tryCatchWapper(searchCourse));
 
-courseRoute.get("/:id", getCourseDetails);
+courseRoute.get("/:id", tryCatchWapper(getCourseDetails));
 
 export default courseRoute;

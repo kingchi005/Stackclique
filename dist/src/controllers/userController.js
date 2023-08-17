@@ -15,16 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getErroledCourses = exports.getUserDetails = void 0;
 const inputSchema_1 = require("../zodSchema/inputSchema");
 const prisma_1 = __importDefault(require("../../prisma"));
+const AppError_1 = __importDefault(require("./AppError"));
 const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.idParamSchema.safeParse(req.params);
     if (!safeParam.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeParam.error.issues.map((d) => d.message).join(", "),
-                details: safeParam.error,
-            },
-        });
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), 401, safeParam.error);
     const { id } = safeParam.data;
     const user = yield prisma_1.default.user.findUnique({
         where: { id },
@@ -56,10 +51,7 @@ const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
         },
     });
     if (!user)
-        return res.status(404).json({
-            ok: false,
-            error: { message: "User not found" },
-        });
+        throw new AppError_1.default("User not found", 404);
     return res.status(200).json({
         ok: true,
         data: user,
@@ -69,13 +61,7 @@ exports.getUserDetails = getUserDetails;
 const getErroledCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.idParamSchema.safeParse(req.params);
     if (!safeParam.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeParam.error.issues.map((d) => d.message).join(", "),
-                details: safeParam.error,
-            },
-        });
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), 401, safeParam.error);
     const { id } = safeParam.data;
     const user = yield prisma_1.default.user.findUnique({
         where: { id },
@@ -102,15 +88,9 @@ const getErroledCourses = (req, res) => __awaiter(void 0, void 0, void 0, functi
         },
     });
     if (!user)
-        return res.status(401).json({
-            ok: false,
-            error: { message: `User with id '${id}' does not exist` },
-        });
+        throw new AppError_1.default(`User with id '${id}' does not exist`, 401);
     if (user.enrolled_courses.length < 1)
-        return res.status(404).json({
-            ok: false,
-            error: { message: `User with id '${id}' is not enrolled in any course` },
-        });
+        throw new AppError_1.default(`User with id '${id}' is not enrolled in any course`, 404);
     return res.status(200).json({
         ok: true,
         data: user.enrolled_courses,

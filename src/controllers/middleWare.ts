@@ -1,9 +1,10 @@
 import { Response, Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { ErrorResponse } from "../types";
 import { bearerTokenSchema } from "../zodSchema/inputSchema";
 import prisma from "../../prisma";
 import env from "../../env";
+import AppError from "./AppError";
+import { UNAUTHORIZED } from "./errorController";
 
 export const secureRoute = async (
 	req: Request,
@@ -13,29 +14,18 @@ export const secureRoute = async (
 	const isValid = bearerTokenSchema.safeParse(req.headers.authorization);
 
 	if (!isValid.success)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Invalid API key" },
-		});
+		throw new AppError("Invalid API key", UNAUTHORIZED.code);
 
 	const providedToken = isValid.data.split(" ")?.[1]?.trim();
 
-	if (!providedToken)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Invalid API key" },
-		});
+	if (!providedToken) throw new AppError("Invalid API key", UNAUTHORIZED.code);
 
 	let id = "";
 
 	try {
 		id = jwt.verify(providedToken, env.HASH_SECRET) as string;
 	} catch (error: any) {
-		// console.log(error.message);
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Invalid API key", details: error },
-		});
+		throw new AppError("Invalid API key", UNAUTHORIZED.code, error);
 	}
 
 	const user = await prisma.user.findUnique({
@@ -66,11 +56,7 @@ export const secureRoute = async (
 		},
 	});
 	//
-	if (!user)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Not a user" },
-		});
+	if (!user) throw new AppError("Not a user", UNAUTHORIZED.code);
 
 	res.locals.user_id = user.id;
 

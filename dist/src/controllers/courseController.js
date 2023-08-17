@@ -15,16 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchCourse = exports.getCourseByLimit = exports.getCourseDetails = void 0;
 const zod_1 = require("zod");
 const prisma_1 = __importDefault(require("../../prisma"));
+const AppError_1 = __importDefault(require("./AppError"));
 const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ id: zod_1.z.string() }).safeParse(req.params);
     if (!safeParam.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeParam.error.issues.map((d) => d.message).join(", "),
-                details: safeParam.error,
-            },
-        });
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), 401, safeParam.error);
     const { id } = safeParam.data;
     const course = yield prisma_1.default.course.findFirst({
         where: { id },
@@ -44,10 +39,7 @@ const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, functio
         },
     });
     if (!course)
-        return res.status(404).json({
-            ok: false,
-            error: { message: "Course not found" },
-        });
+        throw new AppError_1.default("Course not found", 404);
     return res.status(200).json({
         ok: true,
         data: course,
@@ -57,13 +49,7 @@ exports.getCourseDetails = getCourseDetails;
 const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ p: zod_1.z.string() }).safeParse(req.query);
     if (!safeParam.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeParam.error.issues.map((d) => d.message).join(", "),
-                details: safeParam.error,
-            },
-        });
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), 401, safeParam.error);
     const { p } = safeParam.data;
     const courses = yield prisma_1.default.course.findMany({
         take: +p,
@@ -80,10 +66,7 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
         },
     });
     if ((courses === null || courses === void 0 ? void 0 : courses.length) < 1)
-        return res.status(404).json({
-            ok: false,
-            error: { message: "No course in record" },
-        });
+        throw new AppError_1.default("No course in record", 404);
     return res.status(200).json({
         ok: true,
         data: courses,
@@ -98,13 +81,7 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     })
         .safeParse(req.query);
     if (!safeParam.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeParam.error.issues.map((d) => d.message).join(", "),
-                details: safeParam.error,
-            },
-        });
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), 401, safeParam.error);
     const { category, title } = safeParam.data;
     const courses = yield prisma_1.default.course.findMany({
         where: {
@@ -120,10 +97,7 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         },
     });
     if (courses.length < 1)
-        return res.status(404).json({
-            ok: false,
-            error: { message: "No result found" },
-        });
+        throw new AppError_1.default("No result found", 404);
     return res.status(200).json({
         ok: true,
         data: courses,

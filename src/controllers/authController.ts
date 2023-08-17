@@ -1,19 +1,27 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import prisma from "../../prisma";
-import { ErrorResponse, SuccessResponse } from "../types";
+import { SuccessResponse } from "../types";
 import {
 	emailSchema,
-	phoneNumberSchema,
 	emailSignupInputSchema,
-	phoneSignupInputSchema,
 	loginEmailSchema,
-	loginPhoneSchema,
 } from "../zodSchema/inputSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import env from "./../../env";
 import { sendEmail } from "./mailcontroller";
+import AppError from "./AppError";
+import {
+	ACCEPTED,
+	BAD_REQUEST,
+	CONFLICT,
+	CREATED,
+	INTERNAL_SERVER_ERROR,
+	NOT_ACCEPTED,
+	OK,
+	UNAUTHORIZED,
+} from "./errorController";
 
 export const sendOTPSMS = async (req: Request, res: Response) => {
 	/* {
@@ -70,13 +78,11 @@ export const sendOTPSMS = async (req: Request, res: Response) => {
 export const sendOTPEmail = async (req: Request, res: Response) => {
 	const safe = z.object({ email: emailSchema }).safeParse(req.params);
 	if (!safe.success)
-		return res.status(401).json(<ErrorResponse<typeof safe.error>>{
-			ok: false,
-			error: {
-				message: safe.error.issues.map((d) => d.message).join(", "),
-				details: safe.error,
-			},
-		});
+		throw new AppError(
+			safe.error.issues.map((d) => d.message).join(", "),
+			BAD_REQUEST.code,
+			safe.error
+		);
 
 	const { email } = safe.data;
 
@@ -85,10 +91,7 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 	});
 
 	if (emailIsExisting)
-		return res.status(202).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Your email is already verified" },
-		});
+		throw new AppError("Your email is already verified", CONFLICT.code);
 
 	const OTP = (() => Math.floor(Math.random() * 900000) + 100000)();
 
@@ -107,14 +110,11 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 			// select: { email: true, otp: true, expiredAt: true },
 		});
 	} catch (error) {
-		console.log(error);
-		return res.status(500).json(<ErrorResponse<any>>{
-			ok: false,
-			error: {
-				message: "An error occored please try after few minutes",
-				details: error,
-			},
-		});
+		throw new AppError(
+			"An error occored please try after few minutes",
+			INTERNAL_SERVER_ERROR.code,
+			error
+		);
 	}
 
 	// send email with OTP---------------------------------------
@@ -127,15 +127,13 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 	);
 
 	if (!emailResponse.success)
-		return res.status(500).json(<ErrorResponse<any>>{
-			ok: false,
-			error: {
-				message: "An error occored and email was not sent",
-				details: emailResponse.details,
-			},
-		});
+		throw new AppError(
+			"An error occored and email was not sent",
+			INTERNAL_SERVER_ERROR.code,
+			emailResponse.details
+		);
 
-	return res.status(200).json(<SuccessResponse<any>>{
+	return res.status(OK.code).json(<SuccessResponse<any>>{
 		ok: true,
 		data: {},
 		message: emailResponse.message,
@@ -239,40 +237,31 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 	// validate user input
 	const safe = emailSignupInputSchema.safeParse(req.body);
 	if (!safe.success)
-		return res.status(400).json(<ErrorResponse<typeof safe.error>>{
-			ok: false,
-			error: {
-				message: safe.error.issues.map((d) => d.message).join(", "),
-				details: safe.error,
-			},
-		});
+		throw new AppError(
+			safe.error.issues.map((d) => d.message).join(", "),
+			BAD_REQUEST.code,
+			safe.error
+		);
 
 	const { email, otp, password, username } = safe.data;
 
 	// check if user already exists-------------------------
 	const existingUser = await prisma.user.findFirst({ where: { email } });
 	if (existingUser)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: `User with email '${email}' already exists` },
-		});
+		throw new AppError(
+			`User with email '${email}' already exists`,
+			CONFLICT.code
+		);
 
 	// verify email using OTP
 	const foundOTP = await prisma.userEmailVerificationToken.findUnique({
 		where: { email, otp, verified: false },
 	});
 
-	if (!foundOTP)
-		return res.status(404).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Invalid OTP or email" },
-		});
+	if (!foundOTP) throw new AppError("Invalid OTP or email", UNAUTHORIZED.code);
 
 	if (foundOTP.expiredAt < new Date())
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "OTP has expired" },
-		});
+		throw new AppError("OTP has expired", NOT_ACCEPTED.code);
 
 	// user verified
 	await prisma.userEmailVerificationToken.update({
@@ -290,39 +279,25 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 			data: { email, password: hashedPassword, username },
 			select: { email: true, username: true, id: true },
 		});
-		return res.status(201).json(<SuccessResponse<any>>{
+		return res.status(CREATED.code).json(<SuccessResponse<any>>{
 			ok: true,
 			message: "Registreation successful",
 			data: newUser,
 		});
 	} catch (error) {
-		console.log(error);
-
-		return res.status(500).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { details: error, message: "An error occoured please try again" },
-		});
+		throw new AppError("An error occoured please try again", 500, error);
 	}
 };
 
 export const handleLogin = async (req: Request, res: Response) => {
-	// if (!req.body.email && !req.body.phone_number)
-	// 	return res.status(401).json(<ErrorResponse<any>>{
-	// 		ok: false,
-	// 		error: { message: "please provide email or phone number" },
-	// 	});
-
-	// if (req.body.email) {
 	const safeInput = loginEmailSchema.safeParse(req.body);
 
 	if (!safeInput.success)
-		return res.status(401).json(<ErrorResponse<typeof safeInput.error>>{
-			ok: false,
-			error: {
-				message: safeInput.error.issues.map((d) => d.message).join(", "),
-				details: safeInput.error,
-			},
-		});
+		throw new AppError(
+			safeInput.error.issues.map((d) => d.message).join(", "),
+			BAD_REQUEST.code,
+			safeInput.error
+		);
 
 	// login with email
 	const { email, password } = safeInput.data;
@@ -332,23 +307,15 @@ export const handleLogin = async (req: Request, res: Response) => {
 		select: { id: true, username: true, email: true, password: true },
 	});
 
-	if (!user)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Incorrect email" },
-		});
+	if (!user) throw new AppError("Incorrect email", UNAUTHORIZED.code);
 
 	const authorised = await bcrypt.compareSync(password, user.password);
 
-	if (!authorised)
-		return res.status(401).json(<ErrorResponse<any>>{
-			ok: false,
-			error: { message: "Incorrect password" },
-		});
+	if (!authorised) throw new AppError("Incorrect password", 401);
 
 	const token = jwt.sign({ id: user.id }, env.HASH_SECRET + "");
 	const { password: pass, ...userData } = user;
-	return res.status(200).json(<SuccessResponse<typeof userData>>{
+	return res.status(ACCEPTED.code).json(<SuccessResponse<typeof userData>>{
 		ok: true,
 		message: "Login successful",
 		data: {
@@ -444,5 +411,3 @@ export const handleLogin = async (req: Request, res: Response) => {
 // 		.verificationChecks.create({ to: "+2348107721911", code: `569132` })
 // 		.then((res) => console.log(res));
 // })();
-
-// import "../../node_modules/body-parser/lib/types/json.js:89:19";

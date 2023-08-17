@@ -31,28 +31,20 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = __importDefault(require("./../../env"));
 const mailcontroller_1 = require("./mailcontroller");
+const AppError_1 = __importDefault(require("./AppError"));
 const sendOTPSMS = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.sendOTPSMS = sendOTPSMS;
 const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safe = zod_1.z.object({ email: inputSchema_1.emailSchema }).safeParse(req.params);
     if (!safe.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safe.error.issues.map((d) => d.message).join(", "),
-                details: safe.error,
-            },
-        });
+        throw new AppError_1.default(safe.error.issues.map((d) => d.message).join(", "), 401, safe.error);
     const { email } = safe.data;
     const emailIsExisting = yield prisma_1.default.user.findFirst({
         where: { email },
     });
     if (emailIsExisting)
-        return res.status(202).json({
-            ok: false,
-            error: { message: "Your email is already verified" },
-        });
+        throw new AppError_1.default("Your email is already verified", 202);
     const OTP = (() => Math.floor(Math.random() * 900000) + 100000)();
     try {
         const generatedUserOTP = yield prisma_1.default.userEmailVerificationToken.upsert({
@@ -69,25 +61,12 @@ const sendOTPEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            error: {
-                message: "An error occored please try after few minutes",
-                details: error,
-            },
-        });
+        throw new AppError_1.default("An error occored please try after few minutes", 500, error);
     }
     const EMAIL_MESSAGE = `<p>Your Stack Clique verification code is <b>${OTP}</b></p><p>This code will expire after <i>10 minutes</i></p>`;
     const emailResponse = yield (0, mailcontroller_1.sendEmail)(email, EMAIL_MESSAGE, "STACK CLIQUE EMAIL VERIFICATION");
     if (!emailResponse.success)
-        return res.status(500).json({
-            ok: false,
-            error: {
-                message: "An error occored and email was not sent",
-                details: emailResponse.details,
-            },
-        });
+        throw new AppError_1.default("An error occored and email was not sent", 500, emailResponse.details);
     return res.status(200).json({
         ok: true,
         data: {},
@@ -101,33 +80,18 @@ exports.handleSignupByPhone = handleSignupByPhone;
 const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safe = inputSchema_1.emailSignupInputSchema.safeParse(req.body);
     if (!safe.success)
-        return res.status(400).json({
-            ok: false,
-            error: {
-                message: safe.error.issues.map((d) => d.message).join(", "),
-                details: safe.error,
-            },
-        });
+        throw new AppError_1.default(safe.error.issues.map((d) => d.message).join(", "), 401, safe.error);
     const { email, otp, password, username } = safe.data;
     const existingUser = yield prisma_1.default.user.findFirst({ where: { email } });
     if (existingUser)
-        return res.status(401).json({
-            ok: false,
-            error: { message: `User with email '${email}' already exists` },
-        });
+        throw new AppError_1.default(`User with email '${email}' already exists`, 401);
     const foundOTP = yield prisma_1.default.userEmailVerificationToken.findUnique({
         where: { email, otp, verified: false },
     });
     if (!foundOTP)
-        return res.status(404).json({
-            ok: false,
-            error: { message: "Invalid OTP or email" },
-        });
+        throw new AppError_1.default("Invalid OTP or email", 404);
     if (foundOTP.expiredAt < new Date())
-        return res.status(401).json({
-            ok: false,
-            error: { message: "OTP has expired" },
-        });
+        throw new AppError_1.default("OTP has expired", 401);
     yield prisma_1.default.userEmailVerificationToken.update({
         data: { verified: true },
         where: { email, otp },
@@ -146,40 +110,24 @@ const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, func
         });
     }
     catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            ok: false,
-            error: { details: error, message: "An error occoured please try again" },
-        });
+        throw new AppError_1.default("An error occoured please try again", 500, error);
     }
 });
 exports.handleSignupByEmail = handleSignupByEmail;
 const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeInput = inputSchema_1.loginEmailSchema.safeParse(req.body);
     if (!safeInput.success)
-        return res.status(401).json({
-            ok: false,
-            error: {
-                message: safeInput.error.issues.map((d) => d.message).join(", "),
-                details: safeInput.error,
-            },
-        });
+        throw new AppError_1.default(safeInput.error.issues.map((d) => d.message).join(", "), 401, safeInput.error);
     const { email, password } = safeInput.data;
     const user = yield prisma_1.default.user.findFirst({
         where: { email },
         select: { id: true, username: true, email: true, password: true },
     });
     if (!user)
-        return res.status(401).json({
-            ok: false,
-            error: { message: "Incorrect email" },
-        });
+        throw new AppError_1.default("Incorrect email", 401);
     const authorised = yield bcrypt_1.default.compareSync(password, user.password);
     if (!authorised)
-        return res.status(401).json({
-            ok: false,
-            error: { message: "Incorrect password" },
-        });
+        throw new AppError_1.default("Incorrect password", 401);
     const token = jsonwebtoken_1.default.sign({ id: user.id }, env_1.default.HASH_SECRET + "");
     const { password: pass } = user, userData = __rest(user, ["password"]);
     return res.status(200).json({
