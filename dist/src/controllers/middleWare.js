@@ -18,20 +18,21 @@ const inputSchema_1 = require("../zodSchema/inputSchema");
 const prisma_1 = __importDefault(require("../../prisma"));
 const env_1 = __importDefault(require("../../env"));
 const AppError_1 = __importDefault(require("./AppError"));
+const errorController_1 = require("./errorController");
 const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const isValid = inputSchema_1.bearerTokenSchema.safeParse(req.headers.authorization);
     if (!isValid.success)
-        throw new AppError_1.default("Invalid API key", 401);
+        throw new AppError_1.default("Invalid API key", errorController_1.UNAUTHORIZED.code);
     const providedToken = (_b = (_a = isValid.data.split(" ")) === null || _a === void 0 ? void 0 : _a[1]) === null || _b === void 0 ? void 0 : _b.trim();
     if (!providedToken)
-        throw new AppError_1.default("Invalid API key", 401);
+        throw new AppError_1.default("Invalid API key", errorController_1.UNAUTHORIZED.code);
     let id = "";
     try {
         id = jsonwebtoken_1.default.verify(providedToken, env_1.default.HASH_SECRET);
     }
     catch (error) {
-        throw new AppError_1.default("Invalid API key", 401, error);
+        throw new AppError_1.default("Invalid API key", errorController_1.UNAUTHORIZED.code, error);
     }
     const user = yield prisma_1.default.user.findUnique({
         where: { id },
@@ -61,7 +62,7 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         },
     });
     if (!user)
-        throw new AppError_1.default("Not a user", 401);
+        throw new AppError_1.default("Not a user", errorController_1.UNAUTHORIZED.code);
     res.locals.user_id = user.id;
     next();
 });

@@ -12,13 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tryCatchWapper = exports.GATEWAY_TIMEOUT = exports.SERVICE_UNAVAILABLE = exports.BAD_GATEWAY = exports.INTERNAL_SERVER_ERROR = exports.METHOD_NOT_ALLOWED = exports.NOT_FOUND = exports.FORBIDDEN = exports.UNAUTHORIZED = exports.BAD_REQUEST = void 0;
+exports.tryCatchWapper = exports.GATEWAY_TIMEOUT = exports.SERVICE_UNAVAILABLE = exports.BAD_GATEWAY = exports.INTERNAL_SERVER_ERROR = exports.CONFLICT = exports.NOT_ACCEPTED = exports.METHOD_NOT_ALLOWED = exports.NOT_FOUND = exports.FORBIDDEN = exports.UNAUTHORIZED = exports.BAD_REQUEST = exports.NO_CONTENT = exports.ACCEPTED = exports.CREATED = exports.OK = void 0;
 const AppError_1 = __importDefault(require("./AppError"));
+exports.OK = { code: 200, message: "OK" };
+exports.CREATED = { code: 201, message: "Created" };
+exports.ACCEPTED = { code: 202, message: "Accepted" };
+exports.NO_CONTENT = { code: 204, message: "No Content" };
 exports.BAD_REQUEST = { code: 400, message: "Bad Request" };
 exports.UNAUTHORIZED = { code: 401, message: "Unauthorized" };
 exports.FORBIDDEN = { code: 403, message: "Forbidden" };
 exports.NOT_FOUND = { code: 404, message: "Not Found" };
 exports.METHOD_NOT_ALLOWED = { code: 405, message: "Method Not Allowed" };
+exports.NOT_ACCEPTED = { code: 406, message: "Not Accepted" };
+exports.CONFLICT = { code: 409, message: "Conflict" };
 exports.INTERNAL_SERVER_ERROR = {
     code: 500,
     message: "Internal Server Error",
