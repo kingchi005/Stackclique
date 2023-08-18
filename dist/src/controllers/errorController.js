@@ -43,6 +43,7 @@ function errorController(error, req, res, next) {
             error: { message: error.message, details: error.details },
         });
     }
+    console.log(error);
     return res.status(exports.INTERNAL_SERVER_ERROR.code).json({
         ok: false,
         error: {
