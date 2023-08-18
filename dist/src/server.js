@@ -26,6 +26,9 @@ const PORT = +env_1.default.PORT || 3000;
 app.use((0, cors_1.default)({ origin: ["https://app.swaggerhub.com/"] }));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
+app.use("/", (re, res) => {
+    res.status(300).json({ msg: "welcome to the stackclique api" });
+});
 app.use("/dev/api-docs", swagger_ui_express_1.default.serve);
 app.get("/dev/api-docs", swagger_ui_express_1.default.setup(swagger_config_1.default));
 app.use("/auth", auth_1.default);

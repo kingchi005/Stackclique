@@ -20,6 +20,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API Doc endpoint
+app.use("/", (re, res) => {
+	res.status(300).json({ msg: "welcome to the stackclique api" });
+});
 app.use("/dev/api-docs", swaggerUI.serve);
 app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 // Routes setup
