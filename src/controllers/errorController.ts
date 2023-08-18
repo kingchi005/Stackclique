@@ -39,6 +39,7 @@ export default function errorController(
 		});
 	}
 
+	console.log(error);
 	return res.status(INTERNAL_SERVER_ERROR.code).json(<ErrorResponse<any>>{
 		ok: false,
 		error: {
