@@ -36,6 +36,6 @@ app.use("/courses", courses_1.default);
 app.use("/user", user_1.default);
 app.use(errorController_1.default);
 app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server at ${env_1.default.BASE_URL}`);
 }));
 //# sourceMappingURL=server.js.map

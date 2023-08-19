@@ -246,10 +246,17 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 	const { email, otp, password, username } = safe.data;
 
 	// check if user already exists-------------------------
-	const existingUser = await prisma.user.findFirst({ where: { email } });
-	if (existingUser)
+	const existingEmail = await prisma.user.findFirst({ where: { email } });
+	if (existingEmail)
 		throw new AppError(
 			`User with email '${email}' already exists`,
+			CONFLICT.code
+		);
+
+	const existingUsername = await prisma.user.findFirst({ where: { username } });
+	if (existingUsername)
+		throw new AppError(
+			`User with user name '${username}' already exists`,
 			CONFLICT.code
 		);
 

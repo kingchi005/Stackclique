@@ -8,7 +8,7 @@ import swaggerUI from "swagger-ui-express";
 import swaggerConfig from "./api-doc/swagger-config";
 import env from "../env";
 import courseRoute from "./routes/courses";
-// import { secureRoute } from "./controllers/middleWare";
+import { secureRoute } from "./controllers/middleWare";
 import errorController from "./controllers/errorController";
 
 const app: Application = express();
@@ -30,7 +30,7 @@ app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 app.use("/auth", authRouter);
 
 // secured routes
-// app.use(secureRoute);
+app.use(secureRoute);
 
 app.use("/courses", courseRoute);
 app.use("/user", userRoutes);
@@ -45,6 +45,6 @@ app.use("/user", userRoutes);
 app.use(errorController);
 
 app.listen(PORT, async () => {
-	console.log(`Server running on port ${PORT}`);
+	console.log(`Server at ${env.BASE_URL}`);
 	// await prisma.$connect();
 });
