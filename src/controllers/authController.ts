@@ -262,10 +262,14 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 
 	// verify email using OTP
 	const foundOTP = await prisma.userEmailVerificationToken.findUnique({
-		where: { email, otp, verified: false },
+		where: { email, otp },
 	});
 
-	if (!foundOTP) throw new AppError("Invalid OTP or email", UNAUTHORIZED.code);
+	if (!foundOTP)
+		throw new AppError("Incorrect OTP or email", UNAUTHORIZED.code);
+
+	if (foundOTP.verified)
+		throw new AppError("Your email is already verified", CONFLICT.code);
 
 	if (foundOTP.expiredAt < new Date())
 		throw new AppError("OTP has expired", NOT_ACCEPTED.code);
