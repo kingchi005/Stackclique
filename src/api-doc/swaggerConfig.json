@@ -171,6 +171,15 @@
 						},
 						"required": true,
 						"example": "1c3fbd80-4046-413e-afd0-57928a29a824"
+					},
+					{
+						"name": "authorization",
+						"in": "header",
+						"schema": {
+							"type": "string"
+						},
+						"required": true,
+						"example": "Token eyJhbGciOiJIUzI1NiJ9.YWEzZmUwM2EtZTllNy00MWRhLWI2NzQtZjNhNjlkNmZlZWJj.URbQfOfpA1Low-dFBAIcjJXo1SUcyLwaX0kO2Tv0dWE"
 					}
 				],
 				"responses": {

@@ -83,14 +83,19 @@ const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, func
     if (!safe.success)
         throw new AppError_1.default(safe.error.issues.map((d) => d.message).join(", "), errorController_1.BAD_REQUEST.code, safe.error);
     const { email, otp, password, username } = safe.data;
-    const existingUser = yield prisma_1.default.user.findFirst({ where: { email } });
-    if (existingUser)
+    const existingEmail = yield prisma_1.default.user.findFirst({ where: { email } });
+    if (existingEmail)
         throw new AppError_1.default(`User with email '${email}' already exists`, errorController_1.CONFLICT.code);
+    const existingUsername = yield prisma_1.default.user.findFirst({ where: { username } });
+    if (existingUsername)
+        throw new AppError_1.default(`User with user name '${username}' already exists`, errorController_1.CONFLICT.code);
     const foundOTP = yield prisma_1.default.userEmailVerificationToken.findUnique({
-        where: { email, otp, verified: false },
+        where: { email, otp },
     });
     if (!foundOTP)
-        throw new AppError_1.default("Invalid OTP or email", errorController_1.UNAUTHORIZED.code);
+        throw new AppError_1.default("Incorrect OTP or email", errorController_1.UNAUTHORIZED.code);
+    if (foundOTP.verified)
+        throw new AppError_1.default("Your email is already verified", errorController_1.CONFLICT.code);
     if (foundOTP.expiredAt < new Date())
         throw new AppError_1.default("OTP has expired", errorController_1.NOT_ACCEPTED.code);
     yield prisma_1.default.userEmailVerificationToken.update({

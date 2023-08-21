@@ -9,7 +9,7 @@ import swaggerConfig from "./api-doc/swagger-config";
 import env from "../env";
 import courseRoute from "./routes/courses";
 import { secureRoute } from "./controllers/middleWare";
-import errorController from "./controllers/errorController";
+import errorController, { tryCatchWapper } from "./controllers/errorController";
 
 const app: Application = express();
 const PORT = +env.PORT || 3000;

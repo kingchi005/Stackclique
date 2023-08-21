@@ -20,6 +20,7 @@ const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_config_1 = __importDefault(require("./api-doc/swagger-config"));
 const env_1 = __importDefault(require("../env"));
 const courses_1 = __importDefault(require("./routes/courses"));
+const middleWare_1 = require("./controllers/middleWare");
 const errorController_1 = __importDefault(require("./controllers/errorController"));
 const app = (0, express_1.default)();
 const PORT = +env_1.default.PORT || 3000;
@@ -32,6 +33,7 @@ app.get("/", (re, res) => {
 app.use("/dev/api-docs", swagger_ui_express_1.default.serve);
 app.get("/dev/api-docs", swagger_ui_express_1.default.setup(swagger_config_1.default));
 app.use("/auth", auth_1.default);
+app.use(middleWare_1.secureRoute);
 app.use("/courses", courses_1.default);
 app.use("/user", user_1.default);
 app.use(errorController_1.default);

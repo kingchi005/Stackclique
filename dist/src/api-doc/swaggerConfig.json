@@ -24,9 +24,7 @@
     "paths": {
         "/auth/signup-email": {
             "post": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "signup using email",
                 "requestBody": {
                     "content": {
@@ -35,7 +33,7 @@
                                 "type": "object",
                                 "example": {
                                     "username": "Eazy Bundle",
-                                    "email": "eazybundledata@gmail.com",
+                                    "email": "example@email.com",
                                     "otp": "8051",
                                     "password": "ihjsbd"
                                 }
@@ -55,9 +53,7 @@
         },
         "/auth/get-email-otp/{email}": {
             "get": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "request email verification",
                 "parameters": [
                     {
@@ -67,7 +63,7 @@
                             "type": "string"
                         },
                         "required": true,
-                        "example": "eazybundledata@gmail.com"
+                        "example": "example@email.com"
                     }
                 ],
                 "responses": {
@@ -82,9 +78,7 @@
         },
         "/auth/get-sms-otp/{phone_numebr}": {
             "get": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "request phone number verification",
                 "parameters": [
                     {
@@ -94,7 +88,7 @@
                             "type": "number"
                         },
                         "required": true,
-                        "example": "+2348107721911"
+                        "example": "+23481234567890"
                     }
                 ],
                 "responses": {
@@ -109,9 +103,7 @@
         },
         "/auth/login": {
             "post": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "login",
                 "requestBody": {
                     "content": {
@@ -119,23 +111,14 @@
                             "schema": {
                                 "type": "object",
                                 "example": {
-                                    "phone_number": "+2349450527410",
+                                    "email": "example@email.com",
                                     "password": "testing"
                                 }
                             }
                         }
                     }
                 },
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "Bearer token "
-                    }
-                ],
+                "parameters": [],
                 "responses": {
                     "200": {
                         "description": "Successful response",
@@ -148,9 +131,7 @@
         },
         "/auth/signup-phone": {
             "post": {
-                "tags": [
-                    "authentication routes"
-                ],
+                "tags": ["authentication routes"],
                 "summary": "signup using phone number",
                 "requestBody": {
                     "content": {
@@ -159,7 +140,7 @@
                                 "type": "object",
                                 "example": {
                                     "username": "Jane David",
-                                    "phone_number": "+2348107721911",
+                                    "phone_number": "+23481234567890",
                                     "otp": "602630",
                                     "password": "ihjsbd"
                                 }
@@ -179,9 +160,7 @@
         },
         "/courses/{id}": {
             "get": {
-                "tags": [
-                    "course routes"
-                ],
+                "tags": ["course routes"],
                 "summary": "get course details",
                 "parameters": [
                     {
@@ -192,6 +171,15 @@
                         },
                         "required": true,
                         "example": "1c3fbd80-4046-413e-afd0-57928a29a824"
+                    },
+                    {
+                        "name": "authorization",
+                        "in": "header",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "example": "Token eyJhbGciOiJIUzI1NiJ9.YWEzZmUwM2EtZTllNy00MWRhLWI2NzQtZjNhNjlkNmZlZWJj.URbQfOfpA1Low-dFBAIcjJXo1SUcyLwaX0kO2Tv0dWE"
                     }
                 ],
                 "responses": {
@@ -206,9 +194,7 @@
         },
         "/courses": {
             "get": {
-                "tags": [
-                    "course routes"
-                ],
+                "tags": ["course routes"],
                 "summary": "get course 'pagnated'",
                 "parameters": [
                     {
@@ -232,9 +218,7 @@
         },
         "/courses/search": {
             "get": {
-                "tags": [
-                    "course routes"
-                ],
+                "tags": ["course routes"],
                 "summary": "Course search by category or title or key_word",
                 "parameters": [
                     {
@@ -258,9 +242,7 @@
         },
         "/user/{id}": {
             "get": {
-                "tags": [
-                    "user routes"
-                ],
+                "tags": ["user routes"],
                 "summary": "get user details",
                 "parameters": [
                     {
@@ -285,9 +267,7 @@
         },
         "/user/enrolled/{id}": {
             "get": {
-                "tags": [
-                    "user routes"
-                ],
+                "tags": ["user routes"],
                 "summary": "get user enrolled courses",
                 "parameters": [
                     {
