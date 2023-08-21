@@ -14,14 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const user_1 = __importDefault(require("./routes/user"));
-const auth_1 = __importDefault(require("./routes/auth"));
+const env_1 = __importDefault(require("../env"));
+const errorController_1 = __importDefault(require("./controllers/errorController"));
+const middleWare_1 = require("./controllers/middleWare");
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_config_1 = __importDefault(require("./api-doc/swagger-config"));
-const env_1 = __importDefault(require("../env"));
-const courses_1 = __importDefault(require("./routes/courses"));
-const middleWare_1 = require("./controllers/middleWare");
-const errorController_1 = __importDefault(require("./controllers/errorController"));
+const routes_1 = require("./routes");
 const app = (0, express_1.default)();
 const PORT = +env_1.default.PORT || 3000;
 app.use((0, cors_1.default)({ origin: ["https://app.swaggerhub.com/"] }));
@@ -32,10 +30,10 @@ app.get("/", (re, res) => {
 });
 app.use("/dev/api-docs", swagger_ui_express_1.default.serve);
 app.get("/dev/api-docs", swagger_ui_express_1.default.setup(swagger_config_1.default));
-app.use("/auth", auth_1.default);
-app.use(middleWare_1.secureRoute);
-app.use("/courses", courses_1.default);
-app.use("/user", user_1.default);
+app.use("/auth", routes_1.authRoute);
+app.use(middleWare_1.authenticate);
+app.use("/courses", routes_1.courseRoute);
+app.use("/user", routes_1.userRoute);
 app.use(errorController_1.default);
 app.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server at ${env_1.default.BASE_URL}`);

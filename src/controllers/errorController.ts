@@ -28,7 +28,8 @@ export const GATEWAY_TIMEOUT = { code: 504, message: "Gateway Timeout" };
 export default function errorController(
 	error: any,
 	req: Request,
-	res: Response
+	res: Response,
+	next: NextFunction
 ) {
 	console.log(error);
 	if (error instanceof AppError)

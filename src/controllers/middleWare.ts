@@ -11,7 +11,7 @@ const isValidToken = (obj: unknown): obj is { id: string } & jwt.JwtPayload =>
 
 const hasExpired = (exp: number) => exp * 1000 < new Date().getTime();
 
-export const secureRoute = async (
+export const authenticate = async (
 	req: Request,
 	res: Response,
 	next: NextFunction

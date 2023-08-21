@@ -6,16 +6,16 @@ import {
 } from "../controllers/authController";
 import { tryCatchWapper } from "../controllers/errorController";
 
-const authRouter = Router();
+const authRoute = Router();
 
-authRouter.get("/get-email-otp/:email", tryCatchWapper(sendOTPEmail));
+authRoute.get("/get-email-otp/:email", tryCatchWapper(sendOTPEmail));
 
 // authRouter.get("/get-sms-otp/:phone_number", tryCatchWapper(sendOTPSMS));
 
-authRouter.post("/signup-email", tryCatchWapper(handleSignupByEmail));
+authRoute.post("/signup-email", tryCatchWapper(handleSignupByEmail));
 
 // authRouter.post("/signup-phone", tryCatchWapper(handleSignupByPhone));
 
-authRouter.post("/login", tryCatchWapper(handleLogin));
+authRoute.post("/login", tryCatchWapper(handleLogin));
 
-export default authRouter;
+export default authRoute;

@@ -30,7 +30,7 @@ exports.INTERNAL_SERVER_ERROR = { code: 500, message: "Internal Server Error" };
 exports.BAD_GATEWAY = { code: 502, message: "Bad Gateway" };
 exports.SERVICE_UNAVAILABLE = { code: 503, message: "Service Unavailable" };
 exports.GATEWAY_TIMEOUT = { code: 504, message: "Gateway Timeout" };
-function errorController(error, req, res) {
+function errorController(error, req, res, next) {
     console.log(error);
     if (error instanceof AppError_1.default)
         return res.status(error.statusCode).json({

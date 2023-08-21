@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.secureRoute = void 0;
+exports.authenticate = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const inputSchema_1 = require("../zodSchema/inputSchema");
 const prisma_1 = __importDefault(require("../../prisma"));
@@ -21,7 +21,7 @@ const AppError_1 = __importDefault(require("./AppError"));
 const errorController_1 = require("./errorController");
 const isValidToken = (obj) => obj !== null && typeof obj == "object" && "id" in obj;
 const hasExpired = (exp) => exp * 1000 < new Date().getTime();
-const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
         const isValid = inputSchema_1.bearerTokenSchema.safeParse(req.headers.authorization);
@@ -72,7 +72,7 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         next(err);
     }
 });
-exports.secureRoute = secureRoute;
+exports.authenticate = authenticate;
 (() => {
 })();
 //# sourceMappingURL=middleWare.js.map
