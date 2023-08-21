@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.tryCatchWapper = exports.GATEWAY_TIMEOUT = exports.SERVICE_UNAVAILABLE = exports.BAD_GATEWAY = exports.INTERNAL_SERVER_ERROR = exports.CONFLICT = exports.NOT_ACCEPTED = exports.METHOD_NOT_ALLOWED = exports.NOT_FOUND = exports.FORBIDDEN = exports.UNAUTHORIZED = exports.BAD_REQUEST = exports.NO_CONTENT = exports.ACCEPTED = exports.CREATED = exports.OK = void 0;
 const AppError_1 = __importDefault(require("./AppError"));
+const jsonwebtoken_1 = require("jsonwebtoken");
 exports.OK = { code: 200, message: "OK" };
 exports.CREATED = { code: 201, message: "Created" };
 exports.ACCEPTED = { code: 202, message: "Accepted" };
@@ -25,25 +26,25 @@ exports.NOT_FOUND = { code: 404, message: "Not Found" };
 exports.METHOD_NOT_ALLOWED = { code: 405, message: "Method Not Allowed" };
 exports.NOT_ACCEPTED = { code: 406, message: "Not Accepted" };
 exports.CONFLICT = { code: 409, message: "Conflict" };
-exports.INTERNAL_SERVER_ERROR = {
-    code: 500,
-    message: "Internal Server Error",
-};
+exports.INTERNAL_SERVER_ERROR = { code: 500, message: "Internal Server Error" };
 exports.BAD_GATEWAY = { code: 502, message: "Bad Gateway" };
-exports.SERVICE_UNAVAILABLE = {
-    code: 503,
-    message: "Service Unavailable",
-};
+exports.SERVICE_UNAVAILABLE = { code: 503, message: "Service Unavailable" };
 exports.GATEWAY_TIMEOUT = { code: 504, message: "Gateway Timeout" };
-function errorController(error, req, res, next) {
-    if (error instanceof AppError_1.default) {
-        console.log(error);
+function errorController(error, req, res) {
+    console.log(error);
+    if (error instanceof AppError_1.default)
         return res.status(error.statusCode).json({
             ok: false,
             error: { message: error.message, details: error.details },
         });
-    }
-    console.log(error);
+    if (error instanceof jsonwebtoken_1.JsonWebTokenError)
+        return res.status(exports.UNAUTHORIZED.code).json({
+            ok: false,
+            error: {
+                message: "Invalid API key",
+                details: error,
+            },
+        });
     return res.status(exports.INTERNAL_SERVER_ERROR.code).json({
         ok: false,
         error: {

@@ -1,0 +1,1446 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"openapi": {
+			"type": "string"
+		},
+		"info": {
+			"type": "object",
+			"properties": {
+				"title": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"termsOfService": {
+					"type": "string"
+				},
+				"contact": {
+					"type": "object",
+					"properties": {
+						"email": {
+							"type": "string"
+						}
+					},
+					"required": ["email"]
+				},
+				"license": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"url": {
+							"type": "string"
+						}
+					},
+					"required": ["name", "url"]
+				},
+				"version": {
+					"type": "string"
+				}
+			},
+			"required": ["title", "version"]
+		},
+		"externalDocs": {
+			"type": "object",
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				}
+			},
+			"required": ["description", "url"]
+		},
+		"servers": {
+			"type": "array",
+			"items": [
+				{
+					"type": "object",
+					"properties": {
+						"url": {
+							"type": "string"
+						}
+					},
+					"required": ["url"]
+				}
+			]
+		},
+		"tags": {
+			"type": "array",
+			"items": [
+				{
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"externalDocs": {
+							"type": "object",
+							"properties": {
+								"description": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							},
+							"required": ["description", "url"]
+						}
+					},
+					"required": ["name"]
+				},
+				{
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"externalDocs": {
+							"type": "object",
+							"properties": {
+								"description": {
+									"type": "string"
+								},
+								"url": {
+									"type": "string"
+								}
+							},
+							"required": ["description", "url"]
+						}
+					},
+					"required": ["name"]
+				},
+				{
+					"type": "object",
+					"properties": {
+						"name": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						}
+					},
+					"required": ["name"]
+				}
+			]
+		},
+		"paths": {
+			"type": "object",
+			"properties": {
+				"": {
+					"type": "object",
+					"properties": {
+						"put": {
+							"type": "object",
+							"properties": {
+								"tags": {
+									"type": "array",
+									"items": [
+										{
+											"type": "string"
+										}
+									]
+								},
+								"summary": {
+									"type": "string"
+								},
+								"description": {
+									"type": "string"
+								},
+								"operationId": {
+									"type": "string"
+								},
+								"requestBody": {
+									"type": "object",
+									"properties": {
+										"description": {
+											"type": "string"
+										},
+										"content": {
+											"type": "object",
+											"properties": {
+												"application/json": {
+													"type": "object",
+													"properties": {
+														"schema": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["schema"]
+												},
+												"application/xml": {
+													"type": "object",
+													"properties": {
+														"schema": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["schema"]
+												},
+												"application/x-www-form-urlencoded": {
+													"type": "object",
+													"properties": {
+														"schema": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["schema"]
+												}
+											},
+											"required": [
+												"application/json",
+												"application/xml",
+												"application/x-www-form-urlencoded"
+											]
+										},
+										"required": {
+											"type": "boolean"
+										}
+									},
+									"required": ["description", "content", "required"]
+								},
+								"responses": {
+									"type": "object",
+									"properties": {
+										"200": {
+											"type": "object",
+											"properties": {
+												"description": {
+													"type": "string"
+												},
+												"content": {
+													"type": "object",
+													"properties": {
+														"application/json": {
+															"type": "object",
+															"properties": {
+																"schema": {
+																	"type": "object",
+																	"properties": {
+																		"$ref": {
+																			"type": "string"
+																		}
+																	},
+																	"required": ["$ref"]
+																}
+															},
+															"required": ["schema"]
+														},
+														"application/xml": {
+															"type": "object",
+															"properties": {
+																"schema": {
+																	"type": "object",
+																	"properties": {
+																		"$ref": {
+																			"type": "string"
+																		}
+																	},
+																	"required": ["$ref"]
+																}
+															},
+															"required": ["schema"]
+														}
+													},
+													"required": ["application/json", "application/xml"]
+												}
+											},
+											"required": ["description", "content"]
+										},
+										"400": {
+											"type": "object",
+											"properties": {
+												"description": {
+													"type": "string"
+												}
+											},
+											"required": []
+										},
+										"404": {
+											"type": "object",
+											"properties": {
+												"description": {
+													"type": "string"
+												}
+											},
+											"required": []
+										},
+										"405": {
+											"type": "object",
+											"properties": {
+												"description": {
+													"type": "string"
+												}
+											},
+											"required": []
+										}
+									},
+									"required": ["200", "400", "404", "405"]
+								},
+								"security": {
+									"type": "array",
+									"items": [
+										{
+											"type": "object",
+											"properties": {
+												"petstore_auth": {
+													"type": "array",
+													"items": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "string"
+														}
+													]
+												}
+											},
+											"required": ["petstore_auth"]
+										}
+									]
+								}
+							},
+							"required": [
+								"tags",
+								"summary",
+								"description",
+								"operationId",
+								"requestBody",
+								"responses",
+								"security"
+							]
+						},
+						"post": {
+							"type": "object",
+							"properties": {
+								"tags": {
+									"type": "array",
+									"items": [
+										{
+											"type": "string"
+										}
+									]
+								},
+								"summary": {
+									"type": "string"
+								},
+								"description": {
+									"type": "string"
+								},
+								"operationId": {
+									"type": "string"
+								},
+								"requestBody": {
+									"type": "object",
+									"properties": {
+										"description": {
+											"type": "string"
+										},
+										"content": {
+											"type": "object",
+											"properties": {
+												"application/json": {
+													"type": "object",
+													"properties": {
+														"schema": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["schema"]
+												},
+												"application/xml": {
+													"type": "object",
+													"properties": {
+														"schema": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["schema"]
+												},
+												"application/x-www-form-urlencoded": {
+													"type": "object",
+													"properties": {
+														"schema": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["schema"]
+												}
+											},
+											"required": [
+												"application/json",
+												"application/xml",
+												"application/x-www-form-urlencoded"
+											]
+										},
+										"required": {
+											"type": "boolean"
+										}
+									},
+									"required": ["description", "content", "required"]
+								},
+								"responses": {
+									"type": "object",
+									"properties": {
+										"200": {
+											"type": "object",
+											"properties": {
+												"description": {
+													"type": "string"
+												},
+												"content": {
+													"type": "object",
+													"properties": {
+														"application/json": {
+															"type": "object",
+															"properties": {
+																"schema": {
+																	"type": "object",
+																	"properties": {
+																		"$ref": {
+																			"type": "string"
+																		}
+																	},
+																	"required": ["$ref"]
+																}
+															},
+															"required": ["schema"]
+														},
+														"application/xml": {
+															"type": "object",
+															"properties": {
+																"schema": {
+																	"type": "object",
+																	"properties": {
+																		"$ref": {
+																			"type": "string"
+																		}
+																	},
+																	"required": ["$ref"]
+																}
+															},
+															"required": ["schema"]
+														}
+													},
+													"required": ["application/json", "application/xml"]
+												}
+											},
+											"required": ["description", "content"]
+										},
+										"405": {
+											"type": "object",
+											"properties": {
+												"description": {
+													"type": "string"
+												}
+											},
+											"required": []
+										}
+									},
+									"required": ["200", "405"]
+								},
+								"security": {
+									"type": "array",
+									"items": [
+										{
+											"type": "object",
+											"properties": {
+												"petstore_auth": {
+													"type": "array",
+													"items": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "string"
+														}
+													]
+												}
+											},
+											"required": ["petstore_auth"]
+										}
+									]
+								}
+							},
+							"required": [
+								"tags",
+								"summary",
+								"description",
+								"operationId",
+								"requestBody",
+								"responses",
+								"security"
+							]
+						}
+					},
+					"required": ["put", "post"]
+				}
+			}
+		},
+		"components": {
+			"type": "object",
+			"properties": {
+				"schemas": {
+					"type": "object",
+					"properties": {
+						"Order": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"petId": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"quantity": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"shipDate": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "format"]
+										},
+										"status": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"description": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												},
+												"enum": {
+													"type": "array",
+													"items": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "string"
+														},
+														{
+															"type": "string"
+														}
+													]
+												}
+											},
+											"required": ["type", "description", "example", "enum"]
+										},
+										"complete": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												}
+											},
+											"required": ["type"]
+										}
+									},
+									"required": [
+										"id",
+										"petId",
+										"quantity",
+										"shipDate",
+										"status",
+										"complete"
+									]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						},
+						"Customer": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"username": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"address": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"xml": {
+													"type": "object",
+													"properties": {
+														"name": {
+															"type": "string"
+														},
+														"wrapped": {
+															"type": "boolean"
+														}
+													},
+													"required": ["name", "wrapped"]
+												},
+												"items": {
+													"type": "object",
+													"properties": {
+														"$ref": {
+															"type": "string"
+														}
+													},
+													"required": ["$ref"]
+												}
+											},
+											"required": ["type", "xml", "items"]
+										}
+									},
+									"required": ["id", "username", "address"]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						},
+						"Address": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"street": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"city": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"state": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"zip": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										}
+									},
+									"required": ["street", "city", "state", "zip"]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						},
+						"Category": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"name": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										}
+									},
+									"required": ["id", "name"]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						},
+						"User": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"username": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"firstName": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"lastName": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"email": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"password": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"phone": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"userStatus": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"description": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "description", "format", "example"]
+										}
+									},
+									"required": [
+										"id",
+										"username",
+										"firstName",
+										"lastName",
+										"email",
+										"password",
+										"phone",
+										"userStatus"
+									]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						},
+						"Tag": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "format"]
+										},
+										"name": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												}
+											},
+											"required": ["type"]
+										}
+									},
+									"required": ["id", "name"]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						},
+						"Pet": {
+							"type": "object",
+							"properties": {
+								"required": {
+									"type": "array",
+									"items": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "string"
+										}
+									]
+								},
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												},
+												"example": {
+													"type": "integer"
+												}
+											},
+											"required": ["type", "format", "example"]
+										},
+										"name": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"example": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "example"]
+										},
+										"category": {
+											"type": "object",
+											"properties": {
+												"$ref": {
+													"type": "string"
+												}
+											},
+											"required": ["$ref"]
+										},
+										"photoUrls": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"xml": {
+													"type": "object",
+													"properties": {
+														"wrapped": {
+															"type": "boolean"
+														}
+													},
+													"required": ["wrapped"]
+												},
+												"items": {
+													"type": "object",
+													"properties": {
+														"type": {
+															"type": "string"
+														},
+														"xml": {
+															"type": "object",
+															"properties": {
+																"name": {
+																	"type": "string"
+																}
+															},
+															"required": ["name"]
+														}
+													},
+													"required": ["type", "xml"]
+												}
+											},
+											"required": ["type", "xml", "items"]
+										},
+										"tags": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"xml": {
+													"type": "object",
+													"properties": {
+														"wrapped": {
+															"type": "boolean"
+														}
+													},
+													"required": ["wrapped"]
+												},
+												"items": {
+													"type": "object",
+													"properties": {
+														"$ref": {
+															"type": "string"
+														}
+													},
+													"required": ["$ref"]
+												}
+											},
+											"required": ["type", "xml", "items"]
+										},
+										"status": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"description": {
+													"type": "string"
+												},
+												"enum": {
+													"type": "array",
+													"items": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "string"
+														},
+														{
+															"type": "string"
+														}
+													]
+												}
+											},
+											"required": ["type", "description", "enum"]
+										}
+									},
+									"required": [
+										"id",
+										"name",
+										"category",
+										"photoUrls",
+										"tags",
+										"status"
+									]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["required", "type", "properties", "xml"]
+						},
+						"ApiResponse": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"properties": {
+									"type": "object",
+									"properties": {
+										"code": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												},
+												"format": {
+													"type": "string"
+												}
+											},
+											"required": ["type", "format"]
+										},
+										"type": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												}
+											},
+											"required": ["type"]
+										},
+										"message": {
+											"type": "object",
+											"properties": {
+												"type": {
+													"type": "string"
+												}
+											},
+											"required": ["type"]
+										}
+									},
+									"required": ["code", "type", "message"]
+								},
+								"xml": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										}
+									},
+									"required": ["name"]
+								}
+							},
+							"required": ["type", "properties", "xml"]
+						}
+					},
+					"required": [
+						"Order",
+						"Customer",
+						"Address",
+						"Category",
+						"User",
+						"Tag",
+						"Pet",
+						"ApiResponse"
+					]
+				},
+				"requestBodies": {
+					"type": "object",
+					"properties": {
+						"Pet": {
+							"type": "object",
+							"properties": {
+								"description": {
+									"type": "string"
+								},
+								"content": {
+									"type": "object",
+									"properties": {
+										"application/json": {
+											"type": "object",
+											"properties": {
+												"schema": {
+													"type": "object",
+													"properties": {
+														"$ref": {
+															"type": "string"
+														}
+													},
+													"required": ["$ref"]
+												}
+											},
+											"required": ["schema"]
+										},
+										"application/xml": {
+											"type": "object",
+											"properties": {
+												"schema": {
+													"type": "object",
+													"properties": {
+														"$ref": {
+															"type": "string"
+														}
+													},
+													"required": ["$ref"]
+												}
+											},
+											"required": ["schema"]
+										}
+									},
+									"required": ["application/json", "application/xml"]
+								}
+							},
+							"required": ["description", "content"]
+						},
+						"UserArray": {
+							"type": "object",
+							"properties": {
+								"description": {
+									"type": "string"
+								},
+								"content": {
+									"type": "object",
+									"properties": {
+										"application/json": {
+											"type": "object",
+											"properties": {
+												"schema": {
+													"type": "object",
+													"properties": {
+														"type": {
+															"type": "string"
+														},
+														"items": {
+															"type": "object",
+															"properties": {
+																"$ref": {
+																	"type": "string"
+																}
+															},
+															"required": ["$ref"]
+														}
+													},
+													"required": ["type", "items"]
+												}
+											},
+											"required": ["schema"]
+										}
+									},
+									"required": ["application/json"]
+								}
+							},
+							"required": ["description", "content"]
+						}
+					},
+					"required": ["Pet", "UserArray"]
+				},
+				"securitySchemes": {
+					"type": "object",
+					"properties": {
+						"petstore_auth": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"flows": {
+									"type": "object",
+									"properties": {
+										"implicit": {
+											"type": "object",
+											"properties": {
+												"authorizationUrl": {
+													"type": "string"
+												},
+												"scopes": {
+													"type": "object",
+													"properties": {
+														"write:pets": {
+															"type": "string"
+														},
+														"read:pets": {
+															"type": "string"
+														}
+													},
+													"required": ["write:pets", "read:pets"]
+												}
+											},
+											"required": ["authorizationUrl", "scopes"]
+										}
+									},
+									"required": ["implicit"]
+								}
+							},
+							"required": ["type", "flows"]
+						},
+						"api_key": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"in": {
+									"type": "string"
+								}
+							},
+							"required": ["type", "name", "in"]
+						},
+						"bearerAuth": {
+							"type": "object",
+							"properties": {
+								"type": {
+									"type": "string"
+								},
+								"scheme": {
+									"type": "string"
+								},
+								"bearerFormat": {
+									"type": "string"
+								}
+							},
+							"required": ["type", "scheme", "bearerFormat"]
+						}
+					},
+					"required": ["petstore_auth", "api_key", "bearerAuth"]
+				}
+			},
+			"required": ["schemas", "requestBodies", "securitySchemes"]
+		}
+	},
+	"required": ["openapi", "info", "servers", "tags", "paths", "components"]
+}

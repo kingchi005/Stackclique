@@ -20,6 +20,7 @@ const env_1 = __importDefault(require("../../env"));
 const AppError_1 = __importDefault(require("./AppError"));
 const errorController_1 = require("./errorController");
 const isValidToken = (obj) => obj !== null && typeof obj == "object" && "id" in obj;
+const hasExpired = (exp) => exp * 1000 < new Date().getTime();
 const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
@@ -33,7 +34,8 @@ const secureRoute = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
         if (!isValidToken(veriedToken))
             throw new AppError_1.default("Invalid API key", errorController_1.UNAUTHORIZED.code);
         const { id, exp } = veriedToken;
-        return res.json({ veriedToken });
+        if (exp && hasExpired(exp))
+            throw new AppError_1.default("API key has expired", errorController_1.UNAUTHORIZED.code);
         const user = yield prisma_1.default.user.findUnique({
             where: { id },
             select: {

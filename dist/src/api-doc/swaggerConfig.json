@@ -3,7 +3,8 @@
     "info": {
         "title": "Stack clique",
         "description": "",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "termsOfService": ""
     },
     "servers": [
         {
@@ -12,13 +13,16 @@
     ],
     "tags": [
         {
-            "name": "authentication routes"
+            "name": "authentication routes",
+            "description": ""
         },
         {
-            "name": "course routes"
+            "name": "course routes",
+            "description": ""
         },
         {
-            "name": "user routes"
+            "name": "user routes",
+            "description": ""
         }
     ],
     "paths": {
@@ -172,15 +176,7 @@
                         "required": true,
                         "example": "1c3fbd80-4046-413e-afd0-57928a29a824"
                     },
-                    {
-                        "name": "authorization",
-                        "in": "header",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "required": true,
-                        "example": "Token eyJhbGciOiJIUzI1NiJ9.YWEzZmUwM2EtZTllNy00MWRhLWI2NzQtZjNhNjlkNmZlZWJj.URbQfOfpA1Low-dFBAIcjJXo1SUcyLwaX0kO2Tv0dWE"
-                    }
+                    {}
                 ],
                 "responses": {
                     "200": {
@@ -290,5 +286,19 @@
                 }
             }
         }
-    }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
 }

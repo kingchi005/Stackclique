@@ -324,7 +324,10 @@ export const handleLogin = async (req: Request, res: Response) => {
 
 	if (!authorised) throw new AppError("Incorrect password", 401);
 
-	const token = jwt.sign({ id: user.id }, env.HASH_SECRET + "");
+	const token = jwt.sign(
+		{ id: user.id, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 },
+		env.HASH_SECRET + ""
+	);
 	const { password: pass, ...userData } = user;
 	return res.status(ACCEPTED.code).json(<SuccessResponse<typeof userData>>{
 		ok: true,

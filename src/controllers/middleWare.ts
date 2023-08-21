@@ -9,7 +9,7 @@ import { UNAUTHORIZED } from "./errorController";
 const isValidToken = (obj: unknown): obj is { id: string } & jwt.JwtPayload =>
 	obj !== null && typeof obj == "object" && "id" in obj;
 
-// const hasExpired = (xp:number)=> new Date()
+const hasExpired = (exp: number) => exp * 1000 < new Date().getTime();
 
 export const secureRoute = async (
 	req: Request,
@@ -33,7 +33,9 @@ export const secureRoute = async (
 			throw new AppError("Invalid API key", UNAUTHORIZED.code);
 
 		const { id, exp } = veriedToken;
-		return res.json({ veriedToken });
+
+		if (exp && hasExpired(exp))
+			throw new AppError("API key has expired", UNAUTHORIZED.code);
 
 		const user = await prisma.user.findUnique({
 			where: { id },
