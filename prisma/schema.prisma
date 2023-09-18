@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
@@ -31,6 +31,9 @@ model User {
   enrolled_courses CourseEnrollement[]
   course_review    CourseReview[]
   level            Int                 @default(0)
+  Chats            Chat[]
+  Channel          Channel?            @relation(fields: [channel_id], references: [id])
+  channel_id       String?
   created_at       DateTime            @default(now())
   updated_at       DateTime            @updatedAt
 }
@@ -109,4 +112,22 @@ model CourseCategory {
   description String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+}
+
+model Chat {
+  id         String   @id @default(uuid())
+  sender     User     @relation(fields: [sender_id], references: [id])
+  sender_id  String
+  message    String
+  channel    Channel  @relation(fields: [channel_id], references: [id])
+  channel_id String
+  created_at DateTime @default(now())
+}
+
+model Channel {
+  id         String   @id @default(uuid())
+  name       String
+  chats      Chat[]
+  users      User[]
+  created_at DateTime @default(now())
 }

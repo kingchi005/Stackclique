@@ -7,7 +7,7 @@ import { authenticate } from "./controllers/middleWare";
 // swagger api doc
 import swaggerUI from "swagger-ui-express";
 import swaggerConfig from "./api-doc/swagger-config";
-import { authRoute, courseRoute, userRoute } from "./routes";
+import { authRoute, connectRoute, courseRoute, userRoute } from "./routes";
 
 const app: Application = express();
 const PORT = +env.PORT || 3000;
@@ -32,6 +32,7 @@ app.use(authenticate);
 
 app.use("/courses", courseRoute);
 app.use("/user", userRoute);
+app.use("/connect", connectRoute);
 
 app.use(errorController);
 
