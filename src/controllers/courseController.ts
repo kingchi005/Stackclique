@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
-import { SuccessResponse } from "../types";
-import prisma from "../../prisma";
 import AppError from "./AppError";
 import { BAD_REQUEST, NOT_FOUND, OK } from "./errorController";
+import prisma from "~/prisma/index";
+import { SuccessResponse } from "../types";
 export const getCourseDetails = async (req: Request, res: Response) => {
 	const safeParam = z.object({ id: z.string() }).safeParse(req.params);
 

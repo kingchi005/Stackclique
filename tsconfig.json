@@ -16,7 +16,13 @@
 		// This compiler run should
 		// only output d.ts files
 		// "emitDeclarationOnly": true
-		"removeComments": true
+		"removeComments": true,
+		"baseUrl": "./",
+		"paths": {
+			"~/controllers/*": ["src/controllers/*"],
+			"~/prisma/*": ["prisma/*"],
+			"~/types/*": ["types.ts"]
+		}
 	},
 	"include": ["src/**/*", "prisma/index.ts", "index.ts"]
 }

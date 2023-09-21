@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {
-	handleLogin,
-	handleSignupByEmail,
 	sendOTPEmail,
-} from "../controllers/authController";
-import { tryCatchWapper } from "../controllers/errorController";
+	handleSignupByEmail,
+	handleLogin,
+} from "~/controllers/authController";
+import { tryCatchWapper } from "~/controllers/errorController";
 
 const authRoute = Router();
 

@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {
 	getCourseByLimit,
-	getCourseDetails,
 	searchCourse,
-} from "../controllers/courseController";
-import { tryCatchWapper } from "../controllers/errorController";
+	getCourseDetails,
+} from "~/controllers/courseController";
+import { tryCatchWapper } from "~/controllers/errorController";
 
 const courseRoute = Router();
 

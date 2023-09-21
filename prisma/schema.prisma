@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -100,7 +100,6 @@ model CourseModule {
   video_url     String
   cover_photo   String
   profile_photo String
-  // completed_by_users User[]
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 }
@@ -125,9 +124,10 @@ model Chat {
 }
 
 model Channel {
-  id         String   @id @default(uuid())
-  name       String
-  chats      Chat[]
-  users      User[]
-  created_at DateTime @default(now())
+  id            String   @id @default(uuid())
+  name          String
+  profile_photo String?
+  chats         Chat[]
+  users         User[]
+  created_at    DateTime @default(now())
 }

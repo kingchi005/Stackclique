@@ -14,15 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.searchCourse = exports.getCourseByLimit = exports.getCourseDetails = void 0;
 const zod_1 = require("zod");
-const prisma_1 = __importDefault(require("../../prisma"));
 const AppError_1 = __importDefault(require("./AppError"));
 const errorController_1 = require("./errorController");
+const index_1 = __importDefault(require("~/prisma/index"));
 const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ id: zod_1.z.string() }).safeParse(req.params);
     if (!safeParam.success)
         throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.BAD_REQUEST.code, safeParam.error);
     const { id } = safeParam.data;
-    const course = yield prisma_1.default.course.findFirst({
+    const course = yield index_1.default.course.findFirst({
         where: { id },
         include: {
             category: { select: { name: true } },
@@ -52,7 +52,7 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
     if (!safeParam.success)
         throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.BAD_REQUEST.code, safeParam.error);
     const { p } = safeParam.data;
-    const courses = yield prisma_1.default.course.findMany({
+    const courses = yield index_1.default.course.findMany({
         take: +p,
         select: {
             id: true,
@@ -84,7 +84,7 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     if (!safeParam.success)
         throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.BAD_REQUEST.code, safeParam.error);
     const { category, title } = safeParam.data;
-    const courses = yield prisma_1.default.course.findMany({
+    const courses = yield index_1.default.course.findMany({
         where: {
             category: { name: { contains: category } },
             title: { contains: title },

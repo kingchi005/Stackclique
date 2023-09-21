@@ -1,9 +1,9 @@
 import { Router } from "express";
+import { tryCatchWapper } from "~/controllers/errorController";
 import {
-	getUserDetails,
 	getErroledCourses,
-} from "../controllers/userController";
-import { tryCatchWapper } from "../controllers/errorController";
+	getUserDetails,
+} from "~/controllers/userController";
 
 const userRoute = Router();
 
