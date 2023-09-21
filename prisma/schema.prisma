@@ -128,6 +128,7 @@ model Channel {
   name          String
   profile_photo String?
   chats         Chat[]
-  users         User[]
+  members         User[]
+  required_user_level Int
   created_at    DateTime @default(now())
 }

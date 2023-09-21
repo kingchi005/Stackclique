@@ -1,3 +1,5 @@
+import { ChatEventEnum } from "./constants";
+
 type IResponse = {
 	ok: boolean;
 };
@@ -39,3 +41,6 @@ const res: SuccessResponse<typeof data> = {
 	ok: true,
 	data,
 };
+
+const AvailableChatEvents = Object.values(ChatEventEnum);
+export type TEvent = (typeof AvailableChatEvents)[0];

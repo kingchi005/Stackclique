@@ -19,9 +19,9 @@
 		"removeComments": true,
 		"baseUrl": "./",
 		"paths": {
-			"~/controllers/*": ["src/controllers/*"],
-			"~/prisma/*": ["prisma/*"],
-			"~/types/*": ["types.ts"]
+			// "~/controllers/*": ["src/controllers/*"],
+			// "~/prisma/*": ["prisma/*"],
+			// "~/types/*": ["types.ts"]
 		}
 	},
 	"include": ["src/**/*", "prisma/index.ts", "index.ts"]

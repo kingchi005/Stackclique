@@ -8,30 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = __importDefault(require("~/prisma/index"));
+exports.initializeSocket = void 0;
+const express_1 = require("express");
+const errorController_1 = require("../controllers/errorController");
 const socket_io_1 = require("socket.io");
+const connectController_1 = require("../controllers/connectController");
+const connectRoute = (0, express_1.Router)();
+connectRoute.post("/create-room", (0, errorController_1.tryCatchWapper)(connectController_1.createRoom));
+connectRoute.get("/channels", (0, errorController_1.tryCatchWapper)(connectController_1.getAllChannels));
 const initializeSocket = (server) => {
     const io = new socket_io_1.Server(server);
     io.on("connection", (socket) => {
         console.log("A user connected");
+        socket.on("joinChannel", (req) => {
+        });
         socket.on("chat:message", (data) => __awaiter(void 0, void 0, void 0, function* () {
             const { sender, content } = data;
-            try {
-                const message = yield index_1.default.message.create({
-                    data: {
-                        sender,
-                        content,
-                    },
-                });
-                io.emit("chat:message", message);
-            }
-            catch (error) {
-                console.error("Error saving chat message:", error);
-            }
         }));
         socket.on("disconnect", () => {
             console.log("A user disconnected");
@@ -39,5 +32,6 @@ const initializeSocket = (server) => {
     });
     return io;
 };
-exports.default = initializeSocket;
+exports.initializeSocket = initializeSocket;
+exports.default = connectRoute;
 //# sourceMappingURL=connect.js.map

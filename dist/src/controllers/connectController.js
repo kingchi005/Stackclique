@@ -12,22 +12,62 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onChatMessage = void 0;
-const index_1 = __importDefault(require("~/prisma/index"));
+exports.getAllChannels = exports.createRoom = exports.onChatMessage = void 0;
+const index_1 = __importDefault(require("../../prisma/index"));
+const errorController_1 = require("./errorController");
 const onChatMessage = (data) => __awaiter(void 0, void 0, void 0, function* () {
     const { sender, content } = data;
     try {
-        const message = yield index_1.default.message.create({
-            data: {
-                sender,
-                content,
-            },
-        });
-        io.emit("chat:message", message);
     }
     catch (error) {
         console.error("Error saving chat message:", error);
     }
 });
 exports.onChatMessage = onChatMessage;
+const createRoom = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    return res.status(errorController_1.OK.code).json({
+        ok: true,
+        data: "ready to create",
+    });
+});
+exports.createRoom = createRoom;
+const getAllChannels = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const channels = [
+        ...(yield index_1.default.channel.findMany({
+            select: {
+                id: true,
+                name: true,
+                profile_photo: true,
+                created_at: true,
+                _count: { select: { users: true } },
+            },
+        })),
+        {
+            id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
+            name: "sheet",
+            profile_photo: "Greece",
+            created_at: "8/29/2116",
+            _count: 2,
+        },
+        {
+            id: "7751eb55-efab-5f55-97de-13d4c06a71e9",
+            name: "soil",
+            profile_photo: "Mauritius",
+            created_at: "6/23/2097",
+            _count: 6,
+        },
+        {
+            id: "8fa2c093-d576-5234-9766-2a01b6018886",
+            name: "red",
+            profile_photo: "Barbados",
+            created_at: "6/14/2078",
+            _count: 4,
+        },
+    ];
+    return res.status(errorController_1.OK.code).json({
+        ok: true,
+        data: channels,
+    });
+});
+exports.getAllChannels = getAllChannels;
 //# sourceMappingURL=connectController.js.map

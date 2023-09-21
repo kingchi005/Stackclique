@@ -13,6 +13,7 @@ const envSchema = z.object({
 	MAIL_PASSWORD: z.string(),
 	MAIL_HOST: z.string(),
 	MAIL_PORT: z.string(),
+	CORS_ORIGIN: z.string(),
 });
 
 const env = envSchema.parse(process.env);

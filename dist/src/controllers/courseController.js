@@ -16,7 +16,7 @@ exports.searchCourse = exports.getCourseByLimit = exports.getCourseDetails = voi
 const zod_1 = require("zod");
 const AppError_1 = __importDefault(require("./AppError"));
 const errorController_1 = require("./errorController");
-const index_1 = __importDefault(require("~/prisma/index"));
+const index_1 = __importDefault(require("../../prisma/index"));
 const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ id: zod_1.z.string() }).safeParse(req.params);
     if (!safeParam.success)
