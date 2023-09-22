@@ -1,5 +1,4 @@
 import { z } from "zod";
-import prisma from "./../../prisma/index";
 
 // helpers functions
 const getStringValidation = (key: string) =>
@@ -88,24 +87,14 @@ export const loginPhoneSchema = z.object({
 	password: passwordSchema,
 });
 
-/*
- * /channels - getAllChannels
- * /channels/:userId - getUserChannels
- * /channel - createChannel
- * /channel/:userId - addUserToChannel
- * /ChatMessage - sendChatMessage
- *
- */
-
-// export const getAllChannels = z.object({});
-
-// export const getUserChannels = z.object({});
 export const createChannelSchema = z.object({
 	name: getStringValidation("name"),
 	required_user_level: getNumberValidation("required_user_level"),
 });
 
-export const addUserToChannelSchema = z.object({});
+export const addUserToChannelSchema = z.object({
+	user_id: getNumberValidation("user_id"),
+});
 
 export const sendChatMessageSchema = z.object({
 	message: getStringValidation("message"),

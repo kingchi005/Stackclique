@@ -1,9 +1,15 @@
 import { Request, Response } from "express";
 import { SuccessResponse } from "../types";
 import prisma from "../../prisma/index";
-import { BAD_REQUEST, OK } from "./errorController";
+import { errCodeEnum } from "./errorController";
 import AppError from "./AppError";
 import { z } from "zod";
+import {
+	addUserToChannelSchema,
+	createChannelSchema,
+	createUserSchema,
+	sendChatMessageSchema,
+} from "../validation/inputSchema";
 /*
  * /channels - getAllChannels
  * /channels/:userId - getUserChannels
@@ -14,17 +20,7 @@ import { z } from "zod";
  */
 
 export const getAllChannels = async (req: Request, res: Response) => {
-	const channels = [
-		...(await prisma.channel.findMany({
-			select: {
-				id: true,
-				name: true,
-				profile_photo: true,
-				required_user_level: true,
-				created_at: true,
-				_count: { select: { members: true } },
-			},
-		})),
+	const hcChanels = [
 		{
 			id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
 			name: "sheet",
@@ -51,9 +47,22 @@ export const getAllChannels = async (req: Request, res: Response) => {
 		},
 	];
 
-	return res.status(OK.code).json(<SuccessResponse<typeof channels>>{
+	const channels = [
+		await prisma.channel.findMany({
+			select: {
+				id: true,
+				name: true,
+				profile_photo: true,
+				required_user_level: true,
+				created_at: true,
+				_count: { select: { members: true } },
+			},
+		}),
+	];
+
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof channels>>{
 		ok: true,
-		data: channels,
+		data: [...channels, ...hcChanels],
 	});
 };
 
@@ -64,11 +73,20 @@ export const getUserChannels = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			BAD_REQUEST.code,
+			errCodeEnum.BAD_REQUEST,
 			safeParam.error
 		);
 
-	const { userId } = safeParam.data;
+	const { userId: id } = safeParam.data;
+
+	const userChannels = (
+		await prisma.user.findFirst({
+			where: { id },
+			select: { channel: true },
+		})
+	)?.channel;
+
+	if (!userChannels) throw new AppError("user not found", 404);
 
 	const channels = [
 		// ...(await prisma.channel.findMany({where:{users:{every:{}}}})),
@@ -90,28 +108,61 @@ export const getUserChannels = async (req: Request, res: Response) => {
 		},
 	];
 
-	return res.status(OK.code).json(<SuccessResponse<typeof channels>>{
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof channels>>{
 		ok: true,
-		data: channels,
+		data: [...userChannels, ...channels],
 	});
 };
 
 export const createChannel = async (req: Request, res: Response) => {
-	return res.status(OK.code).json(<SuccessResponse<any>>{
+	const safeParam = createChannelSchema.safeParse(req.body);
+
+	if (!safeParam.success)
+		throw new AppError(
+			safeParam.error.issues.map((d) => d.message).join(", "),
+			errCodeEnum.BAD_REQUEST,
+			safeParam.error
+		);
+
+	const { name, required_user_level } = safeParam.data;
+
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
 		ok: true,
 		data: "ready to create",
 	});
 };
 
 export const addUserToChannel = async (req: Request, res: Response) => {
-	return res.status(OK.code).json(<SuccessResponse<any>>{
+	const safeParam = addUserToChannelSchema.safeParse(req.body);
+
+	if (!safeParam.success)
+		throw new AppError(
+			safeParam.error.issues.map((d) => d.message).join(", "),
+			errCodeEnum.BAD_REQUEST,
+			safeParam.error
+		);
+
+	const { user_id } = safeParam.data;
+
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
 		ok: true,
 		data: "ready to addUserToChannel",
 	});
 };
 
 export const sendChatMessage = async (req: Request, res: Response) => {
-	return res.status(OK.code).json(<SuccessResponse<any>>{
+	const safeParam = sendChatMessageSchema.safeParse(req.body);
+
+	if (!safeParam.success)
+		throw new AppError(
+			safeParam.error.issues.map((d) => d.message).join(", "),
+			errCodeEnum.BAD_REQUEST,
+			safeParam.error
+		);
+
+	const { channel_id, message, sender_id } = safeParam.data;
+
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
 		ok: true,
 		data: "ready to sendChatMessage and create ChatMessage",
 	});

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import AppError from "./AppError";
-import { BAD_REQUEST, NOT_FOUND, OK } from "./errorController";
 import prisma from "../../prisma/index";
 import { SuccessResponse } from "../types";
+import { errCodeEnum } from "./errorController";
 
 export const getCourseDetails = async (req: Request, res: Response) => {
 	const safeParam = z.object({ id: z.string() }).safeParse(req.params);
@@ -11,7 +11,7 @@ export const getCourseDetails = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			BAD_REQUEST.code,
+			errCodeEnum.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -34,14 +34,9 @@ export const getCourseDetails = async (req: Request, res: Response) => {
 		},
 	});
 
-	if (!course) throw new AppError("Course not found", NOT_FOUND.code);
+	if (!course) throw new AppError("Course not found", errCodeEnum.NOT_FOUND);
 
-	// return res.status(404).json(<ErrorResponse<any>>{
-	// 	ok: false,
-	// 	error: { message: "Course not found" },
-	// });
-
-	return res.status(OK.code).json(<SuccessResponse<typeof course>>{
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof course>>{
 		ok: true,
 		data: course,
 	});
@@ -53,7 +48,7 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			BAD_REQUEST.code,
+			errCodeEnum.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -77,13 +72,9 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 	});
 
 	if (courses?.length < 1)
-		throw new AppError("No course in record", NOT_FOUND.code);
-	// return res.status(404).json(<ErrorResponse<any>>{
-	// 	ok: false,
-	// 	error: { message: "No course in record" },
-	// });
+		throw new AppError("No course in record", errCodeEnum.NOT_FOUND);
 
-	return res.status(OK.code).json(<SuccessResponse<typeof courses>>{
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof courses>>{
 		ok: true,
 		data: courses,
 	});
@@ -100,16 +91,9 @@ export const searchCourse = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			BAD_REQUEST.code,
+			errCodeEnum.BAD_REQUEST,
 			safeParam.error
 		);
-	// return res.status(401).json(<ErrorResponse<typeof safeParam.error>>{
-	// 	ok: false,
-	// 	error: {
-	// 		message: safeParam.error.issues.map((d) => d.message).join(", "),
-	// 		details: safeParam.error,
-	// 	},
-	// });
 
 	const { category, title } = safeParam.data;
 
@@ -118,9 +102,7 @@ export const searchCourse = async (req: Request, res: Response) => {
 			category: { name: { contains: category } },
 			title: { contains: title },
 		},
-		// include: {
-		// 	// category: { select: { name: true, description: true } },
-		// },
+
 		select: {
 			id: true,
 			title: true,
@@ -130,13 +112,10 @@ export const searchCourse = async (req: Request, res: Response) => {
 		},
 	});
 
-	if (courses.length < 1) throw new AppError("No result found", NOT_FOUND.code);
-	// return res.status(404).json(<ErrorResponse<any>>{
-	// 	ok: false,
-	// 	error: { message: "No result found" },
-	// });
+	if (courses.length < 1)
+		throw new AppError("No result found", errCodeEnum.NOT_FOUND);
 
-	return res.status(OK.code).json(<SuccessResponse<typeof courses>>{
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof courses>>{
 		ok: true,
 		data: courses,
 	});

@@ -4,8 +4,8 @@ import { bearerTokenSchema } from "../validation/inputSchema";
 import prisma from "../../prisma";
 import env from "../../env";
 import AppError from "./AppError";
-import { UNAUTHORIZED } from "./errorController";
 import { userRole } from "../types";
+import { errCodeEnum } from "./errorController";
 
 const isValidToken = (obj: unknown): obj is { id: string } & jwt.JwtPayload =>
 	obj !== null && typeof obj == "object" && "id" in obj;
@@ -16,7 +16,7 @@ export const onlyAdmins = (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const userRole: userRole = res.locals.user_role;
 		if (userRole !== "Admin")
-			throw new AppError("You are not an Admin", UNAUTHORIZED.code);
+			throw new AppError("You are not an Admin", errCodeEnum.UNAUTHORIZED);
 		else next();
 	} catch (err) {
 		next(err);
@@ -32,22 +32,22 @@ export const authenticate = async (
 		const isValid = bearerTokenSchema.safeParse(req.headers.authorization);
 
 		if (!isValid.success)
-			throw new AppError("Please provide an API key", UNAUTHORIZED.code);
+			throw new AppError("Please provide an API key", errCodeEnum.UNAUTHORIZED);
 
 		const providedToken = isValid.data.split(" ")?.[1]?.trim();
 
 		if (!providedToken)
-			throw new AppError("Invalid API key", UNAUTHORIZED.code);
+			throw new AppError("Invalid API key", errCodeEnum.UNAUTHORIZED);
 
 		const veriedToken: unknown = jwt.verify(providedToken, env.HASH_SECRET);
 
 		if (!isValidToken(veriedToken))
-			throw new AppError("Invalid API key", UNAUTHORIZED.code);
+			throw new AppError("Invalid API key", errCodeEnum.UNAUTHORIZED);
 
 		const { id, exp } = veriedToken;
 
 		if (exp && hasExpired(exp))
-			throw new AppError("API key has expired", UNAUTHORIZED.code);
+			throw new AppError("API key has expired", errCodeEnum.UNAUTHORIZED);
 
 		const user = await prisma.user.findUnique({
 			where: { id },
@@ -78,7 +78,7 @@ export const authenticate = async (
 			},
 		});
 		//
-		if (!user) throw new AppError("Invalid API key", UNAUTHORIZED.code);
+		if (!user) throw new AppError("Invalid API key", errCodeEnum.UNAUTHORIZED);
 
 		res.locals.user_id = user.id;
 		res.locals.user_role = user.role;

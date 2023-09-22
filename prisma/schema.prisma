@@ -33,8 +33,7 @@ model User {
   course_review    CourseReview[]
   level            Int                 @default(0)
   chatsMessages    ChatMessage[]
-  channel          Channel?            @relation(fields: [channel_id], references: [id])
-  channel_id       String?
+  channel          Channel[]
   created_at       DateTime            @default(now())
   updated_at       DateTime            @updatedAt
 }

@@ -1,8 +1,4 @@
-import { BAD_REQUEST } from "../controllers/errorController";
-import {
-	createChannelSchema,
-	sendChatMessageSchema,
-} from "../validation/inputSchema";
+import { sendChatMessageSchema } from "../validation/inputSchema";
 
 export default async () => {
 	const safeParam = sendChatMessageSchema.safeParse({

@@ -3,7 +3,7 @@ import { idParamSchema } from "../validation/inputSchema";
 import { SuccessResponse } from "../types";
 import prisma from "../../prisma";
 import AppError from "./AppError";
-import { BAD_REQUEST, NOT_FOUND, OK } from "./errorController";
+import { errCodeEnum, errMsgEnum } from "./errorController";
 
 export const getUserDetails = async (req: Request, res: Response) => {
 	const safeParam = idParamSchema.safeParse(req.params);
@@ -11,7 +11,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			BAD_REQUEST.code,
+			errCodeEnum.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -47,9 +47,9 @@ export const getUserDetails = async (req: Request, res: Response) => {
 		},
 	});
 
-	if (!user) throw new AppError("User not found", NOT_FOUND.code);
+	if (!user) throw new AppError("User not found", errCodeEnum.NOT_FOUND);
 
-	return res.status(OK.code).json(<SuccessResponse<typeof user>>{
+	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof user>>{
 		ok: true,
 		data: user,
 	});
@@ -61,7 +61,7 @@ export const getErroledCourses = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			BAD_REQUEST.code,
+			errCodeEnum.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -94,15 +94,18 @@ export const getErroledCourses = async (req: Request, res: Response) => {
 	});
 
 	if (!user)
-		throw new AppError(`User with id '${id}' does not exist`, NOT_FOUND.code);
+		throw new AppError(
+			`User with id '${id}' does not exist`,
+			errCodeEnum.NOT_FOUND
+		);
 
 	if (user.enrolled_courses.length < 1)
 		throw new AppError(
 			`User with id '${id}' is not enrolled in any course`,
-			NOT_FOUND.code
+			errCodeEnum.NOT_FOUND
 		);
 
-	return res.status(OK.code).json(<
+	return res.status(errCodeEnum.OK).json(<
 		SuccessResponse<typeof user.enrolled_courses>
 	>{
 		ok: true,
