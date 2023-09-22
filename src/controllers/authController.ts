@@ -6,7 +6,7 @@ import {
 	emailSchema,
 	emailSignupInputSchema,
 	loginEmailSchema,
-} from "../zodSchema/inputSchema";
+} from "../validation/inputSchema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import env from "./../../env";

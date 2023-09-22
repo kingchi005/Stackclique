@@ -9,6 +9,7 @@
 	"git repository": "https://github.com/idevelop4life/Stackclique-",
 	"scripts": {
 		"start": "node dist/src/server",
+		"test": "tsc && node dist/src/test",
 		"dev": "tsc && node dist/src/server",
 		"build": "npx tsc",
 		"pre-start": "npm run db:sync && npm run db:seed",

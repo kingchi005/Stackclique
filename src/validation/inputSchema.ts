@@ -1,5 +1,22 @@
 import { z } from "zod";
+import prisma from "./../../prisma/index";
 
+// helpers functions
+const getStringValidation = (key: string) =>
+	z
+		.string({
+			required_error: `'${key}' is required`,
+			invalid_type_error: `'${key}' must be a string`,
+		})
+		.min(3, { message: `'${key}' must be 3 or more characters` });
+
+const getNumberValidation = (key: string) =>
+	z.number({
+		required_error: `'${key}' is required`,
+		invalid_type_error: `'${key}' must be a number`,
+	});
+
+// single schemas
 export const userInputSchema = z.string({
 	invalid_type_error: "'id' must be a stirng",
 });
@@ -9,7 +26,7 @@ const usernameSchema = z
 		required_error: "username is required",
 		invalid_type_error: "'name' must be a string",
 	})
-	.min(3, { message: "'username' must be 3 ore more characters" });
+	.min(3, { message: "'username' must be 3 or more characters" });
 
 export const emailSchema = z
 	.string({ required_error: "Email is required" })
@@ -32,7 +49,7 @@ const otpSchema = z
 
 const passwordSchema = z
 	.string({ required_error: "'password' is required" })
-	.min(6, { message: "'password' must be 6 ore more characters" });
+	.min(6, { message: "'password' must be 6 or more characters" });
 
 export const bearerTokenSchema = z.string({
 	required_error: "'Authorisation' is required",
@@ -41,10 +58,7 @@ export const bearerTokenSchema = z.string({
 
 export const idParamSchema = z.object({ id: z.string() });
 
-// export const
-
 // input schemas
-
 export const createUserSchema = z.object({
 	username: usernameSchema,
 	email: emailSchema,
@@ -72,4 +86,29 @@ export const loginEmailSchema = z.object({
 export const loginPhoneSchema = z.object({
 	phone_number: phoneNumberSchema,
 	password: passwordSchema,
+});
+
+/*
+ * /channels - getAllChannels
+ * /channels/:userId - getUserChannels
+ * /channel - createChannel
+ * /channel/:userId - addUserToChannel
+ * /ChatMessage - sendChatMessage
+ *
+ */
+
+// export const getAllChannels = z.object({});
+
+// export const getUserChannels = z.object({});
+export const createChannelSchema = z.object({
+	name: getStringValidation("name"),
+	required_user_level: getNumberValidation("required_user_level"),
+});
+
+export const addUserToChannelSchema = z.object({});
+
+export const sendChatMessageSchema = z.object({
+	message: getStringValidation("message"),
+	channel_id: getStringValidation("channel_id"),
+	sender_id: getStringValidation("sender_id"),
 });

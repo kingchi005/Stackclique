@@ -16,6 +16,7 @@ const envSchema = zod_1.z.object({
     MAIL_PASSWORD: zod_1.z.string(),
     MAIL_HOST: zod_1.z.string(),
     MAIL_PORT: zod_1.z.string(),
+    CORS_ORIGIN: zod_1.z.string(),
 });
 const env = envSchema.parse(process.env);
 exports.default = env;

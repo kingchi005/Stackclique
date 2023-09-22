@@ -4,6 +4,7 @@ type IResponse = {
 	ok: boolean;
 };
 
+export type userRole = "Admin" | "Instructor" | "User";
 export type ErrorResponse<T> = IResponse & {
 	error: {
 		message: string;

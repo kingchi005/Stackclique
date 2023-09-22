@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { idParamSchema } from "../zodSchema/inputSchema";
+import { idParamSchema } from "../validation/inputSchema";
 import { SuccessResponse } from "../types";
 import prisma from "../../prisma";
 import AppError from "./AppError";

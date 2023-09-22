@@ -17,7 +17,7 @@
 		// only output d.ts files
 		// "emitDeclarationOnly": true
 		"removeComments": true,
-		"baseUrl": "./",
+		// "baseUrl": "./",
 		"paths": {
 			// "~/controllers/*": ["src/controllers/*"],
 			// "~/prisma/*": ["prisma/*"],

@@ -1,27 +1,17 @@
 import { Request, Response } from "express";
-import { SuccessResponse } from "src/types";
+import { SuccessResponse } from "../types";
 import prisma from "../../prisma/index";
 import { BAD_REQUEST, OK } from "./errorController";
 import AppError from "./AppError";
 import { z } from "zod";
-
-export const onChatMessage = async (data: any) => {
-	const { sender, content } = data;
-
-	try {
-		// const message = await prisma.chat
-		// io.emit("chat:message", message);
-	} catch (error) {
-		console.error("Error saving chat message:", error);
-	}
-};
-
-export const createRoom = async (req: Request, res: Response) => {
-	return res.status(OK.code).json(<SuccessResponse<any>>{
-		ok: true,
-		data: "ready to create",
-	});
-};
+/*
+ * /channels - getAllChannels
+ * /channels/:userId - getUserChannels
+ * /channel - createChannel
+ * /channel/:userId - addUserToChannel
+ * /ChatMessage - sendChatMessage
+ *
+ */
 
 export const getAllChannels = async (req: Request, res: Response) => {
 	const channels = [
@@ -32,7 +22,7 @@ export const getAllChannels = async (req: Request, res: Response) => {
 				profile_photo: true,
 				required_user_level: true,
 				created_at: true,
-				_count: { select: { users: true } },
+				_count: { select: { members: true } },
 			},
 		})),
 		{
@@ -105,3 +95,35 @@ export const getUserChannels = async (req: Request, res: Response) => {
 		data: channels,
 	});
 };
+
+export const createChannel = async (req: Request, res: Response) => {
+	return res.status(OK.code).json(<SuccessResponse<any>>{
+		ok: true,
+		data: "ready to create",
+	});
+};
+
+export const addUserToChannel = async (req: Request, res: Response) => {
+	return res.status(OK.code).json(<SuccessResponse<any>>{
+		ok: true,
+		data: "ready to addUserToChannel",
+	});
+};
+
+export const sendChatMessage = async (req: Request, res: Response) => {
+	return res.status(OK.code).json(<SuccessResponse<any>>{
+		ok: true,
+		data: "ready to sendChatMessage and create ChatMessage",
+	});
+};
+
+/* export const onChatMessage = async (data: any) => {
+	const { sender, content } = data;
+
+	try {
+		// const message = await prisma.chat
+		// io.emit("chat:message", message);
+	} catch (error) {
+		console.error("Error saving chat message:", error);
+	}
+}; */

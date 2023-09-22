@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getErroledCourses = exports.getUserDetails = void 0;
-const inputSchema_1 = require("../zodSchema/inputSchema");
+const inputSchema_1 = require("../validation/inputSchema");
 const prisma_1 = __importDefault(require("../../prisma"));
 const AppError_1 = __importDefault(require("./AppError"));
 const errorController_1 = require("./errorController");

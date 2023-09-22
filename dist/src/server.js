@@ -15,18 +15,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const http_1 = __importDefault(require("http"));
+const socket_io_1 = require("socket.io");
 const env_1 = __importDefault(require("../env"));
 const routes_1 = require("./routes");
-const connect_1 = require("./routes/connect");
-const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
-(0, connect_1.initializeSocket)(server);
 const PORT = +env_1.default.PORT || 3000;
-app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
+const io = new socket_io_1.Server(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: process.env.CORS_ORIGIN,
+        credentials: true,
+    },
+});
+app.set("io", io);
+app.use((0, cors_1.default)({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+}));
+app.use(express_1.default.json({ limit: "16kb" }));
+app.use(express_1.default.urlencoded({ extended: true, limit: "16kb" }));
 app.get("/", (req, res) => {
     res.status(300).json({ msg: "welcome to the stackclique api" });
 });

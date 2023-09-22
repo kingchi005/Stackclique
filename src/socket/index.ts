@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import { ChatEventEnum } from "../constants";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
-import AppError from "src/controllers/AppError";
-import { UNAUTHORIZED } from "src/controllers/errorController";
-import { TEvent } from "src/types";
+import AppError from "../controllers/AppError";
+import { UNAUTHORIZED } from "../controllers/errorController";
+import { TEvent } from "../types";
 
 const mountJoinChatEvent = (
 	socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
@@ -33,6 +33,14 @@ const mountParticipantStoppedTypingEvent = (
 ) => {
 	socket.on(ChatEventEnum.STOP_TYPING_EVENT, (chatId) => {
 		socket.in(chatId).emit(ChatEventEnum.STOP_TYPING_EVENT, chatId);
+	});
+};
+
+const mountParticipantRemovedOrLeavesEvent = (
+	socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
+) => {
+	socket.on(ChatEventEnum.LEAVE_CHAT_EVENT, (chatId) => {
+		socket.in(chatId).emit(ChatEventEnum.LEAVE_CHAT_EVENT, chatId);
 	});
 };
 

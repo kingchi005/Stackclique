@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const constants_1 = require("./constants");
 const details = {
     email: "wrong",
     name: "required",
@@ -22,4 +23,5 @@ const res = {
     ok: true,
     data,
 };
+const AvailableChatEvents = Object.values(constants_1.ChatEventEnum);
 //# sourceMappingURL=types.js.map

@@ -1,15 +1,27 @@
 import { Response, Request, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { bearerTokenSchema } from "../zodSchema/inputSchema";
+import { bearerTokenSchema } from "../validation/inputSchema";
 import prisma from "../../prisma";
 import env from "../../env";
 import AppError from "./AppError";
 import { UNAUTHORIZED } from "./errorController";
+import { userRole } from "../types";
 
 const isValidToken = (obj: unknown): obj is { id: string } & jwt.JwtPayload =>
 	obj !== null && typeof obj == "object" && "id" in obj;
 
 const hasExpired = (exp: number) => exp * 1000 < new Date().getTime();
+
+export const onlyAdmins = (req: Request, res: Response, next: NextFunction) => {
+	try {
+		const userRole: userRole = res.locals.user_role;
+		if (userRole !== "Admin")
+			throw new AppError("You are not an Admin", UNAUTHORIZED.code);
+		else next();
+	} catch (err) {
+		next(err);
+	}
+};
 
 export const authenticate = async (
 	req: Request,
@@ -47,6 +59,7 @@ export const authenticate = async (
 				cover_photo: true,
 				level: true,
 				notifications: true,
+				role: true,
 				enrolled_courses: {
 					select: {
 						course: {
@@ -67,7 +80,8 @@ export const authenticate = async (
 		//
 		if (!user) throw new AppError("Invalid API key", UNAUTHORIZED.code);
 
-		res.locals.user_id = user?.id;
+		res.locals.user_id = user.id;
+		res.locals.user_role = user.role;
 
 		next();
 	} catch (err) {

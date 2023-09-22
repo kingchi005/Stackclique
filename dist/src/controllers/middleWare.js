@@ -12,15 +12,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticate = void 0;
+exports.authenticate = exports.onlyAdmins = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const inputSchema_1 = require("../zodSchema/inputSchema");
+const inputSchema_1 = require("../validation/inputSchema");
 const prisma_1 = __importDefault(require("../../prisma"));
 const env_1 = __importDefault(require("../../env"));
 const AppError_1 = __importDefault(require("./AppError"));
 const errorController_1 = require("./errorController");
 const isValidToken = (obj) => obj !== null && typeof obj == "object" && "id" in obj;
 const hasExpired = (exp) => exp * 1000 < new Date().getTime();
+const onlyAdmins = (req, res, next) => {
+    try {
+        const userRole = res.locals.user_role;
+        if (userRole !== "Admin")
+            throw new AppError_1.default("You are not an Admin", errorController_1.UNAUTHORIZED.code);
+        else
+            next();
+    }
+    catch (err) {
+        next(err);
+    }
+};
+exports.onlyAdmins = onlyAdmins;
 const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     try {
@@ -46,6 +59,7 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
                 cover_photo: true,
                 level: true,
                 notifications: true,
+                role: true,
                 enrolled_courses: {
                     select: {
                         course: {
@@ -65,7 +79,8 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         });
         if (!user)
             throw new AppError_1.default("Invalid API key", errorController_1.UNAUTHORIZED.code);
-        res.locals.user_id = user === null || user === void 0 ? void 0 : user.id;
+        res.locals.user_id = user.id;
+        res.locals.user_role = user.role;
         next();
     }
     catch (err) {

@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleLogin = exports.handleSignupByEmail = exports.handleSignupByPhone = exports.sendOTPEmail = exports.sendOTPSMS = void 0;
 const zod_1 = require("zod");
 const prisma_1 = __importDefault(require("../../prisma"));
-const inputSchema_1 = require("../zodSchema/inputSchema");
+const inputSchema_1 = require("../validation/inputSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const env_1 = __importDefault(require("./../../env"));

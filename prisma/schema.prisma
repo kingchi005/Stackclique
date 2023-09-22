@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -27,12 +27,13 @@ model User {
   password         String
   profile_photo    String?
   cover_photo      String?
+  role             String?             @default("User")
   notifications    Notifications[]
   enrolled_courses CourseEnrollement[]
   course_review    CourseReview[]
   level            Int                 @default(0)
-  Chats            Chat[]
-  Channel          Channel?            @relation(fields: [channel_id], references: [id])
+  chatsMessages    ChatMessage[]
+  channel          Channel?            @relation(fields: [channel_id], references: [id])
   channel_id       String?
   created_at       DateTime            @default(now())
   updated_at       DateTime            @updatedAt
@@ -113,7 +114,7 @@ model CourseCategory {
   updated_at  DateTime @updatedAt
 }
 
-model Chat {
+model ChatMessage {
   id         String   @id @default(uuid())
   sender     User     @relation(fields: [sender_id], references: [id])
   sender_id  String
@@ -124,11 +125,11 @@ model Chat {
 }
 
 model Channel {
-  id            String   @id @default(uuid())
-  name          String
-  profile_photo String?
-  chats         Chat[]
-  members         User[]
+  id                  String        @id @default(uuid())
+  name                String
+  profile_photo       String?
+  chatsMessages       ChatMessage[]
+  members             User[]
   required_user_level Int
-  created_at    DateTime @default(now())
+  created_at          DateTime      @default(now())
 }
