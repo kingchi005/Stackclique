@@ -1,12 +1,16 @@
 import { Request } from "express";
 import cookie from "cookie";
-import jwt from "jsonwebtoken";
 import { Server, Socket } from "socket.io";
 import { ChatEventEnum } from "../constants";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import AppError from "../controllers/AppError";
-import { UNAUTHORIZED } from "../controllers/errorController";
 import { TEvent } from "../types";
+import { errCodeEnum } from "../controllers/errorController";
+import jwt from "jsonwebtoken";
+import { any } from "zod";
+import env from "../../env";
+import prisma from "../../prisma";
+import { hasExpired, isValidToken } from "../controllers/middleWare";
 
 const mountJoinChatEvent = (
 	socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>
@@ -67,43 +71,67 @@ const initializeSocketIO = (
 					// Token is required for the socket to work
 					throw new AppError(
 						"Un-authorized handshake. Token is missing",
-						UNAUTHORIZED.code
+						errCodeEnum.UNAUTHORIZED
 					);
 				}
 
-				// const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET); // decode the token
+				const veriedToken: unknown = jwt.verify(token, env.HASH_SECRET);
 
-				// const user = await User.findById(decodedToken?._id).select(
-				// 	"-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
-				// );
+				if (!isValidToken(veriedToken))
+					throw new AppError(
+						"Un-authorized handshake. Token is missing",
+						errCodeEnum.UNAUTHORIZED
+					);
+
+				const { id, exp } = veriedToken;
+
+				if (exp && hasExpired(exp))
+					throw new AppError(
+						"Handshake token has expired",
+						errCodeEnum.UNAUTHORIZED
+					);
+
+				const user = await prisma.user.findUnique({
+					where: { id },
+					select: {
+						id: true,
+						// email: true,
+						username: true,
+						profile_photo: true,
+						cover_photo: true,
+						level: true,
+						// notifications: true,
+						role: true,
+						created_at: true,
+					},
+				});
 
 				// // retrieve the user
-				// if (!user) {
-				// 	throw new AppError(
-				// 		"Un-authorized handshake. Token is invalid",
-				// 		UNAUTHORIZED.code
-				// 	);
-				// }
-				// socket.user = user; // mount te user object to the socket
+				if (!user)
+					throw new AppError(
+						"Un-authorized handshake. Token is invalid",
+						errCodeEnum.UNAUTHORIZED
+					);
+
+				socket.data.user = user; // mount te user object to the socket
 
 				// We are creating a room with user id so that if user is joined but does not have any active chat going on.
 				// still we want to emit some socket events to the user.
 				// so that the client can catch the event and show the notifications.
-				let user: any = {};
-				socket.join(user._id.toString());
+				socket.join(user.id.toString());
 				socket.emit(ChatEventEnum.CONNECTED_EVENT); // emit the connected event so that client is aware
-				console.log("User connected 🗼. userId: ", user._id.toString());
+				console.log("User connected 🗼. userId: ", user.id.toString());
 
 				// Common events that needs to be mounted on the initialization
-				mountJoinChatEvent(socket);
+				// mountJoinChatEvent(socket);
 				mountParticipantTypingEvent(socket);
 				mountParticipantStoppedTypingEvent(socket);
 
 				socket.on(ChatEventEnum.DISCONNECT_EVENT, () => {
-					// console.log("user has disconnected 🚫. userId: " + socket.user?._id);
-					// if (socket.user?._id) {
-					// 	socket.leave(socket.user._id);
-					// }
+					console.log(
+						"user has disconnected 🚫. userId: " + socket.data.user?.id
+					);
+					if (socket.data.user?.id) socket.leave(socket.data.user.id);
 				});
 			} catch (error) {
 				socket.emit(

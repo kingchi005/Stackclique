@@ -12,24 +12,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tryCatchWapper = exports.GATEWAY_TIMEOUT = exports.SERVICE_UNAVAILABLE = exports.BAD_GATEWAY = exports.INTERNAL_SERVER_ERROR = exports.CONFLICT = exports.NOT_ACCEPTED = exports.METHOD_NOT_ALLOWED = exports.NOT_FOUND = exports.FORBIDDEN = exports.UNAUTHORIZED = exports.BAD_REQUEST = exports.NO_CONTENT = exports.ACCEPTED = exports.CREATED = exports.OK = void 0;
+exports.tryCatchWapper = exports.errMsgEnum = exports.errCodeEnum = void 0;
 const AppError_1 = __importDefault(require("./AppError"));
 const jsonwebtoken_1 = require("jsonwebtoken");
-exports.OK = { code: 200, message: "OK" };
-exports.CREATED = { code: 201, message: "Created" };
-exports.ACCEPTED = { code: 202, message: "Accepted" };
-exports.NO_CONTENT = { code: 204, message: "No Content" };
-exports.BAD_REQUEST = { code: 400, message: "Bad Request" };
-exports.UNAUTHORIZED = { code: 401, message: "Unauthorized" };
-exports.FORBIDDEN = { code: 403, message: "Forbidden" };
-exports.NOT_FOUND = { code: 404, message: "Not Found" };
-exports.METHOD_NOT_ALLOWED = { code: 405, message: "Method Not Allowed" };
-exports.NOT_ACCEPTED = { code: 406, message: "Not Accepted" };
-exports.CONFLICT = { code: 409, message: "Conflict" };
-exports.INTERNAL_SERVER_ERROR = { code: 500, message: "Internal Server Error" };
-exports.BAD_GATEWAY = { code: 502, message: "Bad Gateway" };
-exports.SERVICE_UNAVAILABLE = { code: 503, message: "Service Unavailable" };
-exports.GATEWAY_TIMEOUT = { code: 504, message: "Gateway Timeout" };
+exports.errCodeEnum = {
+    OK: 200,
+    CREATED: 201,
+    ACCEPTED: 202,
+    NO_CONTENT: 204,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    METHOD_NOT_ALLOWED: 405,
+    NOT_ACCEPTED: 406,
+    CONFLICT: 409,
+    INTERNAL_SERVER_ERROR: 500,
+    BAD_GATEWAY: 502,
+    SERVICE_UNAVAILABLE: 503,
+    GATEWAY_TIMEOUT: 504,
+};
+exports.errMsgEnum = {
+    OK: "OK",
+    CREATED: "Created",
+    ACCEPTED: "Accepted",
+    NO_CONTENT: "No Content",
+    BAD_REQUEST: "Bad Request",
+    UNAUTHORIZED: "Unauthorized",
+    FORBIDDEN: "Forbidden",
+    NOT_FOUND: "Not Found",
+    METHOD_NOT_ALLOWED: "Method Not Allowed",
+    NOT_ACCEPTED: "Not Accepted",
+    CONFLICT: "Conflict",
+    INTERNAL_SERVER_ERROR: "Internal Server Error",
+    BAD_GATEWAY: "Bad Gateway",
+    SERVICE_UNAVAILABLE: "Service Unavailable",
+    GATEWAY_TIMEOUT: "Gateway Timeout",
+};
 function errorController(error, req, res, next) {
     console.log(error);
     if (error instanceof AppError_1.default)
@@ -38,14 +57,14 @@ function errorController(error, req, res, next) {
             error: { message: error.message, details: error.details },
         });
     if (error instanceof jsonwebtoken_1.JsonWebTokenError)
-        return res.status(exports.UNAUTHORIZED.code).json({
+        return res.status(exports.errCodeEnum.UNAUTHORIZED).json({
             ok: false,
             error: {
                 message: "Invalid API key",
                 details: error,
             },
         });
-    return res.status(exports.INTERNAL_SERVER_ERROR.code).json({
+    return res.status(exports.errCodeEnum.INTERNAL_SERVER_ERROR).json({
         ok: false,
         error: {
             message: "Something went wrong",

@@ -17,6 +17,10 @@ const cookie_1 = __importDefault(require("cookie"));
 const constants_1 = require("../constants");
 const AppError_1 = __importDefault(require("../controllers/AppError"));
 const errorController_1 = require("../controllers/errorController");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const env_1 = __importDefault(require("../../env"));
+const prisma_1 = __importDefault(require("../../prisma"));
+const middleWare_1 = require("../controllers/middleWare");
 const mountJoinChatEvent = (socket) => {
     socket.on(constants_1.ChatEventEnum.JOIN_CHAT_EVENT, (chatId) => {
         console.log(`User joined the chat 🤝. chatId: `, chatId);
@@ -48,16 +52,39 @@ const initializeSocketIO = (io) => {
                 token = (_b = socket.handshake.auth) === null || _b === void 0 ? void 0 : _b.token;
             }
             if (!token) {
-                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.UNAUTHORIZED.code);
+                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.errCodeEnum.UNAUTHORIZED);
             }
-            let user = {};
-            socket.join(user._id.toString());
+            const veriedToken = jsonwebtoken_1.default.verify(token, env_1.default.HASH_SECRET);
+            if (!(0, middleWare_1.isValidToken)(veriedToken))
+                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.errCodeEnum.UNAUTHORIZED);
+            const { id, exp } = veriedToken;
+            if (exp && (0, middleWare_1.hasExpired)(exp))
+                throw new AppError_1.default("Handshake token has expired", errorController_1.errCodeEnum.UNAUTHORIZED);
+            const user = yield prisma_1.default.user.findUnique({
+                where: { id },
+                select: {
+                    id: true,
+                    username: true,
+                    profile_photo: true,
+                    cover_photo: true,
+                    level: true,
+                    role: true,
+                    created_at: true,
+                },
+            });
+            if (!user)
+                throw new AppError_1.default("Un-authorized handshake. Token is invalid", errorController_1.errCodeEnum.UNAUTHORIZED);
+            socket.data.user = user;
+            socket.join(user.id.toString());
             socket.emit(constants_1.ChatEventEnum.CONNECTED_EVENT);
-            console.log("User connected 🗼. userId: ", user._id.toString());
-            mountJoinChatEvent(socket);
+            console.log("User connected 🗼. userId: ", user.id.toString());
             mountParticipantTypingEvent(socket);
             mountParticipantStoppedTypingEvent(socket);
             socket.on(constants_1.ChatEventEnum.DISCONNECT_EVENT, () => {
+                var _a, _b;
+                console.log("user has disconnected 🚫. userId: " + ((_a = socket.data.user) === null || _a === void 0 ? void 0 : _a.id));
+                if ((_b = socket.data.user) === null || _b === void 0 ? void 0 : _b.id)
+                    socket.leave(socket.data.user.id);
             });
         }
         catch (error) {

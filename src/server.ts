@@ -7,6 +7,7 @@ import env from "../env";
 // swagger api doc
 // import swaggerUI from "swagger-ui-express";
 import { authRoute, connectRoute, courseRoute, userRoute } from "./routes";
+import errorController from "./controllers/errorController";
 // import { rateLimit } from "express-rate-limit";
 
 const app: Application = express();
@@ -69,6 +70,7 @@ app.use("/auth", authRoute);
 app.use("/courses", courseRoute);
 app.use("/user", userRoute);
 app.use("/connect", connectRoute);
+app.use(errorController);
 
 server.listen(PORT, async () => {
 	console.log(`Server at ${env.BASE_URL}`);

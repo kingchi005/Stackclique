@@ -15,9 +15,13 @@ connectRoute.get("/channels", tryCatchWapper(getAllChannels));
 
 connectRoute.get("/channels/:userId", tryCatchWapper(getUserChannels));
 
-connectRoute.post("/channel", onlyAdmins, tryCatchWapper(createChannel));
+connectRoute.post("/channel", /* onlyAdmins, */ tryCatchWapper(createChannel));
 
-connectRoute.post("/channel/:id", onlyAdmins, tryCatchWapper(addUserToChannel));
+connectRoute.post(
+	"/channel/:id/:userId",
+	/* onlyAdmins, */
+	tryCatchWapper(addUserToChannel)
+);
 
 connectRoute.post("/ChatMessage", tryCatchWapper(sendChatMessage));
 

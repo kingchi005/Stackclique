@@ -89,11 +89,13 @@ export const loginPhoneSchema = z.object({
 
 export const createChannelSchema = z.object({
 	name: getStringValidation("name"),
+	description: getStringValidation("description"),
 	required_user_level: getNumberValidation("required_user_level"),
 });
 
 export const addUserToChannelSchema = z.object({
-	user_id: getNumberValidation("user_id"),
+	userId: getStringValidation("userId"),
+	id: getStringValidation("channelId"),
 });
 
 export const sendChatMessageSchema = z.object({

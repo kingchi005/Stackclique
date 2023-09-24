@@ -71,9 +71,13 @@ exports.loginPhoneSchema = zod_1.z.object({
 });
 exports.createChannelSchema = zod_1.z.object({
     name: getStringValidation("name"),
+    description: getStringValidation("description"),
     required_user_level: getNumberValidation("required_user_level"),
 });
-exports.addUserToChannelSchema = zod_1.z.object({});
+exports.addUserToChannelSchema = zod_1.z.object({
+    userId: getStringValidation("userId"),
+    id: getStringValidation("channelId"),
+});
 exports.sendChatMessageSchema = zod_1.z.object({
     message: getStringValidation("message"),
     channel_id: getStringValidation("channel_id"),

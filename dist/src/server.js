@@ -18,6 +18,7 @@ const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const env_1 = __importDefault(require("../env"));
 const routes_1 = require("./routes");
+const errorController_1 = __importDefault(require("./controllers/errorController"));
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const PORT = +env_1.default.PORT || 3000;
@@ -42,6 +43,7 @@ app.use("/auth", routes_1.authRoute);
 app.use("/courses", routes_1.courseRoute);
 app.use("/user", routes_1.userRoute);
 app.use("/connect", routes_1.connectRoute);
+app.use(errorController_1.default);
 server.listen(PORT, () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`Server at ${env_1.default.BASE_URL}`);
 }));

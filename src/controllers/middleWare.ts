@@ -7,10 +7,12 @@ import AppError from "./AppError";
 import { userRole } from "../types";
 import { errCodeEnum } from "./errorController";
 
-const isValidToken = (obj: unknown): obj is { id: string } & jwt.JwtPayload =>
+export const isValidToken = (
+	obj: unknown
+): obj is { id: string } & jwt.JwtPayload =>
 	obj !== null && typeof obj == "object" && "id" in obj;
 
-const hasExpired = (exp: number) => exp * 1000 < new Date().getTime();
+export const hasExpired = (exp: number) => exp * 1000 < new Date().getTime();
 
 export const onlyAdmins = (req: Request, res: Response, next: NextFunction) => {
 	try {

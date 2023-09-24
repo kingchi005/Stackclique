@@ -7,9 +7,9 @@ import { z } from "zod";
 import {
 	addUserToChannelSchema,
 	createChannelSchema,
-	createUserSchema,
 	sendChatMessageSchema,
 } from "../validation/inputSchema";
+import { emitSocketEvent } from "../socket";
 /*
  * /channels - getAllChannels
  * /channels/:userId - getUserChannels
@@ -68,7 +68,7 @@ export const getAllChannels = async (req: Request, res: Response) => {
 
 export const getUserChannels = async (req: Request, res: Response) => {
 	// userId
-	const safeParam = z.object({ userId: z.string() }).safeParse(req.query);
+	const safeParam = z.object({ userId: z.string() }).safeParse(req.params);
 
 	if (!safeParam.success)
 		throw new AppError(
@@ -82,14 +82,14 @@ export const getUserChannels = async (req: Request, res: Response) => {
 	const userChannels = (
 		await prisma.user.findFirst({
 			where: { id },
-			select: { channel: true },
+			select: { channels: true },
 		})
-	)?.channel;
+	)?.channels;
 
-	if (!userChannels) throw new AppError("user not found", 404);
+	if (!userChannels)
+		throw new AppError("user not found", errCodeEnum.NOT_FOUND);
 
 	const channels = [
-		// ...(await prisma.channel.findMany({where:{users:{every:{}}}})),
 		{
 			id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
 			name: "sheet",
@@ -124,16 +124,36 @@ export const createChannel = async (req: Request, res: Response) => {
 			safeParam.error
 		);
 
-	const { name, required_user_level } = safeParam.data;
+	const { name, required_user_level, description } = safeParam.data;
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
+	// verify that channel is not already -----------------------------
+
+	const newChannel = await prisma.channel.create({
+		data: {
+			name,
+			required_user_level,
+			description,
+			admin_id: res.locals.user_id,
+		},
+	});
+
+	if (!newChannel)
+		throw new AppError(
+			"An error occoured and channel was not created",
+			errCodeEnum.NO_CONTENT
+		);
+
+	emitSocketEvent(req, newChannel.id, "newChannel", newChannel);
+
+	return res.status(errCodeEnum.CREATED).json(<SuccessResponse<any>>{
 		ok: true,
-		data: "ready to create",
+		data: newChannel,
+		message: "Channel created",
 	});
 };
 
 export const addUserToChannel = async (req: Request, res: Response) => {
-	const safeParam = addUserToChannelSchema.safeParse(req.body);
+	const safeParam = addUserToChannelSchema.safeParse(req.params);
 
 	if (!safeParam.success)
 		throw new AppError(
@@ -142,11 +162,33 @@ export const addUserToChannel = async (req: Request, res: Response) => {
 			safeParam.error
 		);
 
-	const { user_id } = safeParam.data;
+	const { userId, id: channelId } = safeParam.data;
+
+	// verify that channel is existing -----------------------
+	// verify that user is existing -----------------------
+
+	const addedUser = await prisma.user.update({
+		where: { id: userId },
+		data: { channels: { connect: { id: channelId } } },
+		select: {
+			id: true,
+			username: true,
+			profile_photo: true,
+			channels: { where: { id: channelId }, select: { id: true, name: true } },
+		},
+	});
+
+	emitSocketEvent(
+		req,
+		addedUser.channels[0].id,
+		"userAddToChannelEvent",
+		addedUser
+	);
 
 	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
 		ok: true,
-		data: "ready to addUserToChannel",
+		data: addedUser,
+		message: "User added",
 	});
 };
 
@@ -162,19 +204,27 @@ export const sendChatMessage = async (req: Request, res: Response) => {
 
 	const { channel_id, message, sender_id } = safeParam.data;
 
+	// verify that channel is existing and sender is a member of the channel -----------------------
+
+	const newChat = await prisma.chatMessage.create({
+		data: {
+			message,
+			channel_id,
+			sender_id,
+		},
+		include: {},
+	});
+
+	if (!newChat)
+		throw new AppError(
+			"An error occoured and chat was not created",
+			errCodeEnum.NO_CONTENT
+		);
+
+	emitSocketEvent(req, newChat.channel_id, "newChat", newChat);
+
 	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
 		ok: true,
-		data: "ready to sendChatMessage and create ChatMessage",
+		data: newChat,
 	});
 };
-
-/* export const onChatMessage = async (data: any) => {
-	const { sender, content } = data;
-
-	try {
-		// const message = await prisma.chat
-		// io.emit("chat:message", message);
-	} catch (error) {
-		console.error("Error saving chat message:", error);
-	}
-}; */
