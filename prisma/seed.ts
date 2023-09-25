@@ -110,7 +110,15 @@ export const seedDatabase = async () => {
 					required_user_level: faker.number.int({ min: 1, max: 10 }),
 					profile_photo: faker.image.url(),
 					admin_id: users[0].id,
-					members: { connect: { id: users[i].id } },
+					members: {
+						connect: [
+							{ id: users[0].id },
+							{ id: users[1].id },
+							{ id: users[2].id },
+							{ id: users[3].id },
+							{ id: users[4].id },
+						],
+					},
 				},
 				include: { members: true },
 			});
@@ -120,7 +128,7 @@ export const seedDatabase = async () => {
 					data: {
 						message: faker.lorem.paragraph(),
 						channel: { connect: { id: channel.id } },
-						sender: { connect: { id: users[i].id } },
+						sender: { connect: { id: users[faker.number.int({ max: i })].id } },
 					},
 					// select: {},
 				});
@@ -135,7 +143,7 @@ export const seedDatabase = async () => {
 seedDatabase()
 	.then(() => {
 		console.log("Database seeded successfully");
-		// prisma.$disconnect();
+		prisma.$disconnect();
 	})
 	.catch((error: any) => {
 		console.log(error);

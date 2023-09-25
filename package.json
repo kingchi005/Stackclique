@@ -14,7 +14,7 @@
 		"build": "npx tsc",
 		"pre-start": "npm run db:sync && npm run db:seed",
 		"serve": "tsc && node dist/src/server",
-		"db:seed": "tsc && node dist/prisma/seedb",
+		"db:seed": "ts-node prisma/seed",
 		"db:sync": "npx prisma db push",
 		"db:view": "npx prisma studio"
 	},
