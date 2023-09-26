@@ -27,7 +27,7 @@ const onlyAdmins = (req, res, next) => {
     try {
         const userRole = res.locals.user_role;
         if (userRole !== "Admin")
-            throw new AppError_1.default("You are not an Admin", errorController_1.errCodeEnum.UNAUTHORIZED);
+            throw new AppError_1.default("You are not an Admin", errorController_1.resCode.UNAUTHORIZED);
         else
             next();
     }
@@ -41,16 +41,16 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
     try {
         const isValid = inputSchema_1.bearerTokenSchema.safeParse(req.headers.authorization);
         if (!isValid.success)
-            throw new AppError_1.default("Please provide an API key", errorController_1.errCodeEnum.UNAUTHORIZED);
+            throw new AppError_1.default("Please provide an API key", errorController_1.resCode.UNAUTHORIZED);
         const providedToken = (_b = (_a = isValid.data.split(" ")) === null || _a === void 0 ? void 0 : _a[1]) === null || _b === void 0 ? void 0 : _b.trim();
         if (!providedToken)
-            throw new AppError_1.default("Invalid API key", errorController_1.errCodeEnum.UNAUTHORIZED);
+            throw new AppError_1.default("Invalid API key", errorController_1.resCode.UNAUTHORIZED);
         const veriedToken = jsonwebtoken_1.default.verify(providedToken, env_1.default.HASH_SECRET);
         if (!(0, exports.isValidToken)(veriedToken))
-            throw new AppError_1.default("Invalid API key", errorController_1.errCodeEnum.UNAUTHORIZED);
+            throw new AppError_1.default("Invalid API key", errorController_1.resCode.UNAUTHORIZED);
         const { id, exp } = veriedToken;
         if (exp && (0, exports.hasExpired)(exp))
-            throw new AppError_1.default("API key has expired", errorController_1.errCodeEnum.UNAUTHORIZED);
+            throw new AppError_1.default("API key has expired", errorController_1.resCode.UNAUTHORIZED);
         const user = yield prisma_1.default.user.findUnique({
             where: { id },
             select: {
@@ -80,7 +80,7 @@ const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
             },
         });
         if (!user)
-            throw new AppError_1.default("Invalid API key", errorController_1.errCodeEnum.UNAUTHORIZED);
+            throw new AppError_1.default("Invalid API key", errorController_1.resCode.UNAUTHORIZED);
         res.locals.user_id = user.id;
         res.locals.user_role = user.role;
         next();

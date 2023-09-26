@@ -23,6 +23,6 @@ connectRoute.post(
 	tryCatchWapper(addUserToChannel)
 );
 
-connectRoute.post("/ChatMessage", tryCatchWapper(sendChatMessage));
+connectRoute.post("/chat-message", tryCatchWapper(sendChatMessage));
 
 export default connectRoute;

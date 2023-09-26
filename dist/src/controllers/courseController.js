@@ -20,7 +20,7 @@ const errorController_1 = require("./errorController");
 const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ id: zod_1.z.string() }).safeParse(req.params);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { id } = safeParam.data;
     const course = yield index_1.default.course.findFirst({
         where: { id },
@@ -40,8 +40,8 @@ const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, functio
         },
     });
     if (!course)
-        throw new AppError_1.default("Course not found", errorController_1.errCodeEnum.NOT_FOUND);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+        throw new AppError_1.default("Course not found", errorController_1.resCode.NOT_FOUND);
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: course,
     });
@@ -50,7 +50,7 @@ exports.getCourseDetails = getCourseDetails;
 const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = zod_1.z.object({ p: zod_1.z.string() }).safeParse(req.query);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { p } = safeParam.data;
     const courses = yield index_1.default.course.findMany({
         take: +p,
@@ -67,8 +67,8 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
         },
     });
     if ((courses === null || courses === void 0 ? void 0 : courses.length) < 1)
-        throw new AppError_1.default("No course in record", errorController_1.errCodeEnum.NOT_FOUND);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+        throw new AppError_1.default("No course in record", errorController_1.resCode.NOT_FOUND);
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: courses,
     });
@@ -82,7 +82,7 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     })
         .safeParse(req.query);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { category, title } = safeParam.data;
     const courses = yield index_1.default.course.findMany({
         where: {
@@ -98,8 +98,8 @@ const searchCourse = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         },
     });
     if (courses.length < 1)
-        throw new AppError_1.default("No result found", errorController_1.errCodeEnum.NOT_FOUND);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+        throw new AppError_1.default("No result found", errorController_1.resCode.NOT_FOUND);
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: courses,
     });

@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tryCatchWapper = exports.errMsgEnum = exports.errCodeEnum = void 0;
+exports.tryCatchWapper = exports.errMsgEnum = exports.resCode = void 0;
 const AppError_1 = __importDefault(require("./AppError"));
 const jsonwebtoken_1 = require("jsonwebtoken");
-exports.errCodeEnum = {
+exports.resCode = {
     OK: 200,
     CREATED: 201,
     ACCEPTED: 202,
@@ -57,14 +57,14 @@ function errorController(error, req, res, next) {
             error: { message: error.message, details: error.details },
         });
     if (error instanceof jsonwebtoken_1.JsonWebTokenError)
-        return res.status(exports.errCodeEnum.UNAUTHORIZED).json({
+        return res.status(exports.resCode.UNAUTHORIZED).json({
             ok: false,
             error: {
                 message: "Invalid API key",
                 details: error,
             },
         });
-    return res.status(exports.errCodeEnum.INTERNAL_SERVER_ERROR).json({
+    return res.status(exports.resCode.INTERNAL_SERVER_ERROR).json({
         ok: false,
         error: {
             message: "Something went wrong",

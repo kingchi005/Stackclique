@@ -77,7 +77,7 @@ export const createChannel = async (req: Request, res: Response) => {
 			safeParam.error
 		);
 
-	const { name, required_user_level, description } = safeParam.data;
+	const { name, required_user_level, description, admin_id } = safeParam.data;
 
 	// verify that channel is not already -----------------------------
 	const existingChannel = await prisma.channel.findFirst({ where: { name } });
@@ -92,7 +92,7 @@ export const createChannel = async (req: Request, res: Response) => {
 			name,
 			required_user_level,
 			description,
-			admin_id: res.locals.user_id,
+			admin_id: res.locals.user_id || admin_id,
 		},
 	});
 
@@ -123,12 +123,15 @@ export const addUserToChannel = async (req: Request, res: Response) => {
 
 	const { userId, id } = safeParam.data;
 
-	// verify that channel is existing -----------------------
 	const channel = await prisma.channel.findFirst({ where: { id } });
 	if (!channel) throw new AppError(`Channel does not found`, resCode.NOT_FOUND);
-	// verify that user is existing -----------------------
-	const user = await prisma.user.findFirst({ where: { id } });
+
+	const user = await prisma.user.findFirst({ where: { id: userId } });
+
 	if (!user) throw new AppError(`Not a user`, resCode.NOT_FOUND);
+
+	if (user.level < channel.required_user_level)
+		throw new AppError(`User not eligible`, resCode.NOT_ACCEPTED);
 
 	const addedUser = await prisma.user.update({
 		where: { id: userId },

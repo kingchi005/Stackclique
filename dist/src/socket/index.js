@@ -52,14 +52,14 @@ const initializeSocketIO = (io) => {
                 token = (_b = socket.handshake.auth) === null || _b === void 0 ? void 0 : _b.token;
             }
             if (!token) {
-                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.errCodeEnum.UNAUTHORIZED);
+                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.resCode.UNAUTHORIZED);
             }
             const veriedToken = jsonwebtoken_1.default.verify(token, env_1.default.HASH_SECRET);
             if (!(0, middleWare_1.isValidToken)(veriedToken))
-                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.errCodeEnum.UNAUTHORIZED);
+                throw new AppError_1.default("Un-authorized handshake. Token is missing", errorController_1.resCode.UNAUTHORIZED);
             const { id, exp } = veriedToken;
             if (exp && (0, middleWare_1.hasExpired)(exp))
-                throw new AppError_1.default("Handshake token has expired", errorController_1.errCodeEnum.UNAUTHORIZED);
+                throw new AppError_1.default("Handshake token has expired", errorController_1.resCode.UNAUTHORIZED);
             const user = yield prisma_1.default.user.findUnique({
                 where: { id },
                 select: {
@@ -73,7 +73,7 @@ const initializeSocketIO = (io) => {
                 },
             });
             if (!user)
-                throw new AppError_1.default("Un-authorized handshake. Token is invalid", errorController_1.errCodeEnum.UNAUTHORIZED);
+                throw new AppError_1.default("Un-authorized handshake. Token is invalid", errorController_1.resCode.UNAUTHORIZED);
             socket.data.user = user;
             socket.join(user.id.toString());
             socket.emit(constants_1.ChatEventEnum.CONNECTED_EVENT);

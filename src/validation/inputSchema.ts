@@ -90,6 +90,7 @@ export const loginPhoneSchema = z.object({
 export const createChannelSchema = z.object({
 	name: getStringValidation("name"),
 	description: getStringValidation("description"),
+	admin_id: getStringValidation("admin_id"),
 	required_user_level: getNumberValidation("required_user_level"),
 });
 

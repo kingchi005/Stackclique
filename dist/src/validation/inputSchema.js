@@ -72,6 +72,7 @@ exports.loginPhoneSchema = zod_1.z.object({
 exports.createChannelSchema = zod_1.z.object({
     name: getStringValidation("name"),
     description: getStringValidation("description"),
+    admin_id: getStringValidation("admin_id"),
     required_user_level: getNumberValidation("required_user_level"),
 });
 exports.addUserToChannelSchema = zod_1.z.object({

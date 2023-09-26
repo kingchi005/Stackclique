@@ -8,6 +8,6 @@ connectRoute.get("/channels", (0, errorController_1.tryCatchWapper)(connectContr
 connectRoute.get("/channels/:userId", (0, errorController_1.tryCatchWapper)(connectController_1.getUserChannels));
 connectRoute.post("/channel", (0, errorController_1.tryCatchWapper)(connectController_1.createChannel));
 connectRoute.post("/channel/:id/:userId", (0, errorController_1.tryCatchWapper)(connectController_1.addUserToChannel));
-connectRoute.post("/ChatMessage", (0, errorController_1.tryCatchWapper)(connectController_1.sendChatMessage));
+connectRoute.post("/chat-message", (0, errorController_1.tryCatchWapper)(connectController_1.sendChatMessage));
 exports.default = connectRoute;
 //# sourceMappingURL=connect.js.map

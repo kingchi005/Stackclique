@@ -20,7 +20,7 @@ const errorController_1 = require("./errorController");
 const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.idParamSchema.safeParse(req.params);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { id } = safeParam.data;
     const user = yield prisma_1.default.user.findUnique({
         where: { id },
@@ -52,8 +52,8 @@ const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
         },
     });
     if (!user)
-        throw new AppError_1.default("User not found", errorController_1.errCodeEnum.NOT_FOUND);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+        throw new AppError_1.default("User not found", errorController_1.resCode.NOT_FOUND);
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: user,
     });
@@ -62,7 +62,7 @@ exports.getUserDetails = getUserDetails;
 const getErroledCourses = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.idParamSchema.safeParse(req.params);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { id } = safeParam.data;
     const user = yield prisma_1.default.user.findUnique({
         where: { id },
@@ -89,10 +89,10 @@ const getErroledCourses = (req, res) => __awaiter(void 0, void 0, void 0, functi
         },
     });
     if (!user)
-        throw new AppError_1.default(`User with id '${id}' does not exist`, errorController_1.errCodeEnum.NOT_FOUND);
+        throw new AppError_1.default(`User with id '${id}' does not exist`, errorController_1.resCode.NOT_FOUND);
     if (user.enrolled_courses.length < 1)
-        throw new AppError_1.default(`User with id '${id}' is not enrolled in any course`, errorController_1.errCodeEnum.NOT_FOUND);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+        throw new AppError_1.default(`User with id '${id}' is not enrolled in any course`, errorController_1.resCode.NOT_FOUND);
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: user.enrolled_courses,
     });

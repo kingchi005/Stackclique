@@ -20,32 +20,6 @@ const zod_1 = require("zod");
 const inputSchema_1 = require("../validation/inputSchema");
 const socket_1 = require("../socket");
 const getAllChannels = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const hcChanels = [
-        {
-            id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
-            name: "sheet",
-            profile_photo: "Greece",
-            required_user_level: 10,
-            created_at: "8/29/2116",
-            _count: 2,
-        },
-        {
-            id: "7751eb55-efab-5f55-97de-13d4c06a71e9",
-            name: "soil",
-            profile_photo: "Mauritius",
-            required_user_level: 14,
-            created_at: "6/23/2097",
-            _count: 6,
-        },
-        {
-            id: "8fa2c093-d576-5234-9766-2a01b6018886",
-            name: "red",
-            profile_photo: "Barbados",
-            required_user_level: 97,
-            created_at: "6/14/2078",
-            _count: 4,
-        },
-    ];
     const channels = [
         yield index_1.default.channel.findMany({
             select: {
@@ -58,9 +32,9 @@ const getAllChannels = (req, res) => __awaiter(void 0, void 0, void 0, function*
             },
         }),
     ];
-    return res.status(errorController_1.errCodeEnum.OK).json({
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
-        data: [...channels, ...hcChanels],
+        data: channels,
     });
 });
 exports.getAllChannels = getAllChannels;
@@ -68,55 +42,40 @@ const getUserChannels = (req, res) => __awaiter(void 0, void 0, void 0, function
     var _a;
     const safeParam = zod_1.z.object({ userId: zod_1.z.string() }).safeParse(req.params);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { userId: id } = safeParam.data;
     const userChannels = (_a = (yield index_1.default.user.findFirst({
         where: { id },
         select: { channels: true },
     }))) === null || _a === void 0 ? void 0 : _a.channels;
     if (!userChannels)
-        throw new AppError_1.default("user not found", errorController_1.errCodeEnum.NOT_FOUND);
-    const channels = [
-        {
-            id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
-            name: "sheet",
-            profile_photo: "Greece",
-            required_user_level: 10,
-            created_at: "8/29/2116",
-            _count: 2,
-        },
-        {
-            id: "7751eb55-efab-5f55-97de-13d4c06a71e9",
-            name: "soil",
-            profile_photo: "Mauritius",
-            required_user_level: 14,
-            created_at: "6/23/2097",
-            _count: 6,
-        },
-    ];
-    return res.status(errorController_1.errCodeEnum.OK).json({
+        throw new AppError_1.default("user not found", errorController_1.resCode.NOT_FOUND);
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
-        data: [...userChannels, ...channels],
+        data: userChannels,
     });
 });
 exports.getUserChannels = getUserChannels;
 const createChannel = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.createChannelSchema.safeParse(req.body);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
-    const { name, required_user_level, description } = safeParam.data;
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
+    const { name, required_user_level, description, admin_id } = safeParam.data;
+    const existingChannel = yield index_1.default.channel.findFirst({ where: { name } });
+    if (existingChannel)
+        throw new AppError_1.default(`Channel with the name '${name}' already exists`, errorController_1.resCode.CONFLICT);
     const newChannel = yield index_1.default.channel.create({
         data: {
             name,
             required_user_level,
             description,
-            admin_id: res.locals.user_id,
+            admin_id: res.locals.user_id || admin_id,
         },
     });
     if (!newChannel)
-        throw new AppError_1.default("An error occoured and channel was not created", errorController_1.errCodeEnum.NO_CONTENT);
+        throw new AppError_1.default("An error occoured and channel was not created", errorController_1.resCode.NO_CONTENT);
     (0, socket_1.emitSocketEvent)(req, newChannel.id, "newChannel", newChannel);
-    return res.status(errorController_1.errCodeEnum.CREATED).json({
+    return res.status(errorController_1.resCode.CREATED).json({
         ok: true,
         data: newChannel,
         message: "Channel created",
@@ -126,20 +85,28 @@ exports.createChannel = createChannel;
 const addUserToChannel = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.addUserToChannelSchema.safeParse(req.params);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
-    const { userId, id: channelId } = safeParam.data;
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
+    const { userId, id } = safeParam.data;
+    const channel = yield index_1.default.channel.findFirst({ where: { id } });
+    if (!channel)
+        throw new AppError_1.default(`Channel does not found`, errorController_1.resCode.NOT_FOUND);
+    const user = yield index_1.default.user.findFirst({ where: { id: userId } });
+    if (!user)
+        throw new AppError_1.default(`Not a user`, errorController_1.resCode.NOT_FOUND);
+    if (user.level < channel.required_user_level)
+        throw new AppError_1.default(`User not eligible`, errorController_1.resCode.NOT_ACCEPTED);
     const addedUser = yield index_1.default.user.update({
         where: { id: userId },
-        data: { channels: { connect: { id: channelId } } },
+        data: { channels: { connect: { id: channel.id } } },
         select: {
             id: true,
             username: true,
             profile_photo: true,
-            channels: { where: { id: channelId }, select: { id: true, name: true } },
+            channels: { where: { id: channel.id }, select: { id: true, name: true } },
         },
     });
     (0, socket_1.emitSocketEvent)(req, addedUser.channels[0].id, "userAddToChannelEvent", addedUser);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: addedUser,
         message: "User added",
@@ -149,8 +116,17 @@ exports.addUserToChannel = addUserToChannel;
 const sendChatMessage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.sendChatMessageSchema.safeParse(req.body);
     if (!safeParam.success)
-        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.errCodeEnum.BAD_REQUEST, safeParam.error);
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { channel_id, message, sender_id } = safeParam.data;
+    const channel = yield index_1.default.channel.findFirst({
+        where: { id: channel_id },
+        include: { members: true },
+    });
+    if (!channel)
+        throw new AppError_1.default(`Channel does not found`, errorController_1.resCode.NOT_FOUND);
+    const userMember = channel.members.find((member) => member.id == sender_id);
+    if (!userMember)
+        throw new AppError_1.default(`User not a member of ${channel.name} channel`, errorController_1.resCode.NOT_FOUND);
     const newChat = yield index_1.default.chatMessage.create({
         data: {
             message,
@@ -160,9 +136,9 @@ const sendChatMessage = (req, res) => __awaiter(void 0, void 0, void 0, function
         include: {},
     });
     if (!newChat)
-        throw new AppError_1.default("An error occoured and chat was not created", errorController_1.errCodeEnum.NO_CONTENT);
+        throw new AppError_1.default("An error occoured and chat was not created", errorController_1.resCode.NO_CONTENT);
     (0, socket_1.emitSocketEvent)(req, newChat.channel_id, "newChat", newChat);
-    return res.status(errorController_1.errCodeEnum.OK).json({
+    return res.status(errorController_1.resCode.OK).json({
         ok: true,
         data: newChat,
     });
