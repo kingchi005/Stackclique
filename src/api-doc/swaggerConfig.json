@@ -285,6 +285,142 @@
 					}
 				}
 			}
+		},
+
+		"/connect/channels": {
+			"get": {
+				"tags": ["Connect routes"],
+				"summary": "get list of available channels",
+
+				"responses": {
+					"200": {
+						"description": "Successful response",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/connect/channels/{userId}": {
+			"get": {
+				"tags": ["Connect routes"],
+				"summary": "get list of channel where user is a member",
+
+				"parameters": [
+					{
+						"name": "userId",
+						"in": "path",
+						"schema": {
+							"type": "string"
+						},
+						"required": true,
+						"example": "e0dcd00b-c783-45e1-8b56-0875c6de2f3c"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful response",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/connect/channel": {
+			"post": {
+				"tags": ["Connect routes"],
+				"summary": "create a channel only for instructors and superAdmins",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"example": {
+									"name": "test name",
+									"required_user_level": 3,
+									"description": "Creating a channel for test purpose",
+									"admin_id": "e0dcd00b-c783-45e1-8b56-0875c6de2f3c"
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successful response",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/connect/channel/{id}/{userId}": {
+			"post": {
+				"tags": ["Connect routes"],
+				"summary": "add user to a channel",
+
+				"parameters": [
+					{
+						"name": "id",
+						"description": "channel id",
+						"in": "path",
+						"schema": {
+							"type": "string"
+						},
+						"required": true,
+						"example": "00cbfcec-2cb1-48ca-a5fe-805a4ef7a90e"
+					},
+					{
+						"name": "userId",
+						"description": "user id",
+						"in": "path",
+						"schema": {
+							"type": "string"
+						},
+						"required": true,
+						"example": "e0dcd00b-c783-45e1-8b56-0875c6de2f3c"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful response",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
+		},
+		"/connect/chat-message": {
+			"post": {
+				"tags": ["Connect routes"],
+				"summary": "send chat messages to channels",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"example": {
+									"channel_id": "cf564b8e-2738-4080-a1c0-c3f801775038",
+									"message": "this is hjsdghsb d",
+									"sender_id": "3c560c78-c1a0-43b7-8420-5b6e84ae7383"
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successful response",
+						"content": {
+							"application/json": {}
+						}
+					}
+				}
+			}
 		}
 	},
 	"components": {

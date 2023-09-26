@@ -11,11 +11,11 @@ import {
 } from "../validation/inputSchema";
 import { emitSocketEvent } from "../socket";
 /*
- * /channels - getAllChannels
- * /channels/:userId - getUserChannels
- * /channel - createChannel
- * /channel/:userId - addUserToChannel
- * /ChatMessage - sendChatMessage
+ * /channels - getAllChannels - get
+ * /channels/:userId - getUserChannels - get
+ * /channel - createChannel - post
+ * /channel/:userId - addUserToChannel - post
+ * /ChatMessage - sendChatMessage - post
  *
  */
 

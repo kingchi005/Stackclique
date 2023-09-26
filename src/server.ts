@@ -5,14 +5,15 @@ import { Server } from "socket.io";
 import env from "../env";
 
 // swagger api doc
-// import swaggerUI from "swagger-ui-express";
+import swaggerUI from "swagger-ui-express";
 import { authRoute, connectRoute, courseRoute, userRoute } from "./routes";
 import errorController from "./controllers/errorController";
+import swaggerConfig from "./api-doc/swagger-config";
+import { authenticate } from "./controllers/middleWare";
 // import { rateLimit } from "express-rate-limit";
 
 const app: Application = express();
 const server = http.createServer(app);
-// initializeSocket(server);
 const PORT = +env.PORT || 3000;
 
 // RATE LIMITING-------------------------------
@@ -58,8 +59,8 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.get("/", (req, res) => {
 	res.status(300).json({ msg: "welcome to the stackclique api" });
 });
-// app.use("/dev/api-docs", swaggerUI.serve);
-// app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
+app.use("/dev/api-docs", swaggerUI.serve);
+app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 
 // Routes setup
 app.use("/auth", authRoute);
