@@ -5,7 +5,7 @@ import prisma from "../../prisma";
 import env from "../../env";
 import AppError from "./AppError";
 import { userRole } from "../types";
-import { errCodeEnum } from "./errorController";
+import { resCode } from "./errorController";
 
 export const isValidToken = (
 	obj: unknown
@@ -18,7 +18,7 @@ export const onlyAdmins = (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const userRole: userRole = res.locals.user_role;
 		if (userRole !== "Admin")
-			throw new AppError("You are not an Admin", errCodeEnum.UNAUTHORIZED);
+			throw new AppError("You are not an Admin", resCode.UNAUTHORIZED);
 		else next();
 	} catch (err) {
 		next(err);
@@ -34,22 +34,22 @@ export const authenticate = async (
 		const isValid = bearerTokenSchema.safeParse(req.headers.authorization);
 
 		if (!isValid.success)
-			throw new AppError("Please provide an API key", errCodeEnum.UNAUTHORIZED);
+			throw new AppError("Please provide an API key", resCode.UNAUTHORIZED);
 
 		const providedToken = isValid.data.split(" ")?.[1]?.trim();
 
 		if (!providedToken)
-			throw new AppError("Invalid API key", errCodeEnum.UNAUTHORIZED);
+			throw new AppError("Invalid API key", resCode.UNAUTHORIZED);
 
 		const veriedToken: unknown = jwt.verify(providedToken, env.HASH_SECRET);
 
 		if (!isValidToken(veriedToken))
-			throw new AppError("Invalid API key", errCodeEnum.UNAUTHORIZED);
+			throw new AppError("Invalid API key", resCode.UNAUTHORIZED);
 
 		const { id, exp } = veriedToken;
 
 		if (exp && hasExpired(exp))
-			throw new AppError("API key has expired", errCodeEnum.UNAUTHORIZED);
+			throw new AppError("API key has expired", resCode.UNAUTHORIZED);
 
 		const user = await prisma.user.findUnique({
 			where: { id },
@@ -80,7 +80,7 @@ export const authenticate = async (
 			},
 		});
 		//
-		if (!user) throw new AppError("Invalid API key", errCodeEnum.UNAUTHORIZED);
+		if (!user) throw new AppError("Invalid API key", resCode.UNAUTHORIZED);
 
 		res.locals.user_id = user.id;
 		res.locals.user_role = user.role;

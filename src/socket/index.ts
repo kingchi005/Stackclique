@@ -5,7 +5,7 @@ import { ChatEventEnum } from "../constants";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import AppError from "../controllers/AppError";
 import { TEvent } from "../types";
-import { errCodeEnum } from "../controllers/errorController";
+import { resCode } from "../controllers/errorController";
 import jwt from "jsonwebtoken";
 import { any } from "zod";
 import env from "../../env";
@@ -71,7 +71,7 @@ const initializeSocketIO = (
 					// Token is required for the socket to work
 					throw new AppError(
 						"Un-authorized handshake. Token is missing",
-						errCodeEnum.UNAUTHORIZED
+						resCode.UNAUTHORIZED
 					);
 				}
 
@@ -80,7 +80,7 @@ const initializeSocketIO = (
 				if (!isValidToken(veriedToken))
 					throw new AppError(
 						"Un-authorized handshake. Token is missing",
-						errCodeEnum.UNAUTHORIZED
+						resCode.UNAUTHORIZED
 					);
 
 				const { id, exp } = veriedToken;
@@ -88,7 +88,7 @@ const initializeSocketIO = (
 				if (exp && hasExpired(exp))
 					throw new AppError(
 						"Handshake token has expired",
-						errCodeEnum.UNAUTHORIZED
+						resCode.UNAUTHORIZED
 					);
 
 				const user = await prisma.user.findUnique({
@@ -110,7 +110,7 @@ const initializeSocketIO = (
 				if (!user)
 					throw new AppError(
 						"Un-authorized handshake. Token is invalid",
-						errCodeEnum.UNAUTHORIZED
+						resCode.UNAUTHORIZED
 					);
 
 				socket.data.user = user; // mount te user object to the socket

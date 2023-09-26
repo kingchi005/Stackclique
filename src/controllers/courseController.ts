@@ -3,7 +3,7 @@ import { z } from "zod";
 import AppError from "./AppError";
 import prisma from "../../prisma/index";
 import { SuccessResponse } from "../types";
-import { errCodeEnum } from "./errorController";
+import { resCode } from "./errorController";
 
 export const getCourseDetails = async (req: Request, res: Response) => {
 	const safeParam = z.object({ id: z.string() }).safeParse(req.params);
@@ -11,7 +11,7 @@ export const getCourseDetails = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -34,9 +34,9 @@ export const getCourseDetails = async (req: Request, res: Response) => {
 		},
 	});
 
-	if (!course) throw new AppError("Course not found", errCodeEnum.NOT_FOUND);
+	if (!course) throw new AppError("Course not found", resCode.NOT_FOUND);
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof course>>{
+	return res.status(resCode.OK).json(<SuccessResponse<typeof course>>{
 		ok: true,
 		data: course,
 	});
@@ -48,7 +48,7 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -72,9 +72,9 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 	});
 
 	if (courses?.length < 1)
-		throw new AppError("No course in record", errCodeEnum.NOT_FOUND);
+		throw new AppError("No course in record", resCode.NOT_FOUND);
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof courses>>{
+	return res.status(resCode.OK).json(<SuccessResponse<typeof courses>>{
 		ok: true,
 		data: courses,
 	});
@@ -91,7 +91,7 @@ export const searchCourse = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -113,9 +113,9 @@ export const searchCourse = async (req: Request, res: Response) => {
 	});
 
 	if (courses.length < 1)
-		throw new AppError("No result found", errCodeEnum.NOT_FOUND);
+		throw new AppError("No result found", resCode.NOT_FOUND);
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof courses>>{
+	return res.status(resCode.OK).json(<SuccessResponse<typeof courses>>{
 		ok: true,
 		data: courses,
 	});

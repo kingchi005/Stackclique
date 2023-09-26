@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { SuccessResponse } from "../types";
 import prisma from "../../prisma/index";
-import { errCodeEnum } from "./errorController";
+import { resCode } from "./errorController";
 import AppError from "./AppError";
 import { z } from "zod";
 import {
@@ -20,33 +20,6 @@ import { emitSocketEvent } from "../socket";
  */
 
 export const getAllChannels = async (req: Request, res: Response) => {
-	const hcChanels = [
-		{
-			id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
-			name: "sheet",
-			profile_photo: "Greece",
-			required_user_level: 10,
-			created_at: "8/29/2116",
-			_count: 2,
-		},
-		{
-			id: "7751eb55-efab-5f55-97de-13d4c06a71e9",
-			name: "soil",
-			profile_photo: "Mauritius",
-			required_user_level: 14,
-			created_at: "6/23/2097",
-			_count: 6,
-		},
-		{
-			id: "8fa2c093-d576-5234-9766-2a01b6018886",
-			name: "red",
-			profile_photo: "Barbados",
-			required_user_level: 97,
-			created_at: "6/14/2078",
-			_count: 4,
-		},
-	];
-
 	const channels = [
 		await prisma.channel.findMany({
 			select: {
@@ -60,9 +33,9 @@ export const getAllChannels = async (req: Request, res: Response) => {
 		}),
 	];
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof channels>>{
+	return res.status(resCode.OK).json(<SuccessResponse<typeof channels>>{
 		ok: true,
-		data: [...channels, ...hcChanels],
+		data: channels,
 	});
 };
 
@@ -73,7 +46,7 @@ export const getUserChannels = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
@@ -86,31 +59,11 @@ export const getUserChannels = async (req: Request, res: Response) => {
 		})
 	)?.channels;
 
-	if (!userChannels)
-		throw new AppError("user not found", errCodeEnum.NOT_FOUND);
+	if (!userChannels) throw new AppError("user not found", resCode.NOT_FOUND);
 
-	const channels = [
-		{
-			id: "8d62e50b-7098-5735-87a6-8135d2e10dea",
-			name: "sheet",
-			profile_photo: "Greece",
-			required_user_level: 10,
-			created_at: "8/29/2116",
-			_count: 2,
-		},
-		{
-			id: "7751eb55-efab-5f55-97de-13d4c06a71e9",
-			name: "soil",
-			profile_photo: "Mauritius",
-			required_user_level: 14,
-			created_at: "6/23/2097",
-			_count: 6,
-		},
-	];
-
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<typeof channels>>{
+	return res.status(resCode.OK).json(<SuccessResponse<any>>{
 		ok: true,
-		data: [...userChannels, ...channels],
+		data: userChannels,
 	});
 };
 
@@ -120,13 +73,19 @@ export const createChannel = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
 	const { name, required_user_level, description } = safeParam.data;
 
 	// verify that channel is not already -----------------------------
+	const existingChannel = await prisma.channel.findFirst({ where: { name } });
+	if (existingChannel)
+		throw new AppError(
+			`Channel with the name '${name}' already exists`,
+			resCode.CONFLICT
+		);
 
 	const newChannel = await prisma.channel.create({
 		data: {
@@ -140,12 +99,12 @@ export const createChannel = async (req: Request, res: Response) => {
 	if (!newChannel)
 		throw new AppError(
 			"An error occoured and channel was not created",
-			errCodeEnum.NO_CONTENT
+			resCode.NO_CONTENT
 		);
 
 	emitSocketEvent(req, newChannel.id, "newChannel", newChannel);
 
-	return res.status(errCodeEnum.CREATED).json(<SuccessResponse<any>>{
+	return res.status(resCode.CREATED).json(<SuccessResponse<any>>{
 		ok: true,
 		data: newChannel,
 		message: "Channel created",
@@ -158,23 +117,27 @@ export const addUserToChannel = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
-	const { userId, id: channelId } = safeParam.data;
+	const { userId, id } = safeParam.data;
 
 	// verify that channel is existing -----------------------
+	const channel = await prisma.channel.findFirst({ where: { id } });
+	if (!channel) throw new AppError(`Channel does not found`, resCode.NOT_FOUND);
 	// verify that user is existing -----------------------
+	const user = await prisma.user.findFirst({ where: { id } });
+	if (!user) throw new AppError(`Not a user`, resCode.NOT_FOUND);
 
 	const addedUser = await prisma.user.update({
 		where: { id: userId },
-		data: { channels: { connect: { id: channelId } } },
+		data: { channels: { connect: { id: channel.id } } },
 		select: {
 			id: true,
 			username: true,
 			profile_photo: true,
-			channels: { where: { id: channelId }, select: { id: true, name: true } },
+			channels: { where: { id: channel.id }, select: { id: true, name: true } },
 		},
 	});
 
@@ -185,7 +148,7 @@ export const addUserToChannel = async (req: Request, res: Response) => {
 		addedUser
 	);
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
+	return res.status(resCode.OK).json(<SuccessResponse<any>>{
 		ok: true,
 		data: addedUser,
 		message: "User added",
@@ -198,13 +161,26 @@ export const sendChatMessage = async (req: Request, res: Response) => {
 	if (!safeParam.success)
 		throw new AppError(
 			safeParam.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeParam.error
 		);
 
 	const { channel_id, message, sender_id } = safeParam.data;
 
 	// verify that channel is existing and sender is a member of the channel -----------------------
+	const channel = await prisma.channel.findFirst({
+		where: { id: channel_id },
+		include: { members: true },
+	});
+	if (!channel) throw new AppError(`Channel does not found`, resCode.NOT_FOUND);
+
+	const userMember = channel.members.find((member) => member.id == sender_id);
+
+	if (!userMember)
+		throw new AppError(
+			`User not a member of ${channel.name} channel`,
+			resCode.NOT_FOUND
+		);
 
 	const newChat = await prisma.chatMessage.create({
 		data: {
@@ -218,12 +194,12 @@ export const sendChatMessage = async (req: Request, res: Response) => {
 	if (!newChat)
 		throw new AppError(
 			"An error occoured and chat was not created",
-			errCodeEnum.NO_CONTENT
+			resCode.NO_CONTENT
 		);
 
 	emitSocketEvent(req, newChat.channel_id, "newChat", newChat);
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
+	return res.status(resCode.OK).json(<SuccessResponse<any>>{
 		ok: true,
 		data: newChat,
 	});

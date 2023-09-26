@@ -3,7 +3,7 @@ import { ErrorResponse } from "../types";
 import AppError from "./AppError";
 import { JsonWebTokenError } from "jsonwebtoken";
 
-export const errCodeEnum = {
+export const resCode = {
 	OK: 200,
 	CREATED: 201,
 	ACCEPTED: 202,
@@ -53,9 +53,7 @@ export default function errorController(
 		});
 
 	if (error instanceof JsonWebTokenError)
-		return res.status(errCodeEnum.UNAUTHORIZED).json(<
-			ErrorResponse<typeof error>
-		>{
+		return res.status(resCode.UNAUTHORIZED).json(<ErrorResponse<typeof error>>{
 			ok: false,
 			error: {
 				message: "Invalid API key",
@@ -63,9 +61,7 @@ export default function errorController(
 			},
 		});
 
-	return res.status(errCodeEnum.INTERNAL_SERVER_ERROR).json(<
-		ErrorResponse<any>
-	>{
+	return res.status(resCode.INTERNAL_SERVER_ERROR).json(<ErrorResponse<any>>{
 		ok: false,
 		error: {
 			message: "Something went wrong",

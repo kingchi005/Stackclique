@@ -12,14 +12,14 @@ import jwt from "jsonwebtoken";
 import env from "./../../env";
 import { sendEmail } from "./mailcontroller";
 import AppError from "./AppError";
-import { errCodeEnum } from "./errorController";
+import { resCode } from "./errorController";
 
 export const sendOTPEmail = async (req: Request, res: Response) => {
 	const safe = z.object({ email: emailSchema }).safeParse(req.params);
 	if (!safe.success)
 		throw new AppError(
 			safe.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safe.error
 		);
 
@@ -30,7 +30,7 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 	});
 
 	if (emailIsExisting)
-		throw new AppError("Your email is already verified", errCodeEnum.CONFLICT);
+		throw new AppError("Your email is already verified", resCode.CONFLICT);
 
 	const OTP = (() => Math.floor(Math.random() * 900000) + 100000)();
 
@@ -50,7 +50,7 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 	} catch (error) {
 		throw new AppError(
 			"An error occored please try after few minutes",
-			errCodeEnum.INTERNAL_SERVER_ERROR,
+			resCode.INTERNAL_SERVER_ERROR,
 			error
 		);
 	}
@@ -67,11 +67,11 @@ export const sendOTPEmail = async (req: Request, res: Response) => {
 	if (!emailResponse.success)
 		throw new AppError(
 			"An error occored and email was not sent",
-			errCodeEnum.INTERNAL_SERVER_ERROR,
+			resCode.INTERNAL_SERVER_ERROR,
 			emailResponse.details
 		);
 
-	return res.status(errCodeEnum.OK).json(<SuccessResponse<any>>{
+	return res.status(resCode.OK).json(<SuccessResponse<any>>{
 		ok: true,
 		data: {},
 		message: emailResponse.message,
@@ -84,7 +84,7 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 	if (!safe.success)
 		throw new AppError(
 			safe.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safe.error
 		);
 
@@ -95,14 +95,14 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 	if (existingEmail)
 		throw new AppError(
 			`User with email '${email}' already exists`,
-			errCodeEnum.CONFLICT
+			resCode.CONFLICT
 		);
 
 	const existingUsername = await prisma.user.findFirst({ where: { username } });
 	if (existingUsername)
 		throw new AppError(
 			`User with user name '${username}' already exists`,
-			errCodeEnum.CONFLICT
+			resCode.CONFLICT
 		);
 
 	// verify email using OTP
@@ -111,13 +111,13 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 	});
 
 	if (!foundOTP)
-		throw new AppError("Incorrect OTP or email", errCodeEnum.UNAUTHORIZED);
+		throw new AppError("Incorrect OTP or email", resCode.UNAUTHORIZED);
 
 	if (foundOTP.verified)
-		throw new AppError("Your email is already verified", errCodeEnum.CONFLICT);
+		throw new AppError("Your email is already verified", resCode.CONFLICT);
 
 	if (foundOTP.expiredAt < new Date())
-		throw new AppError("OTP has expired", errCodeEnum.NOT_ACCEPTED);
+		throw new AppError("OTP has expired", resCode.NOT_ACCEPTED);
 
 	// user verified
 	await prisma.userEmailVerificationToken.update({
@@ -135,7 +135,7 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 			data: { email, password: hashedPassword, username },
 			select: { email: true, username: true, id: true },
 		});
-		return res.status(errCodeEnum.CREATED).json(<SuccessResponse<any>>{
+		return res.status(resCode.CREATED).json(<SuccessResponse<any>>{
 			ok: true,
 			message: "Registreation successful",
 			data: newUser,
@@ -151,7 +151,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 	if (!safeInput.success)
 		throw new AppError(
 			safeInput.error.issues.map((d) => d.message).join(", "),
-			errCodeEnum.BAD_REQUEST,
+			resCode.BAD_REQUEST,
 			safeInput.error
 		);
 
@@ -163,7 +163,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 		select: { id: true, username: true, email: true, password: true },
 	});
 
-	if (!user) throw new AppError("Incorrect email", errCodeEnum.UNAUTHORIZED);
+	if (!user) throw new AppError("Incorrect email", resCode.UNAUTHORIZED);
 
 	const authorised = await bcrypt.compareSync(password, user.password);
 
@@ -174,9 +174,7 @@ export const handleLogin = async (req: Request, res: Response) => {
 		env.HASH_SECRET + ""
 	);
 	const { password: pass, ...userData } = user;
-	return res.status(errCodeEnum.ACCEPTED).json(<
-		SuccessResponse<typeof userData>
-	>{
+	return res.status(resCode.ACCEPTED).json(<SuccessResponse<typeof userData>>{
 		ok: true,
 		message: "Login successful",
 		data: {
