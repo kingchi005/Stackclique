@@ -123,7 +123,7 @@ const initializeSocketIO = (
 				console.log("User connected 🗼. userId: ", user.id.toString());
 
 				// Common events that needs to be mounted on the initialization
-				// mountJoinChatEvent(socket);
+				mountJoinChatEvent(socket);
 				mountParticipantTypingEvent(socket);
 				mountParticipantStoppedTypingEvent(socket);
 

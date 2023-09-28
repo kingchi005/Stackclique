@@ -10,6 +10,7 @@ import { authRoute, connectRoute, courseRoute, userRoute } from "./routes";
 import errorController from "./controllers/errorController";
 import swaggerConfig from "./api-doc/swagger-config";
 import { authenticate } from "./controllers/middleWare";
+import { initializeSocketIO } from "./socket";
 // import { rateLimit } from "express-rate-limit";
 
 const app: Application = express();
@@ -70,6 +71,8 @@ app.use("/auth", authRoute);
 
 app.use("/courses", courseRoute);
 app.use("/user", userRoute);
+initializeSocketIO(io);
+
 app.use("/connect", connectRoute);
 app.use(errorController);
 

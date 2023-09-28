@@ -7,6 +7,7 @@ const connectRoute = (0, express_1.Router)();
 connectRoute.get("/channels", (0, errorController_1.tryCatchWapper)(connectController_1.getAllChannels));
 connectRoute.get("/channels/:userId", (0, errorController_1.tryCatchWapper)(connectController_1.getUserChannels));
 connectRoute.post("/channel", (0, errorController_1.tryCatchWapper)(connectController_1.createChannel));
+connectRoute.get("/channel/:id", (0, errorController_1.tryCatchWapper)(connectController_1.getChannelDetails));
 connectRoute.post("/channel/:id/:userId", (0, errorController_1.tryCatchWapper)(connectController_1.addUserToChannel));
 connectRoute.post("/chat-message", (0, errorController_1.tryCatchWapper)(connectController_1.sendChatMessage));
 exports.default = connectRoute;

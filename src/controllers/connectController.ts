@@ -111,6 +111,42 @@ export const createChannel = async (req: Request, res: Response) => {
 	});
 };
 
+export const getChannelDetails = async (req: Request, res: Response) => {
+	const safeParam = z.object({ id: z.string() }).safeParse(req.params);
+
+	if (!safeParam.success)
+		throw new AppError(
+			safeParam.error.issues.map((d) => d.message).join(", "),
+			resCode.BAD_REQUEST,
+			safeParam.error
+		);
+
+	const { id } = safeParam.data;
+
+	const channel = await prisma.channel.findFirst({
+		where: { id },
+		select: {
+			id: true,
+			name: true,
+			profile_photo: true,
+			required_user_level: true,
+			created_at: true,
+			members: true,
+			chatsMessages: {
+				include: {
+					sender: { select: { profile_photo: true, username: true } },
+				},
+			},
+			_count: { select: { members: true } },
+		},
+	});
+
+	return res.status(resCode.OK).json(<SuccessResponse<typeof channel>>{
+		ok: true,
+		data: channel,
+	});
+};
+
 export const addUserToChannel = async (req: Request, res: Response) => {
 	const safeParam = addUserToChannelSchema.safeParse(req.params);
 
@@ -191,7 +227,9 @@ export const sendChatMessage = async (req: Request, res: Response) => {
 			channel_id,
 			sender_id,
 		},
-		include: {},
+		include: {
+			sender: { select: { profile_photo: true, username: true } },
+		},
 	});
 
 	if (!newChat)

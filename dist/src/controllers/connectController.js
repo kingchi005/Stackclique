@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendChatMessage = exports.addUserToChannel = exports.createChannel = exports.getUserChannels = exports.getAllChannels = void 0;
+exports.sendChatMessage = exports.addUserToChannel = exports.getChannelDetails = exports.createChannel = exports.getUserChannels = exports.getAllChannels = void 0;
 const index_1 = __importDefault(require("../../prisma/index"));
 const errorController_1 = require("./errorController");
 const AppError_1 = __importDefault(require("./AppError"));
@@ -82,6 +82,34 @@ const createChannel = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     });
 });
 exports.createChannel = createChannel;
+const getChannelDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const safeParam = zod_1.z.object({ id: zod_1.z.string() }).safeParse(req.params);
+    if (!safeParam.success)
+        throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
+    const { id } = safeParam.data;
+    const channel = yield index_1.default.channel.findFirst({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            profile_photo: true,
+            required_user_level: true,
+            created_at: true,
+            members: true,
+            chatsMessages: {
+                include: {
+                    sender: { select: { profile_photo: true, username: true } },
+                },
+            },
+            _count: { select: { members: true } },
+        },
+    });
+    return res.status(errorController_1.resCode.OK).json({
+        ok: true,
+        data: channel,
+    });
+});
+exports.getChannelDetails = getChannelDetails;
 const addUserToChannel = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const safeParam = inputSchema_1.addUserToChannelSchema.safeParse(req.params);
     if (!safeParam.success)
@@ -133,7 +161,9 @@ const sendChatMessage = (req, res) => __awaiter(void 0, void 0, void 0, function
             channel_id,
             sender_id,
         },
-        include: {},
+        include: {
+            sender: { select: { profile_photo: true, username: true } },
+        },
     });
     if (!newChat)
         throw new AppError_1.default("An error occoured and chat was not created", errorController_1.resCode.NO_CONTENT);

@@ -8,9 +8,9 @@ export const ChatEventEnum = Object.freeze({
 	// ? when participant gets removed from channel, chat gets deleted or leaves a channel
 	LEAVE_CHAT_EVENT: "leaveChat",
 	// ? when admin updates creates a new channel
-	NEW_CHANNEL_EVENT: "updateChannelName",
+	NEW_CHANNEL_EVENT: "newChannel",
 	// ? when admin updates a channel name
-	UPDATE_CHANNEL_NAME_EVENT: "newChannel",
+	UPDATE_CHANNEL_NAME_EVENT: "updateChannelName",
 	// ? when new message is received
 	MESSAGE_RECEIVED_EVENT: "messageReceived",
 	// ? when there is new one on one chat, new channel chat or user gets added in the channel

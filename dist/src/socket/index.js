@@ -78,6 +78,7 @@ const initializeSocketIO = (io) => {
             socket.join(user.id.toString());
             socket.emit(constants_1.ChatEventEnum.CONNECTED_EVENT);
             console.log("User connected 🗼. userId: ", user.id.toString());
+            mountJoinChatEvent(socket);
             mountParticipantTypingEvent(socket);
             mountParticipantStoppedTypingEvent(socket);
             socket.on(constants_1.ChatEventEnum.DISCONNECT_EVENT, () => {

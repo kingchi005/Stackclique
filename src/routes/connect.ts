@@ -4,6 +4,7 @@ import {
 	addUserToChannel,
 	createChannel,
 	getAllChannels,
+	getChannelDetails,
 	getUserChannels,
 	sendChatMessage,
 } from "../controllers/connectController";
@@ -16,6 +17,8 @@ connectRoute.get("/channels", tryCatchWapper(getAllChannels));
 connectRoute.get("/channels/:userId", tryCatchWapper(getUserChannels));
 
 connectRoute.post("/channel", /* onlyAdmins, */ tryCatchWapper(createChannel));
+
+connectRoute.get("/channel/:id", tryCatchWapper(getChannelDetails));
 
 connectRoute.post(
 	"/channel/:id/:userId",
