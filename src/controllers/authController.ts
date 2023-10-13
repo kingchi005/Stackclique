@@ -167,7 +167,8 @@ export const handleLogin = async (req: Request, res: Response) => {
 
 	const authorised = await bcrypt.compareSync(password, user.password);
 
-	if (!authorised) throw new AppError("Incorrect password", 401);
+	if (!authorised)
+		throw new AppError("Incorrect password", resCode.UNAUTHORIZED);
 
 	const token = jwt.sign(
 		{ id: user.id, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 },
