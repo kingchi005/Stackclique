@@ -57,9 +57,11 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 // API Doc endpoint
-app.get("/", (req, res) => {
-	res.status(300).json({ msg: "welcome to the stackclique api" });
-});
+// app.get("/", (req, res) => {
+// 	res.status(300).json({ msg: "welcome to the stackclique api" });
+// });
+app.use("/", swaggerUI.serve);
+app.get("/", swaggerUI.setup(swaggerConfig));
 app.use("/dev/api-docs", swaggerUI.serve);
 app.get("/dev/api-docs", swaggerUI.setup(swaggerConfig));
 

@@ -39,9 +39,8 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json({ limit: "16kb" }));
 app.use(express_1.default.urlencoded({ extended: true, limit: "16kb" }));
-app.get("/", (req, res) => {
-    res.status(300).json({ msg: "welcome to the stackclique api" });
-});
+app.use("/", swagger_ui_express_1.default.serve);
+app.get("/", swagger_ui_express_1.default.setup(swagger_config_1.default));
 app.use("/dev/api-docs", swagger_ui_express_1.default.serve);
 app.get("/dev/api-docs", swagger_ui_express_1.default.setup(swagger_config_1.default));
 app.use("/auth", routes_1.authRoute);
