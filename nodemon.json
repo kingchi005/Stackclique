@@ -1,5 +1,5 @@
 {
-	"watch": ["src"],
+	"watch": ["src", "playground"],
 	"ext": "ts",
-	"exec": "tsc && node dist/src/server"
+	"exec": "npx ts-node playground/stack"
 }

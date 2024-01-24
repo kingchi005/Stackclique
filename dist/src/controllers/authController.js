@@ -127,7 +127,7 @@ const handleLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         throw new AppError_1.default("Incorrect email", errorController_1.resCode.UNAUTHORIZED);
     const authorised = yield bcrypt_1.default.compareSync(password, user.password);
     if (!authorised)
-        throw new AppError_1.default("Incorrect password", 401);
+        throw new AppError_1.default("Incorrect password", errorController_1.resCode.UNAUTHORIZED);
     const token = jsonwebtoken_1.default.sign({ id: user.id, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 }, env_1.default.HASH_SECRET + "");
     const { password: pass } = user, userData = __rest(user, ["password"]);
     return res.status(errorController_1.resCode.ACCEPTED).json({
