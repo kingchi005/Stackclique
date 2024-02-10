@@ -51,7 +51,6 @@ exports.createUserSchema = zod_1.z.object({
 });
 exports.emailSignupInputSchema = zod_1.z.object({
     email: exports.emailSchema,
-    otp: otpSchema,
     username: usernameSchema,
     password: passwordSchema,
 });

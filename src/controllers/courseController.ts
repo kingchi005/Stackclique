@@ -25,6 +25,7 @@ export const getCourseDetails = async (req: Request, res: Response) => {
 					id: true,
 					name: true,
 					title: true,
+					content: true,
 					profile_photo: true,
 					cover_photo: true,
 				},
@@ -55,7 +56,7 @@ export const getCourseByLimit = async (req: Request, res: Response) => {
 	const { p } = safeParam.data;
 
 	const courses = await prisma.course.findMany({
-		take: +p,
+		take: 15,
 
 		// },
 		select: {

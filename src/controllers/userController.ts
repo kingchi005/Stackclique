@@ -35,7 +35,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
 							title: true,
 							about: true,
 							profile_photo: true,
-							_count: { select: { enrollement: {}, reviews: {} } },
+							_count: { select: { enrollement: {}, reviews: {}, module: {} } },
 						},
 					},
 					completed_modules: true,

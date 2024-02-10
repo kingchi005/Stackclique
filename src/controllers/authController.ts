@@ -88,7 +88,7 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 			safe.error
 		);
 
-	const { email, otp, password, username } = safe.data;
+	const { email, password, username } = safe.data;
 
 	// check if user already exists-------------------------
 	const existingEmail = await prisma.user.findFirst({ where: { email } });
@@ -106,24 +106,24 @@ export const handleSignupByEmail = async (req: Request, res: Response) => {
 		);
 
 	// verify email using OTP
-	const foundOTP = await prisma.userEmailVerificationToken.findUnique({
-		where: { email, otp },
-	});
+	// const foundOTP = await prisma.userEmailVerificationToken.findUnique({
+	// 	where: { email, otp },
+	// });
 
-	if (!foundOTP)
-		throw new AppError("Incorrect OTP or email", resCode.UNAUTHORIZED);
+	// if (!foundOTP)
+	// 	throw new AppError("Incorrect OTP or email", resCode.UNAUTHORIZED);
 
-	if (foundOTP.verified)
-		throw new AppError("Your email is already verified", resCode.CONFLICT);
+	// if (foundOTP.verified)
+	// 	throw new AppError("Your email is already verified", resCode.CONFLICT);
 
-	if (foundOTP.expiredAt < new Date())
-		throw new AppError("OTP has expired", resCode.NOT_ACCEPTED);
+	// if (foundOTP.expiredAt < new Date())
+	// 	throw new AppError("OTP has expired", resCode.NOT_ACCEPTED);
 
-	// user verified
-	await prisma.userEmailVerificationToken.update({
-		data: { verified: true },
-		where: { email, otp },
-	});
+	// // user verified
+	// await prisma.userEmailVerificationToken.update({
+	// 	data: { verified: true },
+	// 	where: { email, otp },
+	// });
 
 	// hash user password here -------------------------------------
 	const salt = bcrypt.genSaltSync(10);

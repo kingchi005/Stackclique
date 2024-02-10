@@ -76,26 +76,13 @@ const handleSignupByEmail = (req, res) => __awaiter(void 0, void 0, void 0, func
     const safe = inputSchema_1.emailSignupInputSchema.safeParse(req.body);
     if (!safe.success)
         throw new AppError_1.default(safe.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safe.error);
-    const { email, otp, password, username } = safe.data;
+    const { email, password, username } = safe.data;
     const existingEmail = yield prisma_1.default.user.findFirst({ where: { email } });
     if (existingEmail)
         throw new AppError_1.default(`User with email '${email}' already exists`, errorController_1.resCode.CONFLICT);
     const existingUsername = yield prisma_1.default.user.findFirst({ where: { username } });
     if (existingUsername)
         throw new AppError_1.default(`User with user name '${username}' already exists`, errorController_1.resCode.CONFLICT);
-    const foundOTP = yield prisma_1.default.userEmailVerificationToken.findUnique({
-        where: { email, otp },
-    });
-    if (!foundOTP)
-        throw new AppError_1.default("Incorrect OTP or email", errorController_1.resCode.UNAUTHORIZED);
-    if (foundOTP.verified)
-        throw new AppError_1.default("Your email is already verified", errorController_1.resCode.CONFLICT);
-    if (foundOTP.expiredAt < new Date())
-        throw new AppError_1.default("OTP has expired", errorController_1.resCode.NOT_ACCEPTED);
-    yield prisma_1.default.userEmailVerificationToken.update({
-        data: { verified: true },
-        where: { email, otp },
-    });
     const salt = bcrypt_1.default.genSaltSync(10);
     const hashedPassword = yield bcrypt_1.default.hashSync(password, salt);
     try {

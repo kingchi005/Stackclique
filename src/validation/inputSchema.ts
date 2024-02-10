@@ -65,7 +65,7 @@ export const createUserSchema = z.object({
 
 export const emailSignupInputSchema = z.object({
 	email: emailSchema,
-	otp: otpSchema,
+	// otp: otpSchema,
 	username: usernameSchema,
 	password: passwordSchema,
 });

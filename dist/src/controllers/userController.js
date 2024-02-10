@@ -40,7 +40,7 @@ const getUserDetails = (req, res) => __awaiter(void 0, void 0, void 0, function*
                             title: true,
                             about: true,
                             profile_photo: true,
-                            _count: { select: { enrollement: {}, reviews: {} } },
+                            _count: { select: { enrollement: {}, reviews: {}, module: {} } },
                         },
                     },
                     completed_modules: true,

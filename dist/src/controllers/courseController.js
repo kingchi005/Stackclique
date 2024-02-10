@@ -31,6 +31,7 @@ const getCourseDetails = (req, res) => __awaiter(void 0, void 0, void 0, functio
                     id: true,
                     name: true,
                     title: true,
+                    content: true,
                     profile_photo: true,
                     cover_photo: true,
                 },
@@ -53,7 +54,7 @@ const getCourseByLimit = (req, res) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(safeParam.error.issues.map((d) => d.message).join(", "), errorController_1.resCode.BAD_REQUEST, safeParam.error);
     const { p } = safeParam.data;
     const courses = yield index_1.default.course.findMany({
-        take: +p,
+        take: 15,
         select: {
             id: true,
             title: true,
