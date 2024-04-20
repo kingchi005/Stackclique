@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/staczssq/app
+    - /bin/cp -R images $DEPLOYPATH
